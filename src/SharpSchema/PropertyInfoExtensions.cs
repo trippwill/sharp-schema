@@ -3,9 +3,6 @@
 
 using System.Reflection;
 using Humanizer;
-using Json.More;
-using Json.Schema;
-using Microsoft;
 
 namespace SharpSchema;
 
@@ -54,98 +51,6 @@ internal static class PropertyInfoExtensions
         }
 
         return name.Camelize();
-    }
-
-    /// <summary>
-    /// Sets the range for the specified property in the JSON schema.
-    /// </summary>
-    /// <param name="property">The property to set the range for.</param>
-    /// <param name="propertySchema">The JSON schema builder for the property.</param>
-    public static void SetRange(this PropertyInfo property, JsonSchemaBuilder propertySchema)
-    {
-        Type type = property.PropertyType;
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-        {
-            type = Nullable.GetUnderlyingType(type) ?? Assumes.NotReachable<Type>();
-        }
-
-        // if the property type is a number and has a range, set the minimum and maximum values
-        if (type.IsNumber()
-            && property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.RangeAttribute") is { ConstructorArguments: { Count: 2 } rangeArguments })
-        {
-            if (rangeArguments[0].Value is int minInt)
-            {
-                propertySchema
-                    .Minimum(minInt)
-                    .Maximum((int)rangeArguments[1].Value!);
-            }
-            else if (rangeArguments[0].Value is double minDouble)
-            {
-                propertySchema
-                    .Minimum(decimal.CreateSaturating(minDouble))
-                    .Maximum(decimal.CreateSaturating((double)rangeArguments[1].Value!));
-            }
-            else
-            {
-                Assumes.NotReachable();
-            }
-        }
-
-        // if the property is a string
-        if (type == typeof(string))
-        {
-            // if the property has a regular expression attribute, set the pattern
-            if (property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.RegularExpressionAttribute") is { ConstructorArguments: { Count: 1 } regexArguments })
-            {
-                propertySchema.Pattern((string)regexArguments[0].Value!);
-            }
-
-            // if the property has a string length attribute, set the minimum and maximum lengths
-            if (property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.StringLengthAttribute") is { ConstructorArguments: { Count: 1 } lengthArguments })
-            {
-                if (lengthArguments[0].Value is uint length)
-                {
-                    propertySchema
-                        .MinLength(length)
-                        .MaxLength(length);
-                }
-                else
-                {
-                    Assumes.NotReachable();
-                }
-            }
-
-            // if the property has a max length attribute, set the maximum length
-            if (property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.MaxLengthAttribute") is { ConstructorArguments: { Count: 1 } maxLengthArguments })
-            {
-                if (maxLengthArguments[0].Value is uint maxLength)
-                {
-                    propertySchema.MaxLength(maxLength);
-                }
-                else
-                {
-                    Assumes.NotReachable();
-                }
-            }
-
-            // if the property has a min length attribute, set the minimum length
-            if (property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.MinLengthAttribute") is { ConstructorArguments: { Count: 1 } minLengthArguments })
-            {
-                if (minLengthArguments[0].Value is uint minLength)
-                {
-                    propertySchema.MinLength(minLength);
-                }
-                else
-                {
-                    Assumes.NotReachable();
-                }
-            }
-        }
     }
 
     /// <summary>

@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Reflection;
-using Humanizer;
 using Json.Schema;
 
 namespace SharpSchema;
@@ -13,35 +12,15 @@ namespace SharpSchema;
 internal class ObjectSchemaGenerator(Type type, Dictionary<string, JsonSchemaBuilder> defs)
 {
     /// <summary>
-    /// Gets the JSON schema for the specified object type.
+    /// Adds an object schema to the <see cref="JsonSchemaBuilder"/>.
     /// </summary>
-    /// <param name="isTopLevel">Indicates whether the object is a top-level schema.</param>
-    /// <param name="depth">The depth of the schema.</param>
-    /// <returns>The JSON schema for the object.</returns>
-    public JsonSchemaBuilder GetSchema(bool isTopLevel, int depth)
+    /// <param name="builder">The <see cref="JsonSchemaBuilder"/> instance.</param>
+    /// <param name="depth">The current depth of the object graph.</param>
+    /// <returns>The updated <see cref="JsonSchemaBuilder"/> instance.</returns>
+    public JsonSchemaBuilder AddObject(JsonSchemaBuilder builder, int depth)
     {
-        JsonSchemaBuilder typeSchema = this.CreateObjectSchema(depth);
-
-        if (isTopLevel)
-        {
-            return typeSchema;
-        }
-
-        string defName = type.ToDefinitionName();
-        if (defs.TryAdd(defName, typeSchema))
-        {
-            this.AddToInterfaces(defName);
-        }
-
-        return new JsonSchemaBuilder()
-            .Ref($"#/$defs/{defName}");
-    }
-
-    private JsonSchemaBuilder CreateObjectSchema(int depth)
-    {
-        JsonSchemaBuilder typeSchema = new JsonSchemaBuilder()
-            .Comment(type.Name)
-            .Type(SchemaValueType.Object);
+        builder = builder
+            .Comment(type.Name);
 
         if (type.IsAbstract)
         {
@@ -49,25 +28,26 @@ internal class ObjectSchemaGenerator(Type type, Dictionary<string, JsonSchemaBui
 
             var concreteTypes = assembly.GetTypes()
                 .Where(t => t.IsSubclassOf(type) && !t.IsAbstract)
-                .Select(t => t.ToJsonSchemaInternal(defs, depth).Build())
+                .Select(t => new JsonSchemaBuilder().AddType(t, defs, depth).Build())
                 .ToList();
 
             if (concreteTypes.Count == 0)
             {
-                return typeSchema;
+                return builder;
             }
 
-            return typeSchema
+            return builder
                 .OneOf(concreteTypes);
         }
 
         Dictionary<string, JsonSchema> propertySchemas = this.GetObjectProperties(depth, out IEnumerable<string>? requiredProperties);
-        typeSchema = typeSchema
+        builder = builder
+            .Type(SchemaValueType.Object)
             .Properties(propertySchemas)
             .Required(requiredProperties)
             .AdditionalProperties(false);
 
-        return typeSchema;
+        return builder;
     }
 
     private Dictionary<string, JsonSchema> GetObjectProperties(int depth, out IEnumerable<string> required)
@@ -92,7 +72,15 @@ internal class ObjectSchemaGenerator(Type type, Dictionary<string, JsonSchemaBui
 
             string normalizedName = property.GetPropertyName();
 
-            JsonSchemaBuilder propertySchema = this.CreatePropertySchema(normalizedName, property, depth, ref requiredProperties);
+            JsonSchemaBuilder propertySchema = new JsonSchemaBuilder()
+                .AddPropertyInfo(property, defs, depth, out bool isRequired);
+
+            if (isRequired)
+            {
+                requiredProperties ??= [];
+                requiredProperties.Add(normalizedName);
+            }
+
             propertySchemas[normalizedName] = propertySchema;
         }
 
@@ -119,100 +107,19 @@ internal class ObjectSchemaGenerator(Type type, Dictionary<string, JsonSchemaBui
                 continue;
             }
 
-            JsonSchemaBuilder propertySchema = this.CreatePropertySchema(normalizedName, property, depth, ref requiredProperties);
+            JsonSchemaBuilder propertySchema = new JsonSchemaBuilder()
+                .AddPropertyInfo(property, defs, depth, out bool isRequired);
+
+            if (isRequired)
+            {
+                requiredProperties ??= [];
+                requiredProperties.Add(normalizedName);
+            }
+
             propertySchemas[normalizedName] = propertySchema;
         }
 
         required = requiredProperties ?? Enumerable.Empty<string>();
         return propertySchemas;
-    }
-
-    private JsonSchemaBuilder CreatePropertySchema(string normalizedName, PropertyInfo property, int depth, ref List<string>? requiredProperties)
-    {
-        JsonSchemaBuilder propertySchema = property.PropertyType
-            .ToJsonSchemaInternal(
-                defs,
-                depth,
-                isTopLevel: false,
-                propertyAttributeData: property.GetCustomAttributesData());
-
-        property.SetRange(propertySchema);
-
-        if (property.IsRequired(out bool isNullable))
-        {
-            requiredProperties ??= [];
-            requiredProperties.Add(normalizedName);
-
-            if (isNullable)
-            {
-                propertySchema = new JsonSchemaBuilder()
-                    .OneOf(propertySchema, new JsonSchemaBuilder()
-                        .Type(SchemaValueType.Null));
-            }
-        }
-
-        // if the property has a DescriptionAttribute, add it to the schema
-        CustomAttributeData? displayData = property.GetCustomAttributesData()
-            .FirstOrDefault(a => a.AttributeType.FullName == "System.ComponentModel.DataAnnotations.DisplayAttribute");
-
-        propertySchema = propertySchema
-            .Title(property.Name.Titleize());
-
-        if (displayData is not null)
-        {
-            CustomAttributeNamedArgument nameArgument = displayData.NamedArguments.FirstOrDefault(descriptionData => descriptionData.MemberName == "Name");
-            if (nameArgument != default)
-            {
-                string name = (string)nameArgument.TypedValue.Value!;
-                propertySchema = propertySchema.Title(name);
-            }
-
-            CustomAttributeNamedArgument descriptionArgument = displayData.NamedArguments.FirstOrDefault(descriptionData => descriptionData.MemberName == "Description");
-            if (descriptionArgument != default)
-            {
-                string description = (string)descriptionArgument.TypedValue.Value!;
-                propertySchema = propertySchema.Description(description);
-            }
-        }
-
-        return propertySchema;
-    }
-
-    private void AddToInterfaces(string defName)
-    {
-        foreach (Type iface in type.GetInterfaces())
-        {
-            if (iface.GetCustomAttributesData()
-                .Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute"))
-            {
-                continue;
-            }
-
-            if (iface.GetCustomAttributesData()
-                .Any(a => a.AttributeType.FullName == "System.Runtime.InteropServices.ComVisibleAttribute"))
-            {
-                continue;
-            }
-
-            string ifaceDefName = iface.ToDefinitionName();
-            if (defs.TryGetValue(ifaceDefName, out JsonSchemaBuilder? ifaceSchemaBuilder))
-            {
-                JsonSchema ifaceSchema = ifaceSchemaBuilder;
-
-                IReadOnlyCollection<JsonSchema>? existingOneOf = ifaceSchema.GetOneOf();
-                List<JsonSchema> oneOf = existingOneOf is null ? new() : new(existingOneOf);
-                oneOf.Add(new JsonSchemaBuilder()
-                    .Ref($"#/$defs/{defName}"));
-
-                defs[ifaceDefName] = ifaceSchemaBuilder
-                    .OneOf(oneOf);
-            }
-            else
-            {
-                defs.Add(ifaceDefName, new JsonSchemaBuilder()
-                    .OneOf(new JsonSchemaBuilder()
-                        .Ref($"#/$defs/{defName}")));
-            }
-        }
     }
 }

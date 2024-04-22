@@ -375,6 +375,7 @@ public class TypeExtensionsTests(ITestOutputHelper output)
         Assert.False(properties.ContainsKey("IgnoredProperty".Camelize()));
         Assert.Equal(SchemaValueType.String, properties["Name".Camelize()].GetJsonType());
         Assert.Equal(SchemaValueType.Integer, properties["Age".Camelize()].GetJsonType());
+        Assert.Equal(new Uri("https://schema.org/object-with-properties"), schema.GetId());
     }
 
     [Theory]
@@ -481,12 +482,138 @@ public class TypeExtensionsTests(ITestOutputHelper output)
         Assert.Contains("complexObjectMap", schema.GetRequired()!);
     }
 
+    [Theory]
+    [MemberData(nameof(SchemaEvaluate_WithInput_ReturnsExpectedResult_Data))]
+    public void SchemaEvaluate_WithInput_ReturnsExpectedResult(string caseName, string input, bool expectedIsValid)
+    {
+        _ = caseName;
+
+        // Arrange
+        JsonSchema schema = typeof(ObjectWithProperties).ToJsonSchema();
+
+        // Act
+        EvaluationResults results = schema.Evaluate(JsonDocument.Parse(input).RootElement, new EvaluationOptions()
+        {
+            OutputFormat = OutputFormat.List,
+        });
+
+        if (!results.IsValid)
+        {
+            this.Output.WriteLine(JsonSerializer.Serialize(results, this.writeOptions));
+        }
+
+        // Assert
+        Assert.Equal(expectedIsValid, results.IsValid);
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1204:Static elements should appear before instance elements", Justification = "Test Code")]
+    public static TheoryData<string, string, bool> SchemaEvaluate_WithInput_ReturnsExpectedResult_Data() => new()
+    {
+        {
+            "Name Only",
+            /* lang=json */"""
+            {
+                "name": "Test Name"
+            }
+            """,
+            false
+        },
+        {
+            "Age Only",
+            /* lang=json */"""
+            {
+                "age": 42
+            }
+            """,
+            false
+        },
+        {
+            "Name, Age as String",
+            /* lang=json */"""
+            {
+                "name": "Test Name",
+                "age": "42"
+            }
+            """,
+            false
+        },
+        {
+            "Name and Age",
+            /* lang=json */"""
+            {
+                "name": "Test Name",
+                "age": 42
+            }
+            """,
+            true
+        },
+        {
+            "Name, Age, and Height",
+            /* lang=json */"""
+            {
+                "name": "Test Name",
+                "age": 42,
+                "height": 5.8
+            }
+            """,
+            false
+        },
+        {
+            "Name, Age, and Ignored Property",
+            /* lang=json */"""
+            {
+                "name": "Test Name",
+                "age": 42,
+                "ignoredProperty": 3.14
+            }
+            """,
+            false
+        },
+        {
+            "Name, Age, and Private Property",
+            /* lang=json */"""
+            {
+                "name": "Test Name",
+                "age": 42,
+                "privateProperty": "Private Value"
+            }
+            """,
+            false
+        },
+        {
+            "Name, Age, and Included Private Property",
+            /* lang=json */"""
+            {
+                "name": "Test Name",
+                "age": 42,
+                "includedPrivateProperty": "Included Private Value"
+            }
+            """,
+            true
+        },
+        {
+            "Name, Age, Included Private Property as null",
+            /* lang=json */"""
+            {
+                "name": "Test Name",
+                "age": 42,
+                "includedPrivateProperty": null
+            }
+            """,
+            true
+        },
+    };
+
     private void OutputSchema(JsonSchema schema)
     {
-        this.Output.WriteLine(JsonSerializer.Serialize(schema.ToJsonDocument().RootElement, this.writeOptions));
+        this.Output.WriteLine(
+            JsonSerializer.Serialize(
+                schema.ToJsonDocument().RootElement,
+                this.writeOptions));
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test Code")]
+    [Description("A class with an age property")]
     private interface IHasAge
     {
         int Age { get; }
@@ -509,8 +636,10 @@ public class TypeExtensionsTests(ITestOutputHelper output)
         public IEnumerable<ConcreteClass1> ConcreteClass1List { get; } = [];
     }
 
+    [DisplayName("https://schema.org/object-with-properties")]
     private class ObjectWithProperties : IHasAge
     {
+        [Description("This is for a $comment property")]
         public string Name { get; set; } = string.Empty;
 
         [Display(Name = "Object Age", Description = "The age of the object")]

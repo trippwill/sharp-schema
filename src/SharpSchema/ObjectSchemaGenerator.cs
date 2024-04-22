@@ -19,8 +19,7 @@ internal class ObjectSchemaGenerator(Type type, Dictionary<string, JsonSchemaBui
     /// <returns>The updated <see cref="JsonSchemaBuilder"/> instance.</returns>
     public JsonSchemaBuilder AddObject(JsonSchemaBuilder builder, int depth)
     {
-        builder = builder
-            .Comment(type.Name);
+        builder = builder.AddTypeAnnotations(type);
 
         if (type.IsAbstract)
         {
@@ -72,20 +71,13 @@ internal class ObjectSchemaGenerator(Type type, Dictionary<string, JsonSchemaBui
 
             string normalizedName = property.GetPropertyName();
 
-            JsonSchemaBuilder propertySchema = new JsonSchemaBuilder()
-                .AddPropertyInfo(property, defs, depth, out bool isRequired);
-
-            if (isRequired)
-            {
-                requiredProperties ??= [];
-                requiredProperties.Add(normalizedName);
-            }
-
-            propertySchemas[normalizedName] = propertySchema;
+            propertySchemas[normalizedName] = GetPropertySchema(property, normalizedName, defs, depth, ref requiredProperties);
         }
 
         // add non-public properties with JsonIncludeAttribute
         properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+        propertySchemas.EnsureCapacity(propertySchemas.Count + properties.Length);
+
         foreach (PropertyInfo property in properties)
         {
             // skip properties that have already been added
@@ -107,6 +99,17 @@ internal class ObjectSchemaGenerator(Type type, Dictionary<string, JsonSchemaBui
                 continue;
             }
 
+            propertySchemas[normalizedName] = GetPropertySchema(property, normalizedName, defs, depth, ref requiredProperties);
+        }
+
+        required = requiredProperties ?? Enumerable.Empty<string>();
+
+        return propertySchemas;
+
+        //// -- local functions --
+
+        static JsonSchemaBuilder GetPropertySchema(PropertyInfo property, string normalizedName, Dictionary<string, JsonSchemaBuilder> defs, int depth, ref List<string>? requiredProperties)
+        {
             JsonSchemaBuilder propertySchema = new JsonSchemaBuilder()
                 .AddPropertyInfo(property, defs, depth, out bool isRequired);
 
@@ -116,10 +119,7 @@ internal class ObjectSchemaGenerator(Type type, Dictionary<string, JsonSchemaBui
                 requiredProperties.Add(normalizedName);
             }
 
-            propertySchemas[normalizedName] = propertySchema;
+            return propertySchema;
         }
-
-        required = requiredProperties ?? Enumerable.Empty<string>();
-        return propertySchemas;
     }
 }

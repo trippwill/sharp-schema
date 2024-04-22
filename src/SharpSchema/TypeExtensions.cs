@@ -18,8 +18,17 @@ public static class TypeExtensions
     /// <returns>The <see cref="JsonSchemaBuilder"/> representing the JSON schema.</returns>
     public static JsonSchemaBuilder ToJsonSchema(this Type type)
     {
+        Requires.NotNull(type, nameof(type));
+
         JsonSchemaBuilder builder = new JsonSchemaBuilder()
-            .Schema("https://json-schema.org/draft-07/schema");
+            .Schema("http://json-schema.org/draft-07/schema#");
+
+        // if the type has a DisplayName attribute, use it as the $id
+        if (type.GetCustomAttributesData()
+            .FirstOrDefault(a => a.AttributeType.FullName == "System.ComponentModel.DisplayNameAttribute") is { ConstructorArguments: { Count: 1 } arguments })
+        {
+            builder = builder.Id((string)arguments[0].Value!);
+        }
 
         return type.ToJsonSchema(builder);
     }
@@ -33,7 +42,7 @@ public static class TypeExtensions
     public static JsonSchemaBuilder ToJsonSchema(this Type type, JsonSchemaBuilder builder)
     {
         Dictionary<string, JsonSchemaBuilder> defs = [];
-        builder = builder.AddType(type, defs, depth: 0, isTopLevel: true);
+        builder = builder.AddType(type, defs, isTopLevel: true);
 
         if (defs.Count > 0)
         {
@@ -100,12 +109,6 @@ public static class TypeExtensions
                 continue;
             }
 
-            if (iface.GetCustomAttributesData()
-                .Any(a => a.AttributeType.FullName == "System.Runtime.InteropServices.ComVisibleAttribute"))
-            {
-                continue;
-            }
-
             string ifaceDefName = iface.ToDefinitionName();
             if (defs.TryGetValue(ifaceDefName, out JsonSchemaBuilder? ifaceSchemaBuilder))
             {
@@ -121,9 +124,12 @@ public static class TypeExtensions
             }
             else
             {
-                defs.Add(ifaceDefName, new JsonSchemaBuilder()
+                ifaceSchemaBuilder = new JsonSchemaBuilder()
+                    .AddTypeAnnotations(iface)
                     .OneOf(new JsonSchemaBuilder()
-                        .Ref($"#/$defs/{defName}")));
+                        .Ref($"#/$defs/{defName}"));
+
+                defs.Add(ifaceDefName, ifaceSchemaBuilder);
             }
         }
     }

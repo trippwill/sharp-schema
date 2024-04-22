@@ -20,27 +20,27 @@ public static class JsonSchemaBuilderExtensions
 
     private static readonly Dictionary<Type, Func<JsonSchemaBuilder, JsonSchemaBuilder>> StringFormatSchemas = new(capacity: 5)
     {
-        [typeof(Guid)] = builder => builder
+        [typeof(Guid)] = (builder) => builder
             .Comment("Guid")
             .Type(SchemaValueType.String)
             .Format(Formats.Uuid),
 
-        [typeof(Uri)] = builder => builder
+        [typeof(Uri)] = (builder) => builder
             .Comment("Uri")
             .Type(SchemaValueType.String)
             .Format(Formats.Uri),
 
-        [typeof(DateTimeOffset)] = builder => builder
+        [typeof(DateTimeOffset)] = (builder) => builder
             .Comment("DateTimeOffset")
             .Type(SchemaValueType.String)
             .Format(Formats.DateTime),
 
-        [typeof(TimeOnly)] = builder => builder
+        [typeof(TimeOnly)] = (builder) => builder
             .Comment("TimeOnly")
             .Type(SchemaValueType.String)
             .Format(Formats.Time),
 
-        [typeof(DateOnly)] = builder => builder
+        [typeof(DateOnly)] = (builder) => builder
             .Comment("DateOnly")
             .Type(SchemaValueType.String)
             .Format(Formats.Date),
@@ -56,7 +56,7 @@ public static class JsonSchemaBuilderExtensions
     /// <param name="isTopLevel">Indicates whether the current type is the top-level type.</param>
     /// <param name="propertyAttributeData">The attribute data from the owning property.</param>
     /// <returns>The JSON schema represented by a <see cref="JsonSchemaBuilder"/>.</returns>
-    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, Type type, Dictionary<string, JsonSchemaBuilder> defs, int depth, bool isTopLevel = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, Type type, Dictionary<string, JsonSchemaBuilder> defs, int depth = 0, bool isTopLevel = false, IList<CustomAttributeData>? propertyAttributeData = null)
     {
         depth += 1;
 
@@ -212,23 +212,60 @@ public static class JsonSchemaBuilderExtensions
                 .AddPropertyConstraints(property);
         }
 
-        // if the property has a DescriptionAttribute, add it to the schema
-        CustomAttributeData? displayData = property.GetCustomAttributesData()
-            .FirstOrDefault(a => a.AttributeType.FullName == "System.ComponentModel.DataAnnotations.DisplayAttribute");
+        return builder
+            .Title(property.Name.Titleize())
+            .AddPropertyAnnotations(property);
+    }
 
-        builder = builder
-            .Title(property.Name.Titleize());
+    /// <summary>
+    /// Adds type annotations to the JSON schema builder based on the provided <see cref="Type"/>.
+    /// </summary>
+    /// <param name="builder">The JSON schema builder.</param>
+    /// <param name="type">The <see cref="Type"/> to add annotations for.</param>
+    /// <returns>The updated JSON schema builder.</returns>
+    internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, Type type)
+    {
+        IList<CustomAttributeData> customAttributeData = type.GetCustomAttributesData();
+        return builder.AddAnnotations(customAttributeData, type.Name);
+    }
 
-        if (displayData is not null)
+    /// <summary>
+    /// Adds type annotations to the JSON schema builder based on the provided <see cref="PropertyInfo"/>.
+    /// </summary>
+    /// <param name="builder">The JSON schema builder.</param>
+    /// <param name="property">The <see cref="PropertyInfo"/> to add annotations for.</param>
+    /// <returns>The updated JSON schema builder.</returns>
+    internal static JsonSchemaBuilder AddPropertyAnnotations(this JsonSchemaBuilder builder, PropertyInfo property)
+    {
+        IList<CustomAttributeData> customAttributeData = property.GetCustomAttributesData();
+        return builder.AddAnnotations(customAttributeData);
+    }
+
+    private static JsonSchemaBuilder AddAnnotations(this JsonSchemaBuilder builder, IList<CustomAttributeData> customAttributeData, string? commentFallback = null)
+    {
+        if (customAttributeData
+            .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DescriptionAttribute") is { ConstructorArguments: { Count: 1 } descriptionArguments })
         {
-            CustomAttributeNamedArgument nameArgument = displayData.NamedArguments.FirstOrDefault(descriptionData => descriptionData.MemberName == "Name");
+            string description = (string)descriptionArguments[0].Value!;
+            builder = builder.Comment(description);
+        }
+        else if (commentFallback is not null)
+        {
+            builder = builder.Comment(commentFallback);
+        }
+
+        // if the type has a DisplayAttribute, add it to the schema
+        if (customAttributeData
+            .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.DisplayAttribute") is { NamedArguments: { Count: > 0 } displayArguments })
+        {
+            CustomAttributeNamedArgument nameArgument = displayArguments.FirstOrDefault(descriptionData => descriptionData.MemberName == "Name");
             if (nameArgument != default)
             {
                 string name = (string)nameArgument.TypedValue.Value!;
                 builder = builder.Title(name);
             }
 
-            CustomAttributeNamedArgument descriptionArgument = displayData.NamedArguments.FirstOrDefault(descriptionData => descriptionData.MemberName == "Description");
+            CustomAttributeNamedArgument descriptionArgument = displayArguments.FirstOrDefault(descriptionData => descriptionData.MemberName == "Description");
             if (descriptionArgument != default)
             {
                 string description = (string)descriptionArgument.TypedValue.Value!;

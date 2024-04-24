@@ -16,31 +16,38 @@ namespace SharpSchema;
 /// </summary>
 public static class JsonSchemaBuilderExtensions
 {
-    private const int MaxDepth = 50;
+    private static readonly (string? Namespace, string Name)[] OpenDictionaryGenericTypeNames =
+    [
+        (typeof(IDictionary<,>).GetGenericTypeDefinition().Namespace, typeof(IDictionary<,>).GetGenericTypeDefinition().Name),
+        (typeof(IReadOnlyDictionary<,>).GetGenericTypeDefinition().Namespace, typeof(IReadOnlyDictionary<,>).GetGenericTypeDefinition().Name),
+        (typeof(IImmutableDictionary<,>).GetGenericTypeDefinition().Namespace, typeof(IImmutableDictionary<,>).GetGenericTypeDefinition().Name),
+        (typeof(Dictionary<,>).GetGenericTypeDefinition().Namespace, typeof(Dictionary<,>).GetGenericTypeDefinition().Name),
+        (typeof(ImmutableDictionary<,>).GetGenericTypeDefinition().Namespace, typeof(ImmutableDictionary<,>).GetGenericTypeDefinition().Name),
+    ];
 
-    private static readonly Dictionary<Type, Func<JsonSchemaBuilder, JsonSchemaBuilder>> StringFormatSchemas = new(capacity: 5)
+    private static readonly Dictionary<string, Func<JsonSchemaBuilder, JsonSchemaBuilder>> StringFormatSchemas = new(capacity: 5)
     {
-        [typeof(Guid)] = (builder) => builder
+        [typeof(Guid).Name] = (builder) => builder
             .Comment("Guid")
             .Type(SchemaValueType.String)
             .Format(Formats.Uuid),
 
-        [typeof(Uri)] = (builder) => builder
+        [typeof(Uri).Name] = (builder) => builder
             .Comment("Uri")
             .Type(SchemaValueType.String)
             .Format(Formats.Uri),
 
-        [typeof(DateTimeOffset)] = (builder) => builder
+        [typeof(DateTimeOffset).Name] = (builder) => builder
             .Comment("DateTimeOffset")
             .Type(SchemaValueType.String)
             .Format(Formats.DateTime),
 
-        [typeof(TimeOnly)] = (builder) => builder
+        [typeof(TimeOnly).Name] = (builder) => builder
             .Comment("TimeOnly")
             .Type(SchemaValueType.String)
             .Format(Formats.Time),
 
-        [typeof(DateOnly)] = (builder) => builder
+        [typeof(DateOnly).Name] = (builder) => builder
             .Comment("DateOnly")
             .Type(SchemaValueType.String)
             .Format(Formats.Date),
@@ -51,120 +58,58 @@ public static class JsonSchemaBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="type">The <see cref="Type"/> to convert.</param>
-    /// <param name="defs">The dictionary of definitions used in the JSON schema.</param>
-    /// <param name="depth">The current depth of the object graph.</param>
+    /// <param name="context">The converter context.</param>
     /// <param name="isTopLevel">Indicates whether the current type is the top-level type.</param>
     /// <param name="propertyAttributeData">The attribute data from the owning property.</param>
     /// <returns>The JSON schema represented by a <see cref="JsonSchemaBuilder"/>.</returns>
-    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, Type type, Dictionary<string, JsonSchemaBuilder> defs, int depth = 0, bool isTopLevel = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, Type type, ConverterContext context, bool isTopLevel = false, IList<CustomAttributeData>? propertyAttributeData = null)
     {
-        depth += 1;
+        Requires.NotNull(context, nameof(context));
 
-        Requires.Range(depth < MaxDepth, nameof(depth), $"Exceeded object graph depth of {MaxDepth}.");
-        Requires.NotNull(builder, nameof(builder));
-        Requires.NotNull(type, nameof(type));
-        Requires.NotNull(defs, nameof(defs));
-
-        // unwrap nullable value types
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        try
         {
-            Type underlyingType = Nullable.GetUnderlyingType(type) ?? Assumes.NotReachable<Type>();
-            return builder.AddType(underlyingType, defs, depth);
-        }
-
-        // handle enums as strings as the type code reported is for the underlying numeric type
-        if (type.IsEnum)
-        {
-            string[] enumNames = Enum.GetNames(type);
-            string[] kebabCaseEnumNames = new string[enumNames.Length];
-            for (int i = 0; i < enumNames.Length; i++)
+            if (++context.CurrentDepth > context.MaxDepth)
             {
-                kebabCaseEnumNames[i] = enumNames[i].Kebaberize();
+                throw new InvalidOperationException($"Exceeded object graph depth of {context.MaxDepth}.");
             }
 
-            return builder
-                .Comment(type.Name)
-                .Type(SchemaValueType.String)
-                .Enum(kebabCaseEnumNames);
-        }
+            Requires.NotNull(builder, nameof(builder));
+            Requires.NotNull(type, nameof(type));
+            Requires.NotNull(context, nameof(context));
 
-        // handle remaining value types and complex objects
-        return Type.GetTypeCode(type) switch
+            // unwrap nullable value types
+            if (type.TryUnwrapNullable(out Type? unwrappedType))
+            {
+                return builder.AddType(unwrappedType, context, isTopLevel, propertyAttributeData);
+            }
+
+            // if the type has an AmbientValueAttribute with a string value, use that as the type schema
+            AmbientValueTypeHandler ambientValueTypeHandler = new();
+            if (ambientValueTypeHandler.TryHandle(builder, context, type, isTopLevel, propertyAttributeData) is { IsHandled: true } handledResult)
+            {
+                return handledResult.Builder;
+            }
+
+            // handle enums as strings, or continue and process as the type code for the underlying numeric type
+            EnumAsStringTypeHandler enumAsStringTypeHandler = new();
+            if (enumAsStringTypeHandler.TryHandle(builder, context, type, isTopLevel, propertyAttributeData) is { IsHandled: true } enumHandledResult)
+            {
+                return enumHandledResult.Builder;
+            }
+
+            // handle remaining value types and complex objects
+            TypeCodeTypeHandler typeCodeTypeHandler = new();
+            if (typeCodeTypeHandler.TryHandle(builder, context, type, isTopLevel, propertyAttributeData) is { IsHandled: true } typeCodeHandledResult)
+            {
+                return typeCodeHandledResult.Builder;
+            }
+
+            return builder.AddObjectType(type, isTopLevel, context, propertyAttributeData);
+        }
+        finally
         {
-            TypeCode.Boolean => builder
-                .Comment("bool")
-                .Type(TypeCode.Boolean.ToSchemaValueType()),
-            TypeCode.Byte => builder
-                .Comment("byte")
-                .Type(TypeCode.Byte.ToSchemaValueType())
-                .Minimum(byte.MinValue)
-                .Maximum(byte.MaxValue),
-            TypeCode.Char => builder
-                .Comment("char")
-                .Type(TypeCode.Char.ToSchemaValueType())
-                .Minimum(char.MinValue)
-                .Maximum(char.MaxValue),
-            TypeCode.DateTime => builder
-                .Comment("DateTime")
-                .Type(TypeCode.DateTime.ToSchemaValueType())
-                .Format(Formats.DateTime),
-            TypeCode.Decimal => builder
-                .Comment("decimal")
-                .Type(TypeCode.Decimal.ToSchemaValueType())
-                .Minimum(decimal.MinValue)
-                .Maximum(decimal.MaxValue),
-            TypeCode.Double => builder
-                .Comment("double")
-                .Type(TypeCode.Double.ToSchemaValueType())
-                .Minimum(decimal.CreateSaturating(double.MinValue))
-                .Maximum(decimal.CreateSaturating(double.MaxValue)),
-            TypeCode.Int16 => builder
-                .Comment("short")
-                .Type(TypeCode.Int16.ToSchemaValueType())
-                .Minimum(short.MinValue)
-                .Maximum(short.MaxValue),
-            TypeCode.Int32 => builder
-                .Comment("int")
-                .Type(TypeCode.Int32.ToSchemaValueType())
-                .Minimum(int.MinValue)
-                .Maximum(int.MaxValue),
-            TypeCode.Int64 => builder
-                .Comment("long")
-                .Type(TypeCode.Int64.ToSchemaValueType())
-                .Minimum(long.MinValue)
-                .Maximum(long.MaxValue),
-            TypeCode.SByte => builder
-                .Comment("sbyte")
-                .Type(TypeCode.SByte.ToSchemaValueType())
-                .Minimum(sbyte.MinValue)
-                .Maximum(sbyte.MaxValue),
-            TypeCode.Single => builder
-                .Comment("float")
-                .Type(TypeCode.Single.ToSchemaValueType())
-                .Minimum(decimal.CreateSaturating(float.MinValue))
-                .Maximum(decimal.CreateSaturating(float.MaxValue)),
-            TypeCode.String => builder
-                .Comment("string")
-                .Type(TypeCode.String.ToSchemaValueType()),
-            TypeCode.UInt16 => builder
-                .Comment("ushort")
-                .Type(TypeCode.UInt16.ToSchemaValueType())
-                .Minimum(ushort.MinValue)
-                .Maximum(ushort.MaxValue),
-            TypeCode.UInt32 => builder
-                .Comment("uint")
-                .Type(TypeCode.UInt32.ToSchemaValueType())
-                .Minimum(uint.MinValue)
-                .Maximum(uint.MaxValue),
-            TypeCode.UInt64 => builder
-                .Comment("ulong")
-                .Type(TypeCode.UInt64.ToSchemaValueType())
-                .Minimum(ulong.MinValue)
-                .Maximum(ulong.MaxValue),
-            TypeCode.Object => builder
-                .AddObjectType(type, isTopLevel, defs, depth, propertyAttributeData),
-            _ => Assumes.NotReachable<JsonSchemaBuilder>(),
-        };
+            context.CurrentDepth--;
+        }
     }
 
     /// <summary>
@@ -172,11 +117,10 @@ public static class JsonSchemaBuilderExtensions
     /// </summary>
     /// <param name="builder">The JSON schema builder.</param>
     /// <param name="property">The <see cref="PropertyInfo"/> representing the property.</param>
-    /// <param name="defs">The dictionary of definitions used in the JSON schema.</param>
-    /// <param name="depth">The current depth of the object graph.</param>
+    /// <param name="context">The converter context.</param>
     /// <param name="isRequired">Indicates whether the property is required.</param>
     /// <returns>The updated JSON schema builder.</returns>
-    public static JsonSchemaBuilder AddPropertyInfo(this JsonSchemaBuilder builder, PropertyInfo property, Dictionary<string, JsonSchemaBuilder> defs, int depth, out bool isRequired)
+    public static JsonSchemaBuilder AddPropertyInfo(this JsonSchemaBuilder builder, PropertyInfo property, ConverterContext context, out bool isRequired)
     {
         isRequired = false;
 
@@ -192,8 +136,7 @@ public static class JsonSchemaBuilderExtensions
                     new JsonSchemaBuilder()
                         .AddType(
                             property.PropertyType,
-                            defs,
-                            depth,
+                            context,
                             isTopLevel: false,
                             propertyAttributeData: property.GetCustomAttributesData())
                         .AddPropertyConstraints(property),
@@ -205,8 +148,7 @@ public static class JsonSchemaBuilderExtensions
             builder = builder
                 .AddType(
                     property.PropertyType,
-                    defs,
-                    depth,
+                    context,
                     isTopLevel: false,
                     propertyAttributeData: property.GetCustomAttributesData())
                 .AddPropertyConstraints(property);
@@ -226,7 +168,7 @@ public static class JsonSchemaBuilderExtensions
     internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, Type type)
     {
         IList<CustomAttributeData> customAttributeData = type.GetCustomAttributesData();
-        return builder.AddAnnotations(customAttributeData, type.Name);
+        return builder.AddCommonAnnotations(customAttributeData, type.Name);
     }
 
     /// <summary>
@@ -238,10 +180,10 @@ public static class JsonSchemaBuilderExtensions
     internal static JsonSchemaBuilder AddPropertyAnnotations(this JsonSchemaBuilder builder, PropertyInfo property)
     {
         IList<CustomAttributeData> customAttributeData = property.GetCustomAttributesData();
-        return builder.AddAnnotations(customAttributeData);
+        return builder.AddCommonAnnotations(customAttributeData);
     }
 
-    private static JsonSchemaBuilder AddAnnotations(this JsonSchemaBuilder builder, IList<CustomAttributeData> customAttributeData, string? commentFallback = null)
+    private static JsonSchemaBuilder AddCommonAnnotations(this JsonSchemaBuilder builder, IList<CustomAttributeData> customAttributeData, string? commentFallback = null)
     {
         if (customAttributeData
             .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DescriptionAttribute") is { ConstructorArguments: { Count: 1 } descriptionArguments })
@@ -276,35 +218,39 @@ public static class JsonSchemaBuilderExtensions
         return builder;
     }
 
-    private static JsonSchemaBuilder AddObjectType(this JsonSchemaBuilder builder, Type type, bool isTopLevel, Dictionary<string, JsonSchemaBuilder> defs, int depth, IList<CustomAttributeData>? propertyAttributeData = null)
+    private static JsonSchemaBuilder AddObjectType(this JsonSchemaBuilder builder, Type type, bool isTopLevel, ConverterContext context, IList<CustomAttributeData>? propertyAttributeData = null)
     {
         // handle arrays
         if (type.IsArray)
         {
             Type elementType = type.GetElementType() ?? Assumes.NotReachable<Type>();
-            return builder.AddArrayType(elementType, defs, depth);
+            return builder.AddArrayType(elementType, context);
         }
 
-        // handle enumerable
-        if (typeof(IEnumerable).IsAssignableFrom(type) && type.IsGenericType)
+        // handle other generics
+        if (type.IsGenericType)
         {
-            // handle dictionaries
             Type genericTypeDefinition = type.GetGenericTypeDefinition();
             Type[] genericArguments = type.GetGenericArguments();
 
-            if (genericTypeDefinition == typeof(IDictionary<,>) ||
-                genericTypeDefinition == typeof(IReadOnlyDictionary<,>) ||
-                genericTypeDefinition == typeof(IImmutableDictionary<,>) ||
-                genericTypeDefinition == typeof(Dictionary<,>) ||
-                genericTypeDefinition == typeof(ImmutableDictionary<,>))
+            if (genericTypeDefinition.ImplementsAnyInterface(OpenDictionaryGenericTypeNames))
             {
-                Requires.Range(genericArguments.Length == 2, nameof(type), "Only dictionaries with two generic arguments are supported.");
+                // handle dictionaries
+                Requires.Range(genericArguments.Length <= 2, nameof(type), "Only dictionaries with up to two generic arguments are supported.");
 
-                Type keyType = genericArguments[0];
-                Requires.Argument(keyType == typeof(string), nameof(type), "Only dictionaries with string keys are supported.");
+                // assume that dictionaries with up to one generic argument have string keys
+                Type keyType = genericArguments.Length <= 1
+                    ? typeof(string)
+                    : genericArguments[0];
+
+                Type? valueType = genericArguments.Length <= 1
+                    ? genericArguments.FirstOrDefault()
+                    : genericArguments[1];
+
+                Requires.Argument(keyType.Name == typeof(string).Name, nameof(type), "Only dictionaries with string keys are supported.");
 
                 JsonSchemaBuilder keySchema = new JsonSchemaBuilder()
-                    .AddType(keyType, defs, depth);
+                    .AddType(keyType, context);
 
                 // if the property has a regular expression attribute, use that as the key pattern
                 if (propertyAttributeData is not null)
@@ -316,34 +262,72 @@ public static class JsonSchemaBuilderExtensions
                     }
                 }
 
-                Type valueType = genericArguments[1];
-                JsonSchemaBuilder valueSchema = new JsonSchemaBuilder()
-                    .AddType(valueType, defs, depth);
-
-                return builder
-                    .Comment($"[{keyType.Name} = {valueType.Name}]")
-                    .Type(SchemaValueType.Object)
-                    .PropertyNames(keySchema)
-                    .AdditionalProperties(valueSchema);
+                return valueType is not null
+                    ? builder
+                        .Comment($"[{keyType.Name} = {valueType.Name}]")
+                        .Type(SchemaValueType.Object)
+                        .PropertyNames(keySchema)
+                        .AdditionalProperties(new JsonSchemaBuilder()
+                            .AddType(valueType, context))
+                    : builder
+                        .Comment($"[{keyType.Name}]")
+                        .Type(SchemaValueType.Object)
+                        .PropertyNames(keySchema);
             }
 
-            // handle lists
-            Type elementType = genericArguments.Single();
-            return builder.AddArrayType(elementType, defs, depth);
+            // handle enumerable
+            if (genericTypeDefinition.ImplementsAnyInterface((typeof(IEnumerable).Namespace, typeof(IEnumerable).Name)))
+            {
+                Type elementType = genericArguments.Single();
+                return builder.AddArrayType(elementType, context);
+            }
+
+            // add oneOf for generic types
+            string genericTypeDefinitionName = genericTypeDefinition.ToDefinitionName();
+            string definitionName = type.ToDefinitionName();
+
+            if (context.Defs.TryGetValue(genericTypeDefinitionName, out JsonSchemaBuilder? genericTypeBuilder))
+            {
+                JsonSchema genericTypeSchema = genericTypeBuilder;
+                IReadOnlyCollection<JsonSchema>? existingOneOf = genericTypeSchema.GetOneOf();
+                List<JsonSchema> oneOf = existingOneOf is null ? new() : new(existingOneOf);
+
+                Uri refPath = new($"#/$defs/{definitionName}", UriKind.RelativeOrAbsolute);
+
+                if (!oneOf.Any(s => s.GetRef() == refPath))
+                {
+                    oneOf.Add(new JsonSchemaBuilder()
+                        .Ref(refPath));
+
+                    context.Defs[genericTypeDefinitionName] = genericTypeBuilder
+                        .OneOf(oneOf);
+                }
+            }
+            else
+            {
+                genericTypeBuilder = new JsonSchemaBuilder()
+                    .AddTypeAnnotations(type)
+                    .OneOf(new JsonSchemaBuilder()
+                        .Ref($"#/$defs/{definitionName}"));
+
+                context.Defs.Add(genericTypeDefinitionName, genericTypeBuilder);
+            }
+
+            isTopLevel = false;
         }
 
         // handle specific types with string formats
-        if (StringFormatSchemas.TryGetValue(type, out Func<JsonSchemaBuilder, JsonSchemaBuilder>? stringFormatSchema))
+        if (StringFormatSchemas.TryGetValue(type.Name, out Func<JsonSchemaBuilder, JsonSchemaBuilder>? stringFormatSchema))
         {
             return stringFormatSchema(builder);
         }
 
-        return builder.AddComplexType(type, isTopLevel, defs, depth);
+        return builder.AddComplexType(type, context, isTopLevel);
     }
 
-    private static JsonSchemaBuilder AddArrayType(this JsonSchemaBuilder builder, Type itemType, Dictionary<string, JsonSchemaBuilder> defs, int depth)
+    private static JsonSchemaBuilder AddArrayType(this JsonSchemaBuilder builder, Type itemType, ConverterContext context)
     {
-        JsonSchemaBuilder itemSchema = new JsonSchemaBuilder().AddType(itemType, defs, depth);
+        JsonSchemaBuilder itemSchema = new JsonSchemaBuilder().AddType(itemType, context);
 
         return builder
             .Comment($"{itemType.Name}[]")
@@ -352,30 +336,63 @@ public static class JsonSchemaBuilderExtensions
             .AdditionalItems(false);
     }
 
-    private static JsonSchemaBuilder AddComplexType(this JsonSchemaBuilder builder, Type type, bool isTopLevel, Dictionary<string, JsonSchemaBuilder> defs, int depth)
+    private static JsonSchemaBuilder AddComplexType(this JsonSchemaBuilder builder, Type type, ConverterContext context, bool isTopLevel)
     {
         if (isTopLevel)
         {
-            return new ObjectSchemaGenerator(type, defs)
-                .AddObject(builder, depth);
+            return AddCustomObjectType(builder, type, context);
         }
 
         string defName = type.ToDefinitionName();
-        if (defs.TryAdd(defName, new ObjectSchemaGenerator(type, defs).AddObject(new JsonSchemaBuilder(), depth)))
+        if (context.Defs.TryAdd(defName, AddCustomObjectType(new JsonSchemaBuilder(), type, context)) &&
+            context.IncludeInterfaces)
         {
-            type.AddToInterfaces(defName, defs);
+            type.AddToInterfaces(defName, context.Defs);
         }
 
         return builder
             .Ref($"#/$defs/{defName}");
+
+        //// -- local function --
+
+        static JsonSchemaBuilder AddCustomObjectType(JsonSchemaBuilder builder, Type type, ConverterContext context)
+        {
+            builder = builder.AddTypeAnnotations(type);
+
+            if (type.IsAbstract)
+            {
+                Assembly assembly = type.Assembly;
+
+                var concreteTypes = assembly.GetTypes()
+                    .Where(t => t.IsSubclassOf(type) && !t.IsAbstract)
+                    .Select(t => new JsonSchemaBuilder().AddType(t, context).Build())
+                    .ToList();
+
+                if (concreteTypes.Count == 0)
+                {
+                    return builder;
+                }
+
+                return builder
+                    .OneOf(concreteTypes);
+            }
+
+            Dictionary<string, JsonSchema> propertySchemas = type.GetObjectPropertySchemas(context, out IEnumerable<string>? requiredProperties);
+
+            return builder
+                .Type(SchemaValueType.Object)
+                .Properties(propertySchemas)
+                .Required(requiredProperties)
+                .AdditionalProperties(false);
+        }
     }
 
     private static JsonSchemaBuilder AddPropertyConstraints(this JsonSchemaBuilder builder, PropertyInfo property)
     {
         Type type = property.PropertyType;
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        if (type.IsGenericType && type.GetGenericTypeDefinition().Name == typeof(Nullable<>).Name)
         {
-            type = Nullable.GetUnderlyingType(type) ?? Assumes.NotReachable<Type>();
+            type = type.GetGenericArguments().FirstOrDefault() ?? Assumes.NotReachable<Type>();
         }
 
         // if the property type is a number and has a range, set the minimum and maximum values
@@ -399,10 +416,12 @@ public static class JsonSchemaBuilderExtensions
             {
                 Assumes.NotReachable();
             }
+
+            return builder;
         }
 
         // if the property is a string
-        if (type == typeof(string))
+        if (type.Name == typeof(string).Name)
         {
             // if the property has a regular expression attribute, set the pattern
             if (property.GetCustomAttributesData()
@@ -448,6 +467,25 @@ public static class JsonSchemaBuilderExtensions
                 if (minLengthArguments[0].Value is uint minLength)
                 {
                     builder = builder.MinLength(minLength);
+                }
+                else
+                {
+                    Assumes.NotReachable();
+                }
+            }
+
+            return builder;
+        }
+
+        if (!property.PropertyType.IsValueType)
+        {
+            // if the property has a min length attribute, set the minimum properties
+            if (property.GetCustomAttributesData()
+                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.MinLengthAttribute") is { ConstructorArguments: { Count: 1 } minLengthArguments })
+            {
+                if (minLengthArguments[0].Value is uint minLength)
+                {
+                    builder = builder.MinProperties(minLength);
                 }
                 else
                 {

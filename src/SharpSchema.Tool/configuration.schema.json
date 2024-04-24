@@ -1,0 +1,5219 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$comment": "Configuration",
+  "type": "object",
+  "properties": {
+    "properties": {
+      "oneOf": [
+        {
+          "$comment": "[String = SettingRegistration]",
+          "type": "object",
+          "propertyNames": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Properties"
+    },
+    "categories": {
+      "oneOf": [
+        {
+          "$comment": "[String = CategoryRegistration]",
+          "type": "object",
+          "propertyNames": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.CategoryRegistration"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Categories"
+    },
+    "$schema": {
+      "oneOf": [
+        {
+          "$comment": "string",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Schema"
+    }
+  },
+  "required": [],
+  "additionalProperties": false,
+  "$defs": {
+    "Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting": {
+      "$comment": "LegacySetting",
+      "type": "object",
+      "properties": {
+        "store": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Store"
+        },
+        "path": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Path"
+        },
+        "bitmask": {
+          "oneOf": [
+            {
+              "$comment": "ulong",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 18446744073709551615
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Bitmask"
+        }
+      },
+      "required": [
+        "store",
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Typing.JsonVariant": {
+      "$comment": "JsonVariant",
+      "type": "object",
+      "properties": {
+        "boolValue": {
+          "oneOf": [
+            {
+              "$comment": "bool",
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Bool Value"
+        },
+        "stringValue": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "String Value"
+        },
+        "intValue": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Int Value"
+        },
+        "decimalValue": {
+          "oneOf": [
+            {
+              "$comment": "decimal",
+              "type": "number",
+              "minimum": -79228162514264337593543950335,
+              "maximum": 79228162514264337593543950335
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decimal Value"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migrations.ResultMapEntry": {
+      "$comment": "ResultMapEntry",
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Typing.JsonVariant",
+          "title": "Result"
+        },
+        "matches": {
+          "$comment": "JsonVariant[]",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Typing.JsonVariant"
+          },
+          "additionalItems": false,
+          "title": "Matches"
+        }
+      },
+      "required": [
+        "result",
+        "matches"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migration_CustomRule": {
+      "$comment": "CustomRule",
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "$comment": "LegacySetting[]",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting"
+          },
+          "additionalItems": false,
+          "title": "Inputs"
+        },
+        "map": {
+          "$comment": "ResultMapEntry[]",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.ResultMapEntry"
+          },
+          "additionalItems": false,
+          "title": "Map"
+        }
+      },
+      "required": [
+        "inputs",
+        "map"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migration_PassRule": {
+      "$comment": "PassRule",
+      "type": "object",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting",
+          "title": "Input"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migration_EnumPlusBoolToEnumWithNoneRule": {
+      "$comment": "EnumPlusBoolToEnumWithNoneRule",
+      "type": "object",
+      "properties": {
+        "boolInput": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting",
+          "title": "Bool Input"
+        },
+        "enumInput": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting",
+          "title": "Enum Input"
+        },
+        "trueAndMissingDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "True and Missing Default"
+        }
+      },
+      "required": [
+        "boolInput",
+        "enumInput"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migrations.StringIntMapEntry": {
+      "$comment": "StringIntMapEntry",
+      "type": "object",
+      "properties": {
+        "result": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Result"
+        },
+        "match": {
+          "$comment": "int",
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "title": "Match"
+        }
+      },
+      "required": [
+        "result",
+        "match"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migration_EnumIntegerToStringRule": {
+      "$comment": "EnumIntegerToStringRule",
+      "type": "object",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting",
+          "title": "Input"
+        },
+        "map": {
+          "$comment": "StringIntMapEntry[]",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.StringIntMapEntry"
+          },
+          "additionalItems": false,
+          "title": "Map"
+        }
+      },
+      "required": [
+        "input",
+        "map"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migration_EnumIntegerPlusBoolToEnumWithNoneRule": {
+      "$comment": "EnumIntegerPlusBoolToEnumWithNoneRule",
+      "type": "object",
+      "properties": {
+        "boolInput": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting",
+          "title": "Bool Input"
+        },
+        "enumInput": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting",
+          "title": "Enum Input"
+        },
+        "map": {
+          "$comment": "StringIntMapEntry[]",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.StringIntMapEntry"
+          },
+          "additionalItems": false,
+          "title": "Map"
+        },
+        "trueAndMissingDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "True and Missing Default"
+        }
+      },
+      "required": [
+        "boolInput",
+        "enumInput",
+        "map"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migration_ValueWithSentinelToAutomaticBoolRule": {
+      "$comment": "ValueWithSentinelToAutomaticBoolRule",
+      "type": "object",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting",
+          "title": "Input"
+        },
+        "sentinelValue": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Typing.JsonVariant",
+          "title": "Sentinel Value"
+        }
+      },
+      "required": [
+        "input",
+        "sentinelValue"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migration_ValueWithSentinelToManualParameterRule": {
+      "$comment": "ValueWithSentinelToManualParameterRule",
+      "type": "object",
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migrations.LegacySetting",
+          "title": "Input"
+        },
+        "sentinelValue": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Typing.JsonVariant",
+          "title": "Sentinel Value"
+        }
+      },
+      "required": [
+        "input",
+        "sentinelValue"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Migration": {
+      "$comment": "Migration",
+      "type": "object",
+      "properties": {
+        "custom": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration_CustomRule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Custom"
+        },
+        "pass": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration_PassRule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pass"
+        },
+        "enumPlusBoolToEnumWithNone": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration_EnumPlusBoolToEnumWithNoneRule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enum Plus Bool to Enum With None"
+        },
+        "enumIntegerToString": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration_EnumIntegerToStringRule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enum Integer to String"
+        },
+        "enumIntegerPlusBoolToEnumWithNone": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration_EnumIntegerPlusBoolToEnumWithNoneRule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enum Integer Plus Bool to Enum With None"
+        },
+        "valueWithSentinelToAutomaticBool": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration_ValueWithSentinelToAutomaticBoolRule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value With Sentinel to Automatic Bool"
+        },
+        "valueWithSentinelToManualParameter": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration_ValueWithSentinelToManualParameterRule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value With Sentinel to Manual Parameter"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Services.UnifiedSettings.DataModel.RemovedSettingRegistration": {
+      "$comment": "RemovedSettingRegistration",
+      "type": "object",
+      "properties": {
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_String": {
+      "$comment": "String",
+      "type": "object",
+      "properties": {
+        "maxLength": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Length"
+        },
+        "minLength": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Length"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_StringArray": {
+      "$comment": "StringArray",
+      "type": "object",
+      "properties": {
+        "minItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Items"
+        },
+        "maxItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Items"
+        },
+        "items": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_String",
+          "title": "Items"
+        },
+        "itemsAreOrdered": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Items Are Ordered"
+        },
+        "hasUserSelectableDefaultItem": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Has User Selectable Default Item"
+        },
+        "allowItemEditing": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Allow Item Editing"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "items",
+        "itemsAreOrdered",
+        "hasUserSelectableDefaultItem",
+        "allowItemEditing",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_FormatString": {
+      "$comment": "FormatString",
+      "type": "object",
+      "properties": {
+        "format": {
+          "$comment": "FormatStringKind",
+          "type": "string",
+          "enum": [
+            "unknown",
+            "date",
+            "time",
+            "i-pv4",
+            "email",
+            "uri",
+            "path"
+          ],
+          "title": "Format"
+        },
+        "pathKind": {
+          "$comment": "PathKind",
+          "type": "string",
+          "enum": [
+            "unknown",
+            "file",
+            "folder",
+            "folder-or-uri"
+          ],
+          "title": "Path Kind"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "format",
+        "pathKind",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_FormatStringArray": {
+      "$comment": "FormatStringArray",
+      "type": "object",
+      "properties": {
+        "minItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Items"
+        },
+        "maxItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Items"
+        },
+        "items": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_FormatString",
+          "title": "Items"
+        },
+        "itemsAreOrdered": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Items Are Ordered"
+        },
+        "hasUserSelectableDefaultItem": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Has User Selectable Default Item"
+        },
+        "allowItemEditing": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Allow Item Editing"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "items",
+        "itemsAreOrdered",
+        "hasUserSelectableDefaultItem",
+        "allowItemEditing",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_EnumString": {
+      "$comment": "EnumString",
+      "type": "object",
+      "properties": {
+        "enum": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Enum"
+        },
+        "enumItemLabels": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Enum Item Labels"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "enum",
+        "enumItemLabels",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_EnumStringArray": {
+      "$comment": "EnumStringArray",
+      "type": "object",
+      "properties": {
+        "minItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Items"
+        },
+        "maxItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Items"
+        },
+        "items": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_EnumString",
+          "title": "Items"
+        },
+        "itemsAreOrdered": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Items Are Ordered"
+        },
+        "hasUserSelectableDefaultItem": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Has User Selectable Default Item"
+        },
+        "allowItemEditing": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Allow Item Editing"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "items",
+        "itemsAreOrdered",
+        "hasUserSelectableDefaultItem",
+        "allowItemEditing",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1_T]": {
+      "$comment": "AlternateDefault`1",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Boolean]"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Int32]"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Decimal]"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.String]"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Collections.Immutable.ImmutableArray_1[System.String]]"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Collections.Immutable.ImmutableArray_1[System.Collections.Generic.IReadOnlyDictionary_2[System.String_Microsoft.VisualStudio.Settings.Registration.Typing.JsonVariant]]]"
+        }
+      ]
+    },
+    "Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Boolean]": {
+      "$comment": "AlternateDefault`1",
+      "type": "object",
+      "properties": {
+        "flagName": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Flag Name"
+        }
+      },
+      "required": [
+        "flagName"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_Boolean": {
+      "$comment": "Boolean",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Default"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Boolean]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "isEditable": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Is Editable"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "isEditable",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Int32]": {
+      "$comment": "AlternateDefault`1",
+      "type": "object",
+      "properties": {
+        "flagName": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Flag Name"
+        }
+      },
+      "required": [
+        "flagName"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_Integer": {
+      "$comment": "Integer",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "int",
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "title": "Default"
+        },
+        "minimum": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum"
+        },
+        "maximum": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maximum"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Int32]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "isEditable": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Is Editable"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "isEditable",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Decimal]": {
+      "$comment": "AlternateDefault`1",
+      "type": "object",
+      "properties": {
+        "flagName": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Flag Name"
+        }
+      },
+      "required": [
+        "flagName"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_Number": {
+      "$comment": "Number",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "decimal",
+          "type": "number",
+          "minimum": -79228162514264337593543950335,
+          "maximum": 79228162514264337593543950335,
+          "title": "Default"
+        },
+        "minimum": {
+          "oneOf": [
+            {
+              "$comment": "decimal",
+              "type": "number",
+              "minimum": -79228162514264337593543950335,
+              "maximum": 79228162514264337593543950335
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum"
+        },
+        "maximum": {
+          "oneOf": [
+            {
+              "$comment": "decimal",
+              "type": "number",
+              "minimum": -79228162514264337593543950335,
+              "maximum": 79228162514264337593543950335
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maximum"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Decimal]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "isEditable": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Is Editable"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "isEditable",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.String]": {
+      "$comment": "AlternateDefault`1",
+      "type": "object",
+      "properties": {
+        "flagName": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Flag Name"
+        }
+      },
+      "required": [
+        "flagName"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_String": {
+      "$comment": "String",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Default"
+        },
+        "minLength": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Length"
+        },
+        "maxLength": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Length"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.String]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "isEditable": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Is Editable"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "isEditable",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_FormatString": {
+      "$comment": "FormatString",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Default"
+        },
+        "format": {
+          "$comment": "FormatStringKind",
+          "type": "string",
+          "enum": [
+            "unknown",
+            "date",
+            "time",
+            "i-pv4",
+            "email",
+            "uri",
+            "path"
+          ],
+          "title": "Format"
+        },
+        "pathKind": {
+          "$comment": "PathKind",
+          "type": "string",
+          "enum": [
+            "unknown",
+            "file",
+            "folder",
+            "folder-or-uri"
+          ],
+          "title": "Path Kind"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.String]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "isEditable": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Is Editable"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "format",
+        "pathKind",
+        "isEditable",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_EnumString": {
+      "$comment": "EnumString",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Default"
+        },
+        "enum": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Enum"
+        },
+        "enumItemLabels": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Enum Item Labels"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.String]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "isEditable": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Is Editable"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "enum",
+        "enumItemLabels",
+        "isEditable",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.PropertyRegistration": {
+      "$comment": "PropertyRegistration",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_Boolean"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_Integer"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_Number"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_String"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_FormatString"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.PropertyRegistration_EnumString"
+        }
+      ]
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_Object": {
+      "$comment": "Object",
+      "type": "object",
+      "properties": {
+        "properties": {
+          "$comment": "[String = PropertyRegistration]",
+          "type": "object",
+          "propertyNames": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.PropertyRegistration"
+          },
+          "title": "Properties"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_ObjectArray": {
+      "$comment": "ObjectArray",
+      "type": "object",
+      "properties": {
+        "minItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Items"
+        },
+        "maxItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Items"
+        },
+        "items": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_Object",
+          "title": "Items"
+        },
+        "itemsAreOrdered": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Items Are Ordered"
+        },
+        "hasUserSelectableDefaultItem": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Has User Selectable Default Item"
+        },
+        "allowItemEditing": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Allow Item Editing"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "items",
+        "itemsAreOrdered",
+        "hasUserSelectableDefaultItem",
+        "allowItemEditing",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_Boolean": {
+      "$comment": "Boolean",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Default"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Boolean]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_Integer": {
+      "$comment": "Integer",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "int",
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "title": "Default"
+        },
+        "maximum": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maximum"
+        },
+        "minimum": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Int32]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_Number": {
+      "$comment": "Number",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "decimal",
+          "type": "number",
+          "minimum": -79228162514264337593543950335,
+          "maximum": 79228162514264337593543950335,
+          "title": "Default"
+        },
+        "maximum": {
+          "oneOf": [
+            {
+              "$comment": "decimal",
+              "type": "number",
+              "minimum": -79228162514264337593543950335,
+              "maximum": 79228162514264337593543950335
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maximum"
+        },
+        "minimum": {
+          "oneOf": [
+            {
+              "$comment": "decimal",
+              "type": "number",
+              "minimum": -79228162514264337593543950335,
+              "maximum": 79228162514264337593543950335
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Decimal]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_String": {
+      "$comment": "String",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Default"
+        },
+        "maxLength": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Length"
+        },
+        "minLength": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Length"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.String]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_FormatString": {
+      "$comment": "FormatString",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Default"
+        },
+        "format": {
+          "$comment": "FormatStringKind",
+          "type": "string",
+          "enum": [
+            "unknown",
+            "date",
+            "time",
+            "i-pv4",
+            "email",
+            "uri",
+            "path"
+          ],
+          "title": "Format"
+        },
+        "pathKind": {
+          "$comment": "PathKind",
+          "type": "string",
+          "enum": [
+            "unknown",
+            "file",
+            "folder",
+            "folder-or-uri"
+          ],
+          "title": "Path Kind"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.String]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "format",
+        "pathKind",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_EnumString": {
+      "$comment": "EnumString",
+      "type": "object",
+      "properties": {
+        "default": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Default"
+        },
+        "enum": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Enum"
+        },
+        "enumItemLabels": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Enum Item Labels"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.String]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "default",
+        "enum",
+        "enumItemLabels",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Collections.Immutable.ImmutableArray_1[System.String]]": {
+      "$comment": "AlternateDefault`1",
+      "type": "object",
+      "properties": {
+        "flagName": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Flag Name"
+        }
+      },
+      "required": [
+        "flagName"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.Callback": {
+      "$comment": "Callback",
+      "type": "object",
+      "properties": {
+        "packageId": {
+          "$comment": "Guid",
+          "type": "string",
+          "format": "uuid",
+          "title": "Package Id"
+        },
+        "serviceId": {
+          "$comment": "Guid",
+          "type": "string",
+          "format": "uuid",
+          "title": "Service Id"
+        }
+      },
+      "required": [
+        "packageId",
+        "serviceId"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_StringArray": {
+      "$comment": "StringArray",
+      "type": "object",
+      "properties": {
+        "minItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Items"
+        },
+        "maxItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Items"
+        },
+        "items": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_String",
+          "title": "Items"
+        },
+        "default": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Default"
+        },
+        "itemsAreOrdered": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Items Are Ordered"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Collections.Immutable.ImmutableArray_1[System.String]]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "hasUserSelectableDefaultItem": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Has User Selectable Default Item"
+        },
+        "migrationCallback": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Callback"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration Callback"
+        },
+        "allowItemEditing": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Allow Item Editing"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "items",
+        "default",
+        "itemsAreOrdered",
+        "hasUserSelectableDefaultItem",
+        "allowItemEditing",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_FormatStringArray": {
+      "$comment": "FormatStringArray",
+      "type": "object",
+      "properties": {
+        "minItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Items"
+        },
+        "maxItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Items"
+        },
+        "items": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_FormatString",
+          "title": "Items"
+        },
+        "default": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Default"
+        },
+        "itemsAreOrdered": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Items Are Ordered"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Collections.Immutable.ImmutableArray_1[System.String]]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "hasUserSelectableDefaultItem": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Has User Selectable Default Item"
+        },
+        "migrationCallback": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Callback"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration Callback"
+        },
+        "allowItemEditing": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Allow Item Editing"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "items",
+        "default",
+        "itemsAreOrdered",
+        "hasUserSelectableDefaultItem",
+        "allowItemEditing",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_EnumStringArray": {
+      "$comment": "EnumStringArray",
+      "type": "object",
+      "properties": {
+        "minItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Items"
+        },
+        "maxItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Items"
+        },
+        "items": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_EnumString",
+          "title": "Items"
+        },
+        "default": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Default"
+        },
+        "itemsAreOrdered": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Items Are Ordered"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Collections.Immutable.ImmutableArray_1[System.String]]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "hasUserSelectableDefaultItem": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Has User Selectable Default Item"
+        },
+        "migrationCallback": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Callback"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration Callback"
+        },
+        "allowItemEditing": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Allow Item Editing"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "items",
+        "default",
+        "itemsAreOrdered",
+        "hasUserSelectableDefaultItem",
+        "allowItemEditing",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Collections.Immutable.ImmutableArray_1[System.Collections.Generic.IReadOnlyDictionary_2[System.String_Microsoft.VisualStudio.Settings.Registration.Typing.JsonVariant]]]": {
+      "$comment": "AlternateDefault`1",
+      "type": "object",
+      "properties": {
+        "flagName": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Flag Name"
+        }
+      },
+      "required": [
+        "flagName"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_ObjectArray": {
+      "$comment": "ObjectArray",
+      "type": "object",
+      "properties": {
+        "minItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Items"
+        },
+        "maxItems": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Items"
+        },
+        "items": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ItemsRegistration_Object",
+          "title": "Items"
+        },
+        "default": {
+          "$comment": "IReadOnlyDictionary`2[]",
+          "type": "array",
+          "items": {
+            "$comment": "[String = JsonVariant]",
+            "type": "object",
+            "propertyNames": {
+              "$comment": "string",
+              "type": "string"
+            },
+            "additionalProperties": {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Typing.JsonVariant"
+            }
+          },
+          "additionalItems": false,
+          "title": "Default"
+        },
+        "itemsAreOrdered": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Items Are Ordered"
+        },
+        "alternateDefault": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.AlternateDefault_1[System.Collections.Immutable.ImmutableArray_1[System.Collections.Generic.IReadOnlyDictionary_2[System.String_Microsoft.VisualStudio.Settings.Registration.Typing.JsonVariant]]]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Alternate Default"
+        },
+        "environmentVariableDefault": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Environment Variable Default"
+        },
+        "hasUserSelectableDefaultItem": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Has User Selectable Default Item"
+        },
+        "migrationCallback": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Callback"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration Callback"
+        },
+        "allowItemEditing": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Allow Item Editing"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "items",
+        "default",
+        "itemsAreOrdered",
+        "hasUserSelectableDefaultItem",
+        "allowItemEditing",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_Boolean": {
+      "$comment": "Boolean",
+      "type": "object",
+      "properties": {
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_Integer": {
+      "$comment": "Integer",
+      "type": "object",
+      "properties": {
+        "maximum": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maximum"
+        },
+        "minimum": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_Number": {
+      "$comment": "Number",
+      "type": "object",
+      "properties": {
+        "maximum": {
+          "oneOf": [
+            {
+              "$comment": "decimal",
+              "type": "number",
+              "minimum": -79228162514264337593543950335,
+              "maximum": 79228162514264337593543950335
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maximum"
+        },
+        "minimum": {
+          "oneOf": [
+            {
+              "$comment": "decimal",
+              "type": "number",
+              "minimum": -79228162514264337593543950335,
+              "maximum": 79228162514264337593543950335
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_String": {
+      "$comment": "String",
+      "type": "object",
+      "properties": {
+        "maxLength": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Length"
+        },
+        "minLength": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Length"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_FormatString": {
+      "$comment": "FormatString",
+      "type": "object",
+      "properties": {
+        "format": {
+          "$comment": "FormatStringKind",
+          "type": "string",
+          "enum": [
+            "unknown",
+            "date",
+            "time",
+            "i-pv4",
+            "email",
+            "uri",
+            "path"
+          ],
+          "title": "Format"
+        },
+        "pathKind": {
+          "$comment": "PathKind",
+          "type": "string",
+          "enum": [
+            "unknown",
+            "file",
+            "folder",
+            "folder-or-uri"
+          ],
+          "title": "Path Kind"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "format",
+        "pathKind",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_EnumString": {
+      "$comment": "EnumString",
+      "type": "object",
+      "properties": {
+        "enum": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Enum"
+        },
+        "enumItemLabels": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Enum Item Labels"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "enum",
+        "enumItemLabels",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration": {
+      "$comment": "ExternalSettingRegistration",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_Boolean"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_Integer"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_Number"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_String"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_FormatString"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_EnumString"
+        }
+      ]
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration_External": {
+      "$comment": "External",
+      "type": "object",
+      "properties": {
+        "backingStoreDescription": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Backing Store Description"
+        },
+        "callback": {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Callback",
+          "title": "Callback"
+        },
+        "realtimeNotifications": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Realtime Notifications"
+        },
+        "properties": {
+          "$comment": "[String = ExternalSettingRegistration]",
+          "type": "object",
+          "propertyNames": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration"
+          },
+          "title": "Properties"
+        },
+        "dynamicMessageIds": {
+          "$comment": "String[]",
+          "type": "array",
+          "items": {
+            "$comment": "string",
+            "type": "string"
+          },
+          "additionalItems": false,
+          "title": "Dynamic Message Ids"
+        },
+        "enableWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Enable When"
+        },
+        "applyWhen": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Apply When"
+        },
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        },
+        "transientScopesSupported": {
+          "$comment": "bool",
+          "type": "boolean",
+          "title": "Transient Scopes Supported"
+        },
+        "unsupportedMessage": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unsupported Message"
+        },
+        "migration": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.Migration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Migration"
+        },
+        "type": {
+          "$comment": "string",
+          "type": "string",
+          "title": "Schema Type"
+        }
+      },
+      "required": [
+        "backingStoreDescription",
+        "callback",
+        "realtimeNotifications",
+        "properties",
+        "dynamicMessageIds",
+        "transientScopesSupported",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Microsoft.VisualStudio.Settings.Registration.SettingRegistration": {
+      "$comment": "SettingRegistration",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Services.UnifiedSettings.DataModel.RemovedSettingRegistration"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_StringArray"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_FormatStringArray"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_EnumStringArray"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.ExternalSettingRegistration_ObjectArray"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_Boolean"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_Integer"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_Number"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_String"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_FormatString"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_EnumString"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_StringArray"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_FormatStringArray"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_EnumStringArray"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_ObjectArray"
+        },
+        {
+          "$ref": "#/$defs/Microsoft.VisualStudio.Settings.Registration.SettingRegistration_External"
+        }
+      ]
+    },
+    "Microsoft.VisualStudio.Settings.Registration.CategoryRegistration": {
+      "$comment": "CategoryRegistration",
+      "type": "object",
+      "properties": {
+        "description": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "order": {
+          "oneOf": [
+            {
+              "$comment": "int",
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Order"
+        },
+        "title": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "helpUri": {
+          "oneOf": [
+            {
+              "$comment": "string",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Help Uri"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  }
+}

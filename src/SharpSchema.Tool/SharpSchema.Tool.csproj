@@ -9,6 +9,11 @@
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="System.Reflection.MetadataLoadContext" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpSchema\SharpSchema.csproj" />
   </ItemGroup>
 
 </Project>

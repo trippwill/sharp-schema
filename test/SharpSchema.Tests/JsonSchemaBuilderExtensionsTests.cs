@@ -13,12 +13,11 @@ namespace SharpSchema.Tests
         {
             // Arrange
             var builder = new JsonSchemaBuilder();
-            var defs = new Dictionary<string, JsonSchemaBuilder>();
             Type type = typeof(TestEnum);
             string[] expectedEnumValues = new[] { "value1", "value2", "value3" };
 
             // Act
-            JsonSchema result = builder.AddType(type, defs);
+            JsonSchema result = builder.AddType(type, new ConverterContext());
 
             // Assert
             Assert.Equal(SchemaValueType.String, result.GetJsonType());
@@ -30,12 +29,11 @@ namespace SharpSchema.Tests
         {
             // Arrange
             var builder = new JsonSchemaBuilder();
-            var defs = new Dictionary<string, JsonSchemaBuilder>();
             Type type = typeof(int);
             SchemaValueType expectedType = SchemaValueType.Integer;
 
             // Act
-            JsonSchema result = builder.AddType(type, defs);
+            JsonSchema result = builder.AddType(type, new ConverterContext());
 
             // Assert
             Assert.Equal(expectedType, result.GetJsonType());
@@ -46,12 +44,11 @@ namespace SharpSchema.Tests
         {
             // Arrange
             var builder = new JsonSchemaBuilder();
-            var defs = new Dictionary<string, JsonSchemaBuilder>();
             Type type = typeof(string);
             SchemaValueType expectedType = SchemaValueType.String;
 
             // Act
-            JsonSchema result = builder.AddType(type, defs);
+            JsonSchema result = builder.AddType(type, new ConverterContext());
 
             // Assert
             Assert.Equal(expectedType, result.GetJsonType());
@@ -62,12 +59,11 @@ namespace SharpSchema.Tests
         {
             // Arrange
             var builder = new JsonSchemaBuilder();
-            var defs = new Dictionary<string, JsonSchemaBuilder>();
             Type type = typeof(TestObject);
             SchemaValueType expectedType = SchemaValueType.Object;
 
             // Act
-            JsonSchema result = builder.AddType(type, defs, isTopLevel: true);
+            JsonSchema result = builder.AddType(type, new ConverterContext(), isTopLevel: true);
 
             // Assert
             Assert.Equal(expectedType, result.GetJsonType());
@@ -78,12 +74,11 @@ namespace SharpSchema.Tests
         {
             // Arrange
             var builder = new JsonSchemaBuilder();
-            var defs = new Dictionary<string, JsonSchemaBuilder>();
             System.Reflection.PropertyInfo? property = typeof(TestObject).GetProperty("RequiredProperty");
             bool expectedIsRequired = true;
 
             // Act
-            JsonSchemaBuilder result = builder.AddPropertyInfo(property!, defs, 0, out bool isRequired);
+            JsonSchemaBuilder result = builder.AddPropertyInfo(property!, new ConverterContext(), out bool isRequired);
 
             // Assert
             Assert.Equal(expectedIsRequired, isRequired);
@@ -94,12 +89,11 @@ namespace SharpSchema.Tests
         {
             // Arrange
             var builder = new JsonSchemaBuilder();
-            var defs = new Dictionary<string, JsonSchemaBuilder>();
             System.Reflection.PropertyInfo? property = typeof(TestObject).GetProperty("NullableProperty");
             bool expectedIsRequired = false;
 
             // Act
-            JsonSchema result = builder.AddPropertyInfo(property!, defs, 0, out bool isRequired);
+            JsonSchema result = builder.AddPropertyInfo(property!, new ConverterContext(), out bool isRequired);
 
             // Assert
             Assert.Equal(expectedIsRequired, isRequired);
@@ -112,12 +106,11 @@ namespace SharpSchema.Tests
         {
             // Arrange
             var builder = new JsonSchemaBuilder();
-            var defs = new Dictionary<string, JsonSchemaBuilder>();
             System.Reflection.PropertyInfo? property = typeof(TestObject).GetProperty("NonNullableProperty");
             bool expectedIsRequired = true;
 
             // Act
-            JsonSchema result = builder.AddPropertyInfo(property!, defs, 0, out bool isRequired);
+            JsonSchema result = builder.AddPropertyInfo(property!, new ConverterContext(), out bool isRequired);
 
             // Assert
             Assert.Equal(expectedIsRequired, isRequired);
@@ -130,13 +123,12 @@ namespace SharpSchema.Tests
         {
             // Arrange
             var builder = new JsonSchemaBuilder();
-            var defs = new Dictionary<string, JsonSchemaBuilder>();
             System.Reflection.PropertyInfo? property = typeof(TestObject).GetProperty("AnnotatedProperty");
             string expectedTitle = "Annotated Property";
             string expectedDescription = "This is an annotated property.";
 
             // Act
-            JsonSchema result = builder.AddPropertyInfo(property!, defs, 0, out _);
+            JsonSchema result = builder.AddPropertyInfo(property!, new ConverterContext(), out _);
 
             // Assert
             Assert.Equal(expectedTitle, result.GetTitle());

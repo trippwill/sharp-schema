@@ -78,7 +78,7 @@ internal static class PropertyInfoExtensions
     {
         if (property.PropertyType.IsValueType &&
             property.PropertyType.IsGenericType &&
-            property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            property.PropertyType.GetGenericTypeDefinition().Name == typeof(Nullable<>).Name)
         {
             return true;
         }

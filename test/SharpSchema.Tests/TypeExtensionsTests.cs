@@ -433,7 +433,7 @@ public class TypeExtensionsTests(ITestOutputHelper output)
         Type type = typeof(ExceedingMaxDepthClass);
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => type.ToJsonSchema());
+        Assert.Throws<InvalidOperationException>(() => type.ToJsonSchema());
     }
 
     [Fact]
@@ -480,6 +480,21 @@ public class TypeExtensionsTests(ITestOutputHelper output)
         Assert.Equal(SchemaValueType.Object, schema.GetJsonType());
         Assert.Contains("objectMap", schema.GetRequired()!);
         Assert.Contains("complexObjectMap", schema.GetRequired()!);
+    }
+
+    [Fact]
+    public void ToJsonSchema_WithAmbientSchema_ReturnsObjectSchemaWithProperties()
+    {
+        // Arrange
+        Type type = typeof(AmbientClass);
+
+        // Act
+        JsonSchema schema = type.ToJsonSchema();
+        this.OutputSchema(schema);
+
+        // Assert
+        Assert.Equal(SchemaValueType.Object, schema.GetJsonType());
+        Assert.Contains("name", schema.GetProperties()!);
     }
 
     [Theory]
@@ -614,12 +629,12 @@ public class TypeExtensionsTests(ITestOutputHelper output)
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test Code")]
     [Description("A class with an age property")]
-    private interface IHasAge
+    internal interface IHasAge
     {
         int Age { get; }
     }
 
-    private class ExceedingMaxDepthClass
+    internal class ExceedingMaxDepthClass
     {
         public ExceedingMaxDepthClass? Nested { get; set; }
     }
@@ -682,6 +697,21 @@ public class TypeExtensionsTests(ITestOutputHelper output)
         [JsonInclude]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Test Code")]
         private IHasAge? ForceRequiredReference { get; set; }
+    }
+
+    [AmbientValue(Schema)]
+    private class AmbientClass
+    {
+        private const string Schema = /* lang=json */"""
+            {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            }
+            """;
     }
 
     public record SampleRecord(int Id, string Name);

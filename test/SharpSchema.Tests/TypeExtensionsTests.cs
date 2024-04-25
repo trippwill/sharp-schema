@@ -718,7 +718,7 @@ public class TypeExtensionsTests(ITestOutputHelper output)
 
     public abstract class AbstractClass
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 
     public class ConcreteClass1 : AbstractClass

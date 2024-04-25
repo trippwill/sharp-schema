@@ -34,4 +34,9 @@ public class ConverterContext
     /// Gets a value indicating whether to use the underlying type of an enum in schema generation.
     /// </summary>
     public bool EnumAsUnderlyingType { get; init; } = false;
+
+    /// <summary>
+    /// Gets the default namespace for type schema generation.
+    /// </summary>
+    public string? DefaultNamespace { get; init; }
 }

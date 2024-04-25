@@ -87,66 +87,38 @@ public static class TypeExtensions
     /// Converts a <see cref="Type"/> to a definition name for JSON schema.
     /// </summary>
     /// <param name="type">The <see cref="Type"/> to convert.</param>
+    /// <param name="context">The converter context.</param>
     /// <returns>The definition name for JSON schema.</returns>
-    public static string ToDefinitionName(this Type type)
+    public static string ToDefinitionName(this Type type, ConverterContext context)
     {
         Requires.NotNull(type, nameof(type));
+        Requires.NotNull(context, nameof(context));
 
         string? genericArgs = type.IsGenericType
-            ? $"[{string.Join('_', type.GetGenericArguments().Select(ToDefinitionName))}]"
+            ? $"[{string.Join('_', type.GetGenericArguments().Select(t => t.ToDefinitionName(context)))}]"
             : string.Empty;
 
-        return $"{type.Namespace}.{(type.DeclaringType is null ? string.Empty : (type.DeclaringType.Name + '_'))}{type.Name}{genericArgs}"
-            .Replace('+', '_')
-            .Replace('`', '_');
-    }
-
-    /// <summary>
-    /// Adds the type to the interfaces in the JSON schema definitions.
-    /// </summary>
-    /// <param name="type">The type to add.</param>
-    /// <param name="defName">The definition name for JSON schema.</param>
-    /// <param name="defs">The dictionary of JSON schema definitions.</param>
-    internal static void AddToInterfaces(this Type type, string defName, Dictionary<string, JsonSchemaBuilder> defs)
-    {
-        foreach (Type iface in type.GetInterfaces())
+        string @namespace = type.DeclaringType?.Namespace ?? type.Namespace ?? string.Empty;
+        if (context.DefaultNamespace is not null && @namespace.StartsWith(context.DefaultNamespace))
         {
-            // ignore system interfaces
-            if (iface.Namespace is null || iface.Namespace == "System" || iface.Namespace.StartsWith("System."))
-            {
-                continue;
-            }
-
-            // ignore compiler-generated interfaces
-            if (iface.GetCustomAttributesData()
-                .Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute"))
-            {
-                continue;
-            }
-
-            string ifaceDefName = iface.ToDefinitionName();
-            if (defs.TryGetValue(ifaceDefName, out JsonSchemaBuilder? ifaceSchemaBuilder))
-            {
-                JsonSchema ifaceSchema = ifaceSchemaBuilder;
-
-                IReadOnlyCollection<JsonSchema>? existingOneOf = ifaceSchema.GetOneOf();
-                List<JsonSchema> oneOf = existingOneOf is null ? new() : new(existingOneOf);
-                oneOf.Add(new JsonSchemaBuilder()
-                    .Ref($"#/$defs/{defName}"));
-
-                defs[ifaceDefName] = ifaceSchemaBuilder
-                    .OneOf(oneOf);
-            }
-            else
-            {
-                ifaceSchemaBuilder = new JsonSchemaBuilder()
-                    .AddTypeAnnotations(iface)
-                    .OneOf(new JsonSchemaBuilder()
-                        .Ref($"#/$defs/{defName}"));
-
-                defs.Add(ifaceDefName, ifaceSchemaBuilder);
-            }
+            @namespace = @namespace[context.DefaultNamespace.Length..];
         }
+        else if (@namespace.StartsWith("System.Collections.Immutable"))
+        {
+            @namespace = @namespace["System.Collections.Immutable".Length..];
+        }
+        else if (@namespace.StartsWith("System.Collections.Generic"))
+        {
+            @namespace = @namespace["System.Collections.Generic".Length..];
+        }
+
+        string typeName = type.Name.Split('`')[0];
+
+        string finalName = type.DeclaringType is null
+            ? typeName
+            : $"{type.DeclaringType.Name}_{typeName}";
+
+        return $"{@namespace}.{finalName}{genericArgs}".Trim().Trim('.');
     }
 
     /// <summary>
@@ -247,83 +219,30 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    /// Gets the JSON schema property schemas for an object type.
+    /// Gets the subtypes of the specified <see cref="Type"/>.
     /// </summary>
-    /// <param name="type">The object type.</param>
-    /// <param name="context">The context.</param>
-    /// <param name="required">The required property names.</param>
-    /// <returns>The dictionary of property schemas.</returns>
-    internal static Dictionary<string, JsonSchema> GetObjectPropertySchemas(this Type type, ConverterContext context, out IEnumerable<string> required)
+    /// <param name="type">The base <see cref="Type"/>.</param>
+    /// <returns>An enumerable collection of subtypes.</returns>
+    internal static IEnumerable<Type> GetSubTypes(this Type type)
     {
-        List<string>? requiredProperties = null;
+        Assembly assembly = type.Assembly;
 
-        PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        Dictionary<string, JsonSchema> propertySchemas = new(properties.Length);
-        foreach (PropertyInfo property in properties)
+        foreach (Type t in assembly.GetTypes())
         {
-            if (property.ShouldSkipProperty())
+            if (t.IsSubclassOf(type))
             {
-                continue;
+                if (t.IsAbstract)
+                {
+                    foreach (Type tt in t.GetSubTypes())
+                    {
+                        yield return tt;
+                    }
+
+                    continue;
+                }
+
+                yield return t;
             }
-
-            // skip properties with no public getter
-            MethodInfo? getMethod = property.GetGetMethod();
-            if (getMethod is null || getMethod.IsPublic == false)
-            {
-                continue;
-            }
-
-            string normalizedName = property.GetPropertyName();
-
-            propertySchemas[normalizedName] = GetPropertySchema(property, normalizedName, context, ref requiredProperties);
-        }
-
-        // add non-public properties with JsonIncludeAttribute
-        properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-        propertySchemas.EnsureCapacity(propertySchemas.Count + properties.Length);
-
-        foreach (PropertyInfo property in properties)
-        {
-            // skip properties that have already been added
-            string normalizedName = property.GetPropertyName();
-            if (propertySchemas.ContainsKey(normalizedName))
-            {
-                continue;
-            }
-
-            if (property.ShouldSkipProperty())
-            {
-                continue;
-            }
-
-            // skip properties without JsonIncludeAttribute
-            if (property.GetCustomAttributesData()
-                .All(a => a.AttributeType.FullName != "System.Text.Json.Serialization.JsonIncludeAttribute"))
-            {
-                continue;
-            }
-
-            propertySchemas[normalizedName] = GetPropertySchema(property, normalizedName, context, ref requiredProperties);
-        }
-
-        required = requiredProperties ?? Enumerable.Empty<string>();
-
-        return propertySchemas;
-
-        //// -- local functions --
-
-        static JsonSchemaBuilder GetPropertySchema(PropertyInfo property, string normalizedName, ConverterContext context, ref List<string>? requiredProperties)
-        {
-            JsonSchemaBuilder propertySchema = new JsonSchemaBuilder()
-                .AddPropertyInfo(property, context, out bool isRequired);
-
-            if (isRequired)
-            {
-                requiredProperties ??= [];
-                requiredProperties.Add(normalizedName);
-            }
-
-            return propertySchema;
         }
     }
 }

@@ -12,11 +12,16 @@ namespace SharpSchema.TypeHandlers;
 internal class FallbackTypeHandler : TypeHandler
 {
     /// <inheritdoc/>
-    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public override Result TryHandle(
+        JsonSchemaBuilder builder,
+        ConverterContext context,
+        Type type,
+        bool isRootType = false,
+        IList<CustomAttributeData>? propertyAttributeData = null)
     {
         try
         {
-            builder = AddObjectType(builder, type, isRootType, context, propertyAttributeData);
+            builder = AddObjectType(builder, context, type, isRootType, propertyAttributeData);
             return Result.Handled(builder);
         }
         catch (Exception ex)
@@ -25,25 +30,28 @@ internal class FallbackTypeHandler : TypeHandler
         }
     }
 
-    private static JsonSchemaBuilder AddObjectType(JsonSchemaBuilder builder, Type type, bool isTopLevel, ConverterContext context, IList<CustomAttributeData>? propertyAttributeData = null)
+    private static JsonSchemaBuilder AddObjectType(
+        JsonSchemaBuilder builder,
+        ConverterContext context,
+        Type type,
+        bool isTopLevel,
+        IList<CustomAttributeData>? propertyAttributeData = null)
     {
         // handle other generics
         if (type.IsGenericType)
         {
             Type genericTypeDefinition = type.GetGenericTypeDefinition();
-            Type[] genericArguments = type.GetGenericArguments();
 
             // add oneOf for generic types
-            string genericTypeDefinitionName = genericTypeDefinition.ToDefinitionName();
-            string definitionName = type.ToDefinitionName();
+            string genericTypeDefinitionName = genericTypeDefinition.ToDefinitionName(context);
+            string definitionName = type.ToDefinitionName(context);
+            Uri refPath = new($"#/$defs/{definitionName}", UriKind.RelativeOrAbsolute);
 
             if (context.Defs.TryGetValue(genericTypeDefinitionName, out JsonSchemaBuilder? genericTypeBuilder))
             {
                 JsonSchema genericTypeSchema = genericTypeBuilder;
                 IReadOnlyCollection<JsonSchema>? existingOneOf = genericTypeSchema.GetOneOf();
                 List<JsonSchema> oneOf = existingOneOf is null ? new() : new(existingOneOf);
-
-                Uri refPath = new($"#/$defs/{definitionName}", UriKind.RelativeOrAbsolute);
 
                 if (!oneOf.Any(s => s.GetRef() == refPath))
                 {
@@ -59,7 +67,7 @@ internal class FallbackTypeHandler : TypeHandler
                 genericTypeBuilder = new JsonSchemaBuilder()
                     .AddTypeAnnotations(type)
                     .OneOf(new JsonSchemaBuilder()
-                        .Ref($"#/$defs/{definitionName}"));
+                        .Ref(refPath));
 
                 context.Defs.Add(genericTypeDefinitionName, genericTypeBuilder);
             }
@@ -77,11 +85,11 @@ internal class FallbackTypeHandler : TypeHandler
             return AddCustomObjectType(builder, type, context);
         }
 
-        string defName = type.ToDefinitionName();
+        string defName = type.ToDefinitionName(context);
         if (context.Defs.TryAdd(defName, AddCustomObjectType(new JsonSchemaBuilder(), type, context)) &&
             context.IncludeInterfaces)
         {
-            type.AddToInterfaces(defName, context.Defs);
+            AddToInterfaces(type, context, defName, context.Defs);
         }
 
         return builder
@@ -95,29 +103,149 @@ internal class FallbackTypeHandler : TypeHandler
 
             if (type.IsAbstract)
             {
-                Assembly assembly = type.Assembly;
-
-                var concreteTypes = assembly.GetTypes()
-                    .Where(t => t.IsSubclassOf(type) && !t.IsAbstract)
+                var concreteTypeSchemas = type
+                    .GetSubTypes()
                     .Select(t => new JsonSchemaBuilder().AddType(t, context).Build())
                     .ToList();
 
-                if (concreteTypes.Count == 0)
+                if (concreteTypeSchemas.Count == 0)
                 {
                     return builder;
                 }
 
                 return builder
-                    .OneOf(concreteTypes);
+                    .OneOf(concreteTypeSchemas);
             }
 
-            Dictionary<string, JsonSchema> propertySchemas = type.GetObjectPropertySchemas(context, out IEnumerable<string>? requiredProperties);
+            Dictionary<string, JsonSchema> propertySchemas = GetObjectPropertySchemas(type, context, out IEnumerable<string>? requiredProperties);
 
-            return builder
+            builder = builder
                 .Type(SchemaValueType.Object)
-                .Properties(propertySchemas)
-                .Required(requiredProperties)
-                .AdditionalProperties(false);
+                .Properties(propertySchemas);
+
+            if (requiredProperties is not null)
+            {
+                builder = builder
+                .Required(requiredProperties);
+            }
+
+            return builder.AdditionalProperties(false);
+        }
+    }
+
+    private static Dictionary<string, JsonSchema> GetObjectPropertySchemas(Type type, ConverterContext context, out IEnumerable<string>? required)
+    {
+        List<string>? requiredProperties = null;
+
+        PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        Dictionary<string, JsonSchema> propertySchemas = new(properties.Length);
+        foreach (PropertyInfo property in properties)
+        {
+            if (property.ShouldSkipProperty())
+            {
+                continue;
+            }
+
+            // skip properties with no public getter
+            MethodInfo? getMethod = property.GetGetMethod();
+            if (getMethod is null || getMethod.IsPublic == false)
+            {
+                continue;
+            }
+
+            string normalizedName = property.GetPropertyName();
+
+            propertySchemas[normalizedName] = GetPropertySchema(property, normalizedName, context, ref requiredProperties);
+        }
+
+        // add non-public properties with JsonIncludeAttribute
+        properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+        propertySchemas.EnsureCapacity(propertySchemas.Count + properties.Length);
+
+        foreach (PropertyInfo property in properties)
+        {
+            // skip properties that have already been added
+            string normalizedName = property.GetPropertyName();
+            if (propertySchemas.ContainsKey(normalizedName))
+            {
+                continue;
+            }
+
+            if (property.ShouldSkipProperty())
+            {
+                continue;
+            }
+
+            // skip properties without JsonIncludeAttribute
+            if (property.GetCustomAttributesData()
+                .All(a => a.AttributeType.FullName != "System.Text.Json.Serialization.JsonIncludeAttribute"))
+            {
+                continue;
+            }
+
+            propertySchemas[normalizedName] = GetPropertySchema(property, normalizedName, context, ref requiredProperties);
+        }
+
+        required = requiredProperties;
+
+        return propertySchemas;
+
+        //// -- local functions --
+
+        static JsonSchemaBuilder GetPropertySchema(PropertyInfo property, string normalizedName, ConverterContext context, ref List<string>? requiredProperties)
+        {
+            JsonSchemaBuilder propertySchema = new JsonSchemaBuilder()
+                .AddPropertyInfo(property, context, out bool isRequired);
+
+            if (isRequired)
+            {
+                requiredProperties ??= [];
+                requiredProperties.Add(normalizedName);
+            }
+
+            return propertySchema;
+        }
+    }
+
+    private static void AddToInterfaces(Type type, ConverterContext context, string defName, Dictionary<string, JsonSchemaBuilder> defs)
+    {
+        foreach (Type iface in type.GetInterfaces())
+        {
+            // ignore system interfaces
+            if (iface.Namespace is null || iface.Namespace == "System" || iface.Namespace.StartsWith("System."))
+            {
+                continue;
+            }
+
+            // ignore compiler-generated interfaces
+            if (iface.GetCustomAttributesData()
+                .Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute"))
+            {
+                continue;
+            }
+
+            string ifaceDefName = iface.ToDefinitionName(context);
+            if (defs.TryGetValue(ifaceDefName, out JsonSchemaBuilder? ifaceSchemaBuilder))
+            {
+                JsonSchema ifaceSchema = ifaceSchemaBuilder;
+
+                IReadOnlyCollection<JsonSchema>? existingOneOf = ifaceSchema.GetOneOf();
+                List<JsonSchema> oneOf = existingOneOf is null ? new() : new(existingOneOf);
+                oneOf.Add(new JsonSchemaBuilder()
+                    .Ref($"#/$defs/{defName}"));
+
+                defs[ifaceDefName] = ifaceSchemaBuilder
+                    .OneOf(oneOf);
+            }
+            else
+            {
+                ifaceSchemaBuilder = new JsonSchemaBuilder()
+                    .AddTypeAnnotations(iface)
+                    .OneOf(new JsonSchemaBuilder()
+                        .Ref($"#/$defs/{defName}"));
+
+                defs.Add(ifaceDefName, ifaceSchemaBuilder);
+            }
         }
     }
 }

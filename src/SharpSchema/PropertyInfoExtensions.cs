@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Humanizer;
 
 namespace SharpSchema;
@@ -26,11 +27,31 @@ internal static class PropertyInfoExtensions
             return true;
         }
 
-        // skip properties with JsonIgnoreAttribute
-        if (property.GetCustomAttributesData()
-            .Any(a => a.AttributeType.FullName == "System.Text.Json.Serialization.JsonIgnoreAttribute"))
+        // skip properties with JsonIgnoreAttribute if Condition is not set to Never
+        IList<CustomAttributeData> attributes = property.GetCustomAttributesData();
+        CustomAttributeData? jsonIgnoreAttribute = attributes.FirstOrDefault(a => a.AttributeType.FullName == typeof(JsonIgnoreAttribute).FullName);
+        if (jsonIgnoreAttribute is not null)
         {
-            return true;
+            if (jsonIgnoreAttribute.NamedArguments.Count == 0)
+            {
+                return true;
+            }
+
+            CustomAttributeNamedArgument conditionArgument = jsonIgnoreAttribute.NamedArguments.FirstOrDefault(na => na.MemberName == "Condition");
+            if (conditionArgument == default)
+            {
+                return true;
+            }
+
+            if (conditionArgument.TypedValue.ArgumentType.Name != typeof(JsonIgnoreCondition).Name)
+            {
+                return true;
+            }
+
+            if (conditionArgument.TypedValue.Value is JsonIgnoreCondition condition && condition != JsonIgnoreCondition.Never)
+            {
+                return true;
+            }
         }
 
         return false;

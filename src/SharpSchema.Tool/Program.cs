@@ -84,6 +84,15 @@ internal class Program
             IsRequired = true,
         };
 
+        Option<string?> defaultNamespaceOption = new(
+            ["--default-namespace", "-ns"],
+            description: "The default namespace for type schema generation.",
+            getDefaultValue: () => null)
+        {
+            IsRequired = false,
+            Arity = ArgumentArity.ZeroOrOne,
+        };
+
         Option<FileInfo?> outputOption = new(
             ["--output", "-o"],
             description: "The file to write the schema to. When not provided, outputs to the console.")
@@ -116,6 +125,7 @@ internal class Program
         {
             assemblyOption,
             classNameOption,
+            defaultNamespaceOption,
             outputOption,
             overwriteOption,
             referenceOption,
@@ -123,7 +133,7 @@ internal class Program
         };
 
         rootCommand.SetHandler(
-            (assemblyInfo, className, outputInfo, overwrite, referenceInfos, referenceDirectoryInfos) =>
+            (assemblyInfo, className, defaultNamespace, outputInfo, overwrite, referenceInfos, referenceDirectoryInfos) =>
             {
                 ExitCode exitCode = ExitCode.Success;
                 using (AssemblyLoader loader = new(DefaultConsole.Instance))
@@ -140,7 +150,10 @@ internal class Program
                             goto exit;
                         }
 
-                        JsonSchema schema = type.ToJsonSchema().Build();
+                        JsonSchema schema = type.ToJsonSchema(new ConverterContext()
+                        {
+                            DefaultNamespace = defaultNamespace,
+                        }).Build();
 
                         string schemaString = JsonSerializer.Serialize(
                             schema.ToJsonDocument().RootElement,
@@ -179,6 +192,7 @@ internal class Program
             },
             assemblyOption,
             classNameOption,
+            defaultNamespaceOption,
             outputOption,
             overwriteOption,
             referenceOption,

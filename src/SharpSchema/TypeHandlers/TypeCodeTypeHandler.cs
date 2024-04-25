@@ -6,7 +6,7 @@ using Humanizer;
 using Json.Schema;
 using Microsoft;
 
-namespace SharpSchema;
+namespace SharpSchema.TypeHandlers;
 
 /// <summary>
 /// Handles types with common type codes.

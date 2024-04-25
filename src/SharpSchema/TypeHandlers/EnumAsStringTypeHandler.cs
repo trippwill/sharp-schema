@@ -5,7 +5,7 @@ using System.Reflection;
 using Humanizer;
 using Json.Schema;
 
-namespace SharpSchema;
+namespace SharpSchema.TypeHandlers;
 
 /// <summary>
 /// Handles enum types by representing them as strings.

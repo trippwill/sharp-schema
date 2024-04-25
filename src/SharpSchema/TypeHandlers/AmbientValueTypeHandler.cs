@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text.Json;
 using Json.Schema;
 
-namespace SharpSchema;
+namespace SharpSchema.TypeHandlers;
 
 /// <summary>
 /// Handles ambient value types.

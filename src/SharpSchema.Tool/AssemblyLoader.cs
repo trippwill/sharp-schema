@@ -9,7 +9,7 @@ namespace SharpSchema.Tool;
 /// <summary>
 /// Represents a class responsible for loading assemblies.
 /// </summary>
-internal class AssemblyLoader(IConsole console) : IDisposable
+internal class AssemblyLoader(IConsole console, int directoryRecursionDepth) : IDisposable
 {
     private MetadataLoadContext? context;
 
@@ -25,8 +25,10 @@ internal class AssemblyLoader(IConsole console) : IDisposable
     /// <returns>The loaded assembly.</returns>
     public Assembly LoadAssembly(FileInfo assemblyFile, FileInfo[]? referenceFiles, DirectoryInfo[]? referenceDirectories)
     {
-        Dictionary<string, string> assemblyPathMap = new();
-        assemblyPathMap.Add(assemblyFile.Name, assemblyFile.FullName);
+        Dictionary<string, string> assemblyNamePathMap = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { assemblyFile.Name, assemblyFile.FullName },
+        };
 
         foreach (FileInfo referenceFile in referenceFiles ?? [])
         {
@@ -36,13 +38,12 @@ internal class AssemblyLoader(IConsole console) : IDisposable
                 continue;
             }
 
-            if (assemblyPathMap.ContainsKey(referenceFile.Name))
+            if (assemblyNamePathMap.ContainsKey(referenceFile.Name))
             {
-                console.Error.Write($"Duplicate reference: {referenceFile.FullName}\n");
                 continue;
             }
 
-            assemblyPathMap.Add(referenceFile.Name, referenceFile.FullName);
+            assemblyNamePathMap[referenceFile.Name] = referenceFile.FullName;
         }
 
         foreach (DirectoryInfo referenceDirectory in referenceDirectories ?? [])
@@ -56,20 +57,19 @@ internal class AssemblyLoader(IConsole console) : IDisposable
             foreach (string path in Directory.EnumerateFiles(referenceDirectory.FullName, "*.dll", new EnumerationOptions
             {
                 RecurseSubdirectories = true,
-                MaxRecursionDepth = 2,
+                MaxRecursionDepth = directoryRecursionDepth,
             }))
             {
-                if (assemblyPathMap.ContainsKey(Path.GetFileName(path)))
+                if (assemblyNamePathMap.ContainsKey(Path.GetFileName(path)))
                 {
-                    console.Error.Write($"Duplicate reference: {path}\n");
                     continue;
                 }
 
-                assemblyPathMap.Add(Path.GetFileName(path), path);
+                assemblyNamePathMap[Path.GetFileName(path)] = path;
             }
         }
 
-        PathAssemblyResolver resolver = new(assemblyPathMap.Values);
+        PathAssemblyResolver resolver = new(assemblyNamePathMap.Values);
         this.context = new MetadataLoadContext(resolver);
 
         return this.context.LoadFromAssemblyPath(assemblyFile.FullName);

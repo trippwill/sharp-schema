@@ -4,10 +4,10 @@
 using System.CommandLine;
 using System.CommandLine.IO;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Text.Json;
 using Json.More;
 using Json.Schema;
+using SharpSchema.Annotations;
 
 namespace SharpSchema.Tool;
 
@@ -77,25 +77,27 @@ internal class Program
             IsRequired = true,
         };
 
-        Option<string> classNameOption = new(
-            ["--class-name", "-c"],
-            description: "The name of the root class to generate a schema for.")
+        Option<string[]> classNameOption = new(
+            ["--class", "-c"],
+            description: "The root class to generate a schema for.")
         {
             IsRequired = true,
+            Arity = ArgumentArity.OneOrMore,
+            AllowMultipleArgumentsPerToken = true,
         };
 
-        Option<string?> defaultNamespaceOption = new(
-            ["--default-namespace", "-ns"],
-            description: "The default namespace for type schema generation.",
-            getDefaultValue: () => null)
-        {
-            IsRequired = false,
-            Arity = ArgumentArity.ZeroOrOne,
-        };
-
-        Option<FileInfo?> outputOption = new(
+        Option<DirectoryInfo?> outputOption = new(
             ["--output", "-o"],
-            description: "The file to write the schema to. When not provided, outputs to the console.")
+            description: "The directory to write the generated schemas to. If no path is provided, outputs to the current directory. When this option is not provided, outputs to the console.",
+            parseArgument: result =>
+            {
+                if (result.Tokens.Count != 1)
+                {
+                    return new DirectoryInfo(Environment.CurrentDirectory);
+                }
+
+                return new DirectoryInfo(result.Tokens.Single().Value);
+            })
         {
             IsRequired = false,
         };
@@ -107,7 +109,7 @@ internal class Program
 
         Option<FileInfo[]?> referenceOption = new(
             ["--reference", "-r"],
-            description: "The assembly to reference.")
+            description: "An assembly to reference.")
         {
             IsRequired = false,
             Arity = ArgumentArity.ZeroOrMore,
@@ -115,7 +117,7 @@ internal class Program
 
         Option<DirectoryInfo[]?> referenceDirectoryOption = new(
             ["--reference-directory", "-d"],
-            description: "The directory containing assemblies to reference.")
+            description: "A directory containing assemblies to reference.")
         {
             IsRequired = false,
             Arity = ArgumentArity.ZeroOrMore,
@@ -125,7 +127,6 @@ internal class Program
         {
             assemblyOption,
             classNameOption,
-            defaultNamespaceOption,
             outputOption,
             overwriteOption,
             referenceOption,
@@ -133,46 +134,75 @@ internal class Program
         };
 
         rootCommand.SetHandler(
-            (assemblyInfo, className, defaultNamespace, outputInfo, overwrite, referenceInfos, referenceDirectoryInfos) =>
+            (assemblyInfo, classNames, outputInfo, overwrite, referenceInfos, referenceDirectoryInfos) =>
             {
                 ExitCode exitCode = ExitCode.Success;
-                using (AssemblyLoader loader = new(DefaultConsole.Instance))
+                using (AssemblyLoader loader = new(DefaultConsole.Instance, directoryRecursionDepth: 3))
                 {
                     try
                     {
                         Assembly assembly = loader.LoadAssembly(assemblyInfo, referenceInfos, referenceDirectoryInfos);
-                        Type? type = assembly.GetType(className);
 
-                        if (type is null)
+                        foreach (string className in classNames)
                         {
-                            DefaultConsole.Instance.Error.Write($"Type {className} not found in input assembly.\n");
-                            exitCode = ExitCode.ClassNotFoundError;
-                            goto exit;
-                        }
+                            Type? rootType = assembly.GetType(className);
 
-                        JsonSchema schema = type.ToJsonSchema(new ConverterContext()
-                        {
-                            DefaultNamespace = defaultNamespace,
-                        }).Build();
-
-                        string schemaString = JsonSerializer.Serialize(
-                            schema.ToJsonDocument().RootElement,
-                            WriteOptions);
-
-                        if (outputInfo is null)
-                        {
-                            DefaultConsole.Instance.Out.Write(schemaString);
-                        }
-                        else
-                        {
-                            if (outputInfo.Exists && !overwrite)
+                            if (rootType is null)
                             {
-                                DefaultConsole.Instance.Error.Write($"Output file {outputInfo.FullName} already exists. Use --overwrite to overwrite.\n");
-                                exitCode = ExitCode.OutputFileExists;
+                                DefaultConsole.Instance.Error.Write($"Class {className} not found in assembly.\n");
+                                exitCode = ExitCode.ClassNotFoundError;
                                 goto exit;
                             }
 
-                            File.WriteAllText(outputInfo.FullName, schemaString);
+                            if (!rootType.TryGetCustomAttributeData(typeof(SchemaRootAttribute), out CustomAttributeData? cad))
+                            {
+                                DefaultConsole.Instance.Error.Write($"Class {className} must be decorated with SchemaRootAttribute.\n");
+                                exitCode = ExitCode.Error;
+                                goto exit;
+                            }
+
+                            RootTypeContext rootTypeContext = new(
+                                rootType,
+                                Filename: cad.GetNamedArgument<string>("Filename"),
+                                Id: cad.GetNamedArgument<string>("Id"),
+                                CommonNamespace: cad.GetNamedArgument<string>("CommonNamespace"));
+
+                            DefaultConsole.Instance.Error.Write($"Generating schema for {rootTypeContext.Type.FullName}...\n");
+
+                            JsonSchema schema = rootTypeContext.Type.ToJsonSchema(new ConverterContext()
+                            {
+                                DefaultNamespace = rootTypeContext.CommonNamespace,
+                                Id = rootTypeContext.Id,
+                            }).Build();
+
+                            string schemaString = JsonSerializer.Serialize(
+                                schema.ToJsonDocument().RootElement,
+                                WriteOptions);
+
+                            string fileName = rootTypeContext.Filename ?? $"{rootTypeContext.Type.Name}.schema.json";
+
+                            if (outputInfo is null)
+                            {
+                                DefaultConsole.Instance.Out.Write(schemaString);
+                            }
+                            else
+                            {
+                                FileInfo outputFile = new(Path.Combine(outputInfo.FullName, fileName));
+                                if (outputFile.DirectoryName is string directoryName)
+                                {
+                                    Directory.CreateDirectory(directoryName);
+                                }
+
+                                if (outputFile.Exists && !overwrite)
+                                {
+                                    DefaultConsole.Instance.Error.Write($"Output file {outputFile.FullName} already exists. Use --overwrite to overwrite.\n");
+                                    exitCode = ExitCode.OutputFileExists;
+                                    goto exit;
+                                }
+
+                                File.WriteAllText(outputFile.FullName, schemaString);
+                                DefaultConsole.Instance.Error.Write($"Schema written to {outputFile.FullName}\n");
+                            }
                         }
                     }
                     catch (FileLoadException flex)
@@ -187,12 +217,11 @@ internal class Program
                     }
                 }
 
-                exit:
+exit:
                 return Task.FromResult((int)exitCode);
             },
             assemblyOption,
             classNameOption,
-            defaultNamespaceOption,
             outputOption,
             overwriteOption,
             referenceOption,

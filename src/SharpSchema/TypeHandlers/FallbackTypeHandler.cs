@@ -207,7 +207,7 @@ internal class FallbackTypeHandler : TypeHandler
         }
     }
 
-    private static void AddToInterfaces(Type type, ConverterContext context, string defName, Dictionary<string, JsonSchemaBuilder> defs)
+    private static void AddToInterfaces(Type type, ConverterContext context, string defName, IDictionary<string, JsonSchemaBuilder> defs)
     {
         foreach (Type iface in type.GetInterfaces())
         {

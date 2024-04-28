@@ -6,4 +6,7 @@
     <PackageReference Include="JsonSchema.Net" />
     <PackageReference Include="Microsoft.VisualStudio.Validation" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SharpSchema.Annotations\SharpSchema.Annotations.csproj" />
+  </ItemGroup>
 </Project>

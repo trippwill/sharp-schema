@@ -26,11 +26,9 @@ public static class TypeExtensions
         JsonSchemaBuilder builder = new JsonSchemaBuilder()
             .Schema("http://json-schema.org/draft-07/schema#");
 
-        // if the type has a DisplayName attribute, use it as the $id
-        if (type.GetCustomAttributesData()
-            .FirstOrDefault(a => a.AttributeType.FullName == "System.ComponentModel.DisplayNameAttribute") is { ConstructorArguments: { Count: 1 } arguments })
+        if (context?.Id is string id)
         {
-            builder = builder.Id((string)arguments[0].Value!);
+            builder = builder.Id(id);
         }
 
         return type.ToJsonSchema(builder, context);
@@ -166,55 +164,6 @@ public static class TypeExtensions
         }
 
         underlyingType = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Tries to get the <see cref="CustomAttributeData"/> for the specified <see cref="Type"/> and attribute type.
-    /// </summary>
-    /// <param name="type">The <see cref="Type"/> to check.</param>
-    /// <param name="attributeType">The attribute type.</param>
-    /// <param name="attributeData">When this method returns, contains the <see cref="CustomAttributeData"/> for the specified attribute type, if found; otherwise, <see langword="null"/>.</param>
-    /// <returns><see langword="true"/> if the <see cref="CustomAttributeData"/> for the specified attribute type is found; otherwise, <see langword="false"/>.</returns>
-    internal static bool TryGetCustomAttributeData(this Type type, Type attributeType, [NotNullWhen(true)] out CustomAttributeData? attributeData)
-    {
-        return type.TryGetCustomAttributeData(
-            attributeType.FullName ?? throw new InvalidOperationException("Attribute type has no full name."),
-            out attributeData);
-    }
-
-    /// <summary>
-    /// Tries to get the <see cref="CustomAttributeData"/> for the specified <see cref="Type"/> and attribute type.
-    /// </summary>
-    /// <param name="type">The <see cref="Type"/> to check.</param>
-    /// <param name="attributeFullName">The full name of the attribute type.</param>
-    /// <param name="attributeData">When this method returns, contains the <see cref="CustomAttributeData"/> for the specified attribute type, if found; otherwise, <see langword="null"/>.</param>
-    /// <returns><see langword="true"/> if the <see cref="CustomAttributeData"/> for the specified attribute type is found; otherwise, <see langword="false"/>.</returns>
-    internal static bool TryGetCustomAttributeData(this Type type, string attributeFullName, [NotNullWhen(true)] out CustomAttributeData? attributeData)
-    {
-        attributeData = type.GetCustomAttributesData()
-            .FirstOrDefault(cad => cad.AttributeType.FullName == attributeFullName);
-
-        return attributeData is not null;
-    }
-
-    /// <summary>
-    /// Tries to get the ambient value for the specified <see cref="Type"/>.
-    /// </summary>
-    /// <param name="type">The <see cref="Type"/> to check.</param>
-    /// <param name="ambientValue">The ambient value if present.</param>
-    /// <returns><see langword="true"/> if the ambient value is found; otherwise, <see langword="false"/>.</returns>
-    internal static bool TryGetAmbientValue(this Type type, [NotNullWhen(true)] out string? ambientValue)
-    {
-        if (type.TryGetCustomAttributeData("System.ComponentModel.AmbientValueAttribute", out CustomAttributeData? ambientValueAttribute)
-            && ambientValueAttribute.ConstructorArguments.Count == 1
-            && ambientValueAttribute.ConstructorArguments[0].Value is string value)
-        {
-            ambientValue = value;
-            return true;
-        }
-
-        ambientValue = null;
         return false;
     }
 

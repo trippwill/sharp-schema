@@ -9,52 +9,10 @@ using Microsoft;
 namespace SharpSchema;
 
 /// <summary>
-/// Provides extension methods for converting a <see cref="Type"/> to a JSON schema.
+/// Provides extension methods for <see cref="Type"/>.
 /// </summary>
 public static class TypeExtensions
 {
-    /// <summary>
-    /// Converts a <see cref="Type"/> to a JSON schema using the specified <see cref="JsonSchemaBuilder"/>.
-    /// </summary>
-    /// <param name="type">The <see cref="Type"/> to convert.</param>
-    /// <param name="context">The converter context.</param>
-    /// <returns>The <see cref="JsonSchemaBuilder"/> representing the JSON schema.</returns>
-    public static JsonSchemaBuilder ToJsonSchema(this Type type, ConverterContext? context = null)
-    {
-        Requires.NotNull(type, nameof(type));
-
-        JsonSchemaBuilder builder = new JsonSchemaBuilder()
-            .Schema("http://json-schema.org/draft-07/schema#");
-
-        if (context?.Id is string id)
-        {
-            builder = builder.Id(id);
-        }
-
-        return type.ToJsonSchema(builder, context);
-    }
-
-    /// <summary>
-    /// Converts a <see cref="Type"/> to a JSON schema using the specified <see cref="JsonSchemaBuilder"/>.
-    /// </summary>
-    /// <param name="type">The <see cref="Type"/> to convert.</param>
-    /// <param name="builder">The <see cref="JsonSchemaBuilder"/> to use for building the JSON schema.</param>
-    /// <param name="context">The converter context.</param>
-    /// <returns>The <see cref="JsonSchemaBuilder"/> representing the JSON schema.</returns>
-    public static JsonSchemaBuilder ToJsonSchema(this Type type, JsonSchemaBuilder builder, ConverterContext? context = null)
-    {
-        context ??= new();
-        builder = builder.AddType(type, context, isTopLevel: true);
-
-        if (context.Defs.Count > 0)
-        {
-            builder = builder
-                .Defs(context.Defs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build()));
-        }
-
-        return builder;
-    }
-
     /// <summary>
     /// Converts a <see cref="TypeCode"/> to a <see cref="SchemaValueType"/>.
     /// </summary>

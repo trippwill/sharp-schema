@@ -34,10 +34,10 @@ public static class JsonSchemaBuilderExtensions
     /// <param name="builder">The builder.</param>
     /// <param name="type">The <see cref="Type"/> to convert.</param>
     /// <param name="context">The converter context.</param>
-    /// <param name="isTopLevel">Indicates whether the current type is the top-level type.</param>
+    /// <param name="isRootType">Indicates whether the current type is the top-level type.</param>
     /// <param name="propertyAttributeData">The attribute data from the owning property.</param>
     /// <returns>The JSON schema represented by a <see cref="JsonSchemaBuilder"/>.</returns>
-    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, Type type, ConverterContext context, bool isTopLevel = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, Type type, ConverterContext context, bool isRootType = true, IList<CustomAttributeData>? propertyAttributeData = null)
     {
         Requires.NotNull(builder, nameof(builder));
         Requires.NotNull(type, nameof(type));
@@ -52,7 +52,7 @@ public static class JsonSchemaBuilderExtensions
         {
             foreach (TypeHandler typeHandler in TypeHandlers)
             {
-                TypeHandler.Result result = typeHandler.TryHandle(builder, context, type, isTopLevel, propertyAttributeData);
+                TypeHandler.Result result = typeHandler.TryHandle(builder, context, type, isRootType, propertyAttributeData);
                 (builder, bool isHandled) = result.Unwrap();
 
                 if (isHandled)
@@ -94,7 +94,7 @@ public static class JsonSchemaBuilderExtensions
                         .AddType(
                             property.PropertyType,
                             context,
-                            isTopLevel: false,
+                            isRootType: false,
                             propertyAttributeData: property.GetCustomAttributesData())
                         .AddPropertyConstraints(property),
                     new JsonSchemaBuilder()
@@ -106,7 +106,7 @@ public static class JsonSchemaBuilderExtensions
                 .AddType(
                     property.PropertyType,
                     context,
-                    isTopLevel: false,
+                    isRootType: false,
                     propertyAttributeData: property.GetCustomAttributesData())
                 .AddPropertyConstraints(property);
         }
@@ -125,7 +125,7 @@ public static class JsonSchemaBuilderExtensions
     /// <returns>The updated JSON schema builder.</returns>
     internal static JsonSchemaBuilder AddArrayType(this JsonSchemaBuilder builder, Type itemType, ConverterContext context)
     {
-        JsonSchemaBuilder itemSchema = new JsonSchemaBuilder().AddType(itemType, context);
+        JsonSchemaBuilder itemSchema = new JsonSchemaBuilder().AddType(itemType, context, isRootType: false);
 
         return builder
             .Comment($"{itemType.Name}[]")

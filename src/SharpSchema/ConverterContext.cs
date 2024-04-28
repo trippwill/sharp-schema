@@ -39,9 +39,4 @@ public class ConverterContext
     /// Gets the default namespace for type schema generation.
     /// </summary>
     public string? DefaultNamespace { get; init; }
-
-    /// <summary>
-    /// Gets the default schema ID for the schema.
-    /// </summary>
-    public string? Id { get; init; }
 }

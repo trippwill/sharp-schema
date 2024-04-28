@@ -7,30 +7,34 @@ using System.Reflection;
 namespace SharpSchema.Tool;
 
 /// <summary>
-/// Represents a class responsible for loading assemblies.
+/// Initializes a new instance of the <see cref="AssemblyLoader"/> class.
 /// </summary>
-internal class AssemblyLoader(IConsole console, int directoryRecursionDepth) : IDisposable
+/// <param name="console">The console instance used for error output.</param>
+/// <param name="directoryRecursionDepth">The maximum recursion depth when searching for reference files in directories.</param>
+/// <param name="referenceFiles">A collection of reference files.</param>
+/// <param name="referenceDirectories">A collection of reference directories.</param>
+internal class AssemblyLoader(IConsole console, int directoryRecursionDepth, FileInfo[] referenceFiles, DirectoryInfo[] referenceDirectories) : IDisposable
 {
-    private MetadataLoadContext? context;
+    private readonly MetadataLoadContext context = GetContext(console, directoryRecursionDepth, referenceFiles, referenceDirectories);
 
     /// <inheritdoc/>
-    public void Dispose() => this.context?.Dispose();
+    public void Dispose() => this.context.Dispose();
 
     /// <summary>
     /// Loads an assembly from the specified file path along with optional reference files and directories.
     /// </summary>
     /// <param name="assemblyFile">The file path of the assembly to load.</param>
-    /// <param name="referenceFiles">Optional reference files to include.</param>
-    /// <param name="referenceDirectories">Optional reference directories to include.</param>
     /// <returns>The loaded assembly.</returns>
-    public Assembly LoadAssembly(FileInfo assemblyFile, FileInfo[]? referenceFiles, DirectoryInfo[]? referenceDirectories)
+    public Assembly LoadAssembly(FileInfo assemblyFile)
     {
-        Dictionary<string, string> assemblyNamePathMap = new(StringComparer.OrdinalIgnoreCase)
-        {
-            { assemblyFile.Name, assemblyFile.FullName },
-        };
+        return this.context.LoadFromAssemblyPath(assemblyFile.FullName);
+    }
 
-        foreach (FileInfo referenceFile in referenceFiles ?? [])
+    private static MetadataLoadContext GetContext(IConsole console, int directoryRecursionDepth, ReadOnlyMemory<FileInfo> referenceFiles, ReadOnlyMemory<DirectoryInfo> referenceDirectories)
+    {
+        Dictionary<string, string> assemblyNamePathMap = new(StringComparer.OrdinalIgnoreCase);
+
+        foreach (FileInfo referenceFile in referenceFiles.Span)
         {
             if (!referenceFile.Exists)
             {
@@ -46,7 +50,7 @@ internal class AssemblyLoader(IConsole console, int directoryRecursionDepth) : I
             assemblyNamePathMap[referenceFile.Name] = referenceFile.FullName;
         }
 
-        foreach (DirectoryInfo referenceDirectory in referenceDirectories ?? [])
+        foreach (DirectoryInfo referenceDirectory in referenceDirectories.Span)
         {
             if (!referenceDirectory.Exists)
             {
@@ -70,8 +74,6 @@ internal class AssemblyLoader(IConsole console, int directoryRecursionDepth) : I
         }
 
         PathAssemblyResolver resolver = new(assemblyNamePathMap.Values);
-        this.context = new MetadataLoadContext(resolver);
-
-        return this.context.LoadFromAssemblyPath(assemblyFile.FullName);
+        return new(resolver);
     }
 }

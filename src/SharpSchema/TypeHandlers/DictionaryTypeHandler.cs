@@ -57,7 +57,7 @@ internal class DictionaryTypeHandler : TypeHandler
         Requires.Argument(keyType.Name == typeof(string).Name, nameof(type), "Only dictionaries with string keys are supported.");
 
         JsonSchemaBuilder keySchema = new JsonSchemaBuilder()
-            .AddType(keyType, context);
+            .AddType(keyType, context, isRootType = false);
 
         // if the property has a regular expression attribute, use that as the key pattern
         if (propertyAttributeData is not null)
@@ -75,7 +75,7 @@ internal class DictionaryTypeHandler : TypeHandler
                 .Type(SchemaValueType.Object)
                 .PropertyNames(keySchema)
                 .AdditionalProperties(new JsonSchemaBuilder()
-                    .AddType(valueType, context))
+                    .AddType(valueType, context, isRootType: false))
             : builder
                 .Comment($"[{keyType.Name}]")
                 .Type(SchemaValueType.Object)

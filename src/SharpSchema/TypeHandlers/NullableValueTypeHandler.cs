@@ -12,7 +12,7 @@ namespace SharpSchema.TypeHandlers;
 internal class NullableValueTypeHandler : TypeHandler
 {
     /// <inheritdoc/>
-    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType, IList<CustomAttributeData>? propertyAttributeData = null)
     {
         if (!type.TryUnwrapNullable(out Type? underlyingType))
         {

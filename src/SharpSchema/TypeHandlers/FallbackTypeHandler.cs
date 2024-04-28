@@ -78,9 +78,9 @@ internal class FallbackTypeHandler : TypeHandler
         return AddComplexType(builder, type, context, isTopLevel);
     }
 
-    private static JsonSchemaBuilder AddComplexType(JsonSchemaBuilder builder, Type type, ConverterContext context, bool isTopLevel)
+    private static JsonSchemaBuilder AddComplexType(JsonSchemaBuilder builder, Type type, ConverterContext context, bool isRootType)
     {
-        if (isTopLevel)
+        if (isRootType)
         {
             return AddCustomObjectType(builder, type, context);
         }
@@ -105,7 +105,7 @@ internal class FallbackTypeHandler : TypeHandler
             {
                 var concreteTypeSchemas = type
                     .GetSubTypes()
-                    .Select(t => new JsonSchemaBuilder().AddType(t, context).Build())
+                    .Select(t => new JsonSchemaBuilder().AddType(t, context, isRootType: false).Build())
                     .ToList();
 
                 if (concreteTypeSchemas.Count == 0)

@@ -3,12 +3,6 @@
 
 using System.CommandLine;
 using System.CommandLine.IO;
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Json.More;
-using Json.Schema;
-using SharpSchema.Annotations;
 
 namespace SharpSchema.Tool;
 

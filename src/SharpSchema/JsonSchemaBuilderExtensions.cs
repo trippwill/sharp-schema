@@ -6,6 +6,7 @@ using Humanizer;
 using Json.More;
 using Json.Schema;
 using Microsoft;
+using SharpSchema.Annotations;
 using SharpSchema.TypeHandlers;
 
 namespace SharpSchema;
@@ -143,7 +144,19 @@ public static class JsonSchemaBuilderExtensions
     internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, Type type)
     {
         IList<CustomAttributeData> customAttributeData = type.GetCustomAttributesData();
-        return builder.AddCommonAnnotations(customAttributeData, type.Name);
+        builder = builder.AddCommonAnnotations(customAttributeData, type.Name);
+
+        if (customAttributeData.FirstOrDefault(cad => cad.AttributeType.FullName == typeof(SchemaMinAttribute).FullName) is CustomAttributeData minCad)
+        {
+            builder = builder.MinProperties((uint)minCad.GetConstructorArgument<int>(0));
+        }
+
+        if (customAttributeData.FirstOrDefault(cad => cad.AttributeType.FullName == typeof(SchemaMaxAttribute).FullName) is CustomAttributeData maxCad)
+        {
+            builder = builder.MaxProperties((uint)maxCad.GetConstructorArgument<int>(0));
+        }
+
+        return builder;
     }
 
     /// <summary>

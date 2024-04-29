@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Json.Schema;
 using Microsoft;
+using SharpSchema.Annotations;
 
 namespace SharpSchema;
 
@@ -138,6 +139,11 @@ public static class TypeExtensions
         {
             if (t.IsSubclassOf(type))
             {
+                if (t.TryGetCustomAttributeData(typeof(SchemaIgnoreAttribute), out _))
+                {
+                    continue;
+                }
+
                 if (t.IsAbstract)
                 {
                     foreach (Type tt in t.GetSubTypes())

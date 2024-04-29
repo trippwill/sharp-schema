@@ -4,6 +4,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Humanizer;
+using SharpSchema.Annotations;
 
 namespace SharpSchema;
 
@@ -27,31 +28,9 @@ internal static class PropertyInfoExtensions
             return true;
         }
 
-        // skip properties with JsonIgnoreAttribute if Condition is not set to Never
-        IList<CustomAttributeData> attributes = property.GetCustomAttributesData();
-        CustomAttributeData? jsonIgnoreAttribute = attributes.FirstOrDefault(a => a.AttributeType.FullName == typeof(JsonIgnoreAttribute).FullName);
-        if (jsonIgnoreAttribute is not null)
+        if (property.TryGetCustomAttributeData(typeof(JsonIgnoreAttribute), out CustomAttributeData? ignoreAttributeData))
         {
-            if (jsonIgnoreAttribute.NamedArguments.Count == 0)
-            {
-                return true;
-            }
-
-            CustomAttributeNamedArgument conditionArgument = jsonIgnoreAttribute.NamedArguments.FirstOrDefault(na => na.MemberName == "Condition");
-            if (conditionArgument == default)
-            {
-                return true;
-            }
-
-            if (conditionArgument.TypedValue.ArgumentType.Name != typeof(JsonIgnoreCondition).Name)
-            {
-                return true;
-            }
-
-            if (conditionArgument.TypedValue.Value is JsonIgnoreCondition condition && condition != JsonIgnoreCondition.Never)
-            {
-                return true;
-            }
+            return ignoreAttributeData.GetNamedArgument<int>("Condition") != (int)JsonIgnoreCondition.Never;
         }
 
         return false;
@@ -65,10 +44,10 @@ internal static class PropertyInfoExtensions
     public static string GetPropertyName(this PropertyInfo property)
     {
         string name = property.Name;
-        if (property.GetCustomAttributesData()
-            .FirstOrDefault(cad => cad.AttributeType.FullName == "System.Text.Json.Serialization.JsonPropertyNameAttribute") is { ConstructorArguments: { Count: 1 } arguments })
+
+        if (property.TryGetCustomAttributeData(typeof(JsonPropertyNameAttribute), out CustomAttributeData? cad))
         {
-            name = (string)arguments[0].Value!;
+            name = cad.GetNamedArgument<string>("Name") ?? name;
         }
 
         return name.Camelize();
@@ -84,10 +63,14 @@ internal static class PropertyInfoExtensions
     {
         isNullable = property.IsNullable();
 
-        bool isForcedRequired = property.GetCustomAttributesData()
-            .Any(a => a.AttributeType.FullName == "System.Text.Json.Serialization.JsonRequiredAttribute");
+        if (property.TryGetCustomAttributeData(typeof(SchemaRequiredAttribute), out CustomAttributeData? cad))
+        {
+            return cad.GetConstructorArgument<bool>(0);
+        }
 
-        return isForcedRequired || !isNullable;
+        bool isJsonRequired = property.TryGetCustomAttributeData(typeof(JsonRequiredAttribute), out _);
+
+        return isJsonRequired || !isNullable;
     }
 
     /// <summary>

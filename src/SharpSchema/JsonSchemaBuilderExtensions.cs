@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Humanizer;
 using Json.More;
 using Json.Schema;
@@ -87,7 +89,13 @@ public static class JsonSchemaBuilderExtensions
             isRequired = true;
         }
 
-        if (isNullable)
+        if (property.TryGetCustomAttributeData(typeof(SchemaConstAttribute), out CustomAttributeData? cad) &&
+            cad.TryGetConstructorArgument(0, out object? value))
+        {
+            isRequired = true;
+            builder = builder.Const(JsonSerializer.SerializeToNode(value));
+        }
+        else if (isNullable)
         {
             builder = builder
                 .OneOf(
@@ -144,19 +152,7 @@ public static class JsonSchemaBuilderExtensions
     internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, Type type)
     {
         IList<CustomAttributeData> customAttributeData = type.GetCustomAttributesData();
-        builder = builder.AddCommonAnnotations(customAttributeData, type.Name);
-
-        if (customAttributeData.FirstOrDefault(cad => cad.AttributeType.FullName == typeof(SchemaMinAttribute).FullName) is CustomAttributeData minCad)
-        {
-            builder = builder.MinProperties((uint)minCad.GetConstructorArgument<int>(0));
-        }
-
-        if (customAttributeData.FirstOrDefault(cad => cad.AttributeType.FullName == typeof(SchemaMaxAttribute).FullName) is CustomAttributeData maxCad)
-        {
-            builder = builder.MaxProperties((uint)maxCad.GetConstructorArgument<int>(0));
-        }
-
-        return builder;
+        return builder.AddCommonAnnotations(customAttributeData, type.Name);
     }
 
     /// <summary>

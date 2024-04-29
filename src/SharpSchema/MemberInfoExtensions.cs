@@ -51,6 +51,25 @@ public static class MemberInfoExtensions
             }
         }
 
+        Type? baseType = memberInfo.DeclaringType?.BaseType;
+        while (baseType is not null)
+        {
+            MemberInfo[] membersInfos = baseType.GetMember(memberInfo.Name);
+            foreach (MemberInfo member in membersInfos)
+            {
+                foreach (CustomAttributeData cad in member.GetCustomAttributesData())
+                {
+                    if (cad.AttributeType.FullName == attributeFullName)
+                    {
+                        attributeData = cad;
+                        return true;
+                    }
+                }
+            }
+
+            baseType = baseType.BaseType;
+        }
+
         return attributeData is not null;
     }
 

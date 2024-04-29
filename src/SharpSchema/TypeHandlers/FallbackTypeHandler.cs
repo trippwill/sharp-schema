@@ -2,7 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Json.Schema;
+using SharpSchema.Annotations;
 
 namespace SharpSchema.TypeHandlers;
 
@@ -129,6 +131,16 @@ internal class FallbackTypeHandler : TypeHandler
                 .Required(requiredProperties);
             }
 
+            if (type.TryGetCustomAttributeData(typeof(SchemaMinAttribute), out CustomAttributeData? minCad))
+            {
+                builder = builder.MinProperties((uint)minCad.GetConstructorArgument<int>(0));
+            }
+
+            if (type.TryGetCustomAttributeData(typeof(SchemaMaxAttribute), out CustomAttributeData? maxCad))
+            {
+                builder = builder.MaxProperties((uint)maxCad.GetConstructorArgument<int>(0));
+            }
+
             return builder.AdditionalProperties(false);
         }
     }
@@ -177,8 +189,7 @@ internal class FallbackTypeHandler : TypeHandler
             }
 
             // skip properties without JsonIncludeAttribute
-            if (property.GetCustomAttributesData()
-                .All(a => a.AttributeType.FullName != "System.Text.Json.Serialization.JsonIncludeAttribute"))
+            if (!property.TryGetCustomAttributeData(typeof(JsonIncludeAttribute), out _))
             {
                 continue;
             }

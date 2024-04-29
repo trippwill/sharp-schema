@@ -28,10 +28,19 @@ internal static class PropertyInfoExtensions
             return true;
         }
 
+        if (property.TryGetCustomAttributeData(typeof(SchemaIgnoreAttribute), out _))
+        {
+            return true;
+        }
+
         if (property.TryGetCustomAttributeData(typeof(JsonIgnoreAttribute), out CustomAttributeData? ignoreAttributeData))
         {
-            int condition = ignoreAttributeData.GetNamedArgument<int>("Condition");
-            return condition == default ? true : condition != (int)JsonIgnoreCondition.Never;
+            if (ignoreAttributeData.TryGetNamedArgument("Condition", out int condition))
+            {
+                return condition == (int)JsonIgnoreCondition.Always;
+            }
+
+            return true;
         }
 
         return false;
@@ -44,14 +53,15 @@ internal static class PropertyInfoExtensions
     /// <returns>The name of the property.</returns>
     public static string GetPropertyName(this PropertyInfo property)
     {
-        string name = property.Name;
+        string name = property.Name.Camelize();
 
-        if (property.TryGetCustomAttributeData(typeof(JsonPropertyNameAttribute), out CustomAttributeData? cad))
+        if (property.TryGetCustomAttributeData(typeof(JsonPropertyNameAttribute), out CustomAttributeData? cad) &&
+            cad.TryGetConstructorArgument(0, out string? jsonName))
         {
-            name = cad.GetNamedArgument<string>("Name") ?? name;
+            name = jsonName;
         }
 
-        return name.Camelize();
+        return name;
     }
 
     /// <summary>
@@ -69,9 +79,30 @@ internal static class PropertyInfoExtensions
             return cad.GetConstructorArgument<bool>(0);
         }
 
-        bool isJsonRequired = property.TryGetCustomAttributeData(typeof(JsonRequiredAttribute), out _);
+        if (property.TryGetCustomAttributeData(typeof(JsonRequiredAttribute), out _))
+        {
+            return true;
+        }
 
-        return isJsonRequired || !isNullable;
+        if (property.TryGetCustomAttributeData(typeof(JsonIgnoreAttribute), out CustomAttributeData? ignoreAttributeData))
+        {
+            if (ignoreAttributeData.TryGetNamedArgument("Condition", out int condition))
+            {
+                return condition switch
+                {
+                    (int)JsonIgnoreCondition.Always => false,
+                    (int)JsonIgnoreCondition.WhenWritingDefault => false,
+                    (int)JsonIgnoreCondition.WhenWritingNull => false,
+                    _ => true,
+                };
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return !isNullable;
     }
 
     /// <summary>

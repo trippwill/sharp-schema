@@ -30,7 +30,8 @@ internal static class PropertyInfoExtensions
 
         if (property.TryGetCustomAttributeData(typeof(JsonIgnoreAttribute), out CustomAttributeData? ignoreAttributeData))
         {
-            return ignoreAttributeData.GetNamedArgument<int>("Condition") != (int)JsonIgnoreCondition.Never;
+            int condition = ignoreAttributeData.GetNamedArgument<int>("Condition");
+            return condition == default ? true : condition != (int)JsonIgnoreCondition.Never;
         }
 
         return false;

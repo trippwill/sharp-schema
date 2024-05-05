@@ -53,7 +53,7 @@ internal static class PropertyInfoExtensions
     /// <returns>The name of the property.</returns>
     public static string GetPropertyName(this PropertyInfo property)
     {
-        string name = property.Name.Camelize();
+        string name = property.Name.ToJsonPropertyName();
 
         if (property.TryGetCustomAttributeData(typeof(JsonPropertyNameAttribute), out CustomAttributeData? cad) &&
             cad.TryGetConstructorArgument(0, out string? jsonName))

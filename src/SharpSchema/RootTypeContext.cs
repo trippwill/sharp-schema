@@ -14,6 +14,13 @@ public record struct RootTypeContext(Type Type, string? Filename, string? Id, st
     /// <summary>
     /// Creates a <see cref="RootTypeContext"/> instance from the specified <see cref="Type"/>.
     /// </summary>
+    /// <typeparam name="T">The type to create the <see cref="RootTypeContext"/> from.</typeparam>
+    /// <returns>A new instance of <see cref="RootTypeContext"/>.</returns>
+    public static RootTypeContext FromType<T>() => FromType(typeof(T));
+
+    /// <summary>
+    /// Creates a <see cref="RootTypeContext"/> instance from the specified <see cref="Type"/>.
+    /// </summary>
     /// <param name="type">The <see cref="Type"/> to create the <see cref="RootTypeContext"/> from.</param>
     /// <returns>A new instance of <see cref="RootTypeContext"/>.</returns>
     public static RootTypeContext FromType(Type type)

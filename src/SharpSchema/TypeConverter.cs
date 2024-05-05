@@ -9,7 +9,7 @@ namespace SharpSchema;
 /// Converts a <see cref="RootTypeContext"/> to a <see cref="JsonSchemaBuilder"/>.
 /// </summary>
 /// <param name="options">The converter options.</param>
-public class TypeConverter(TypeConverter.Options options)
+public class TypeConverter(TypeConverter.Options? options = null)
 {
     /// <summary>
     /// Converts a <see cref="RootTypeContext"/> to a <see cref="JsonSchemaBuilder"/>.
@@ -18,6 +18,8 @@ public class TypeConverter(TypeConverter.Options options)
     /// <returns>The converted <see cref="JsonSchemaBuilder"/>.</returns>
     public JsonSchemaBuilder Convert(RootTypeContext typeContext)
     {
+        options ??= Options.Default;
+
         JsonSchemaBuilder builder = new JsonSchemaBuilder()
             .Schema("http://json-schema.org/draft-07/schema#");
 
@@ -46,5 +48,11 @@ public class TypeConverter(TypeConverter.Options options)
     /// <summary>
     /// Options for the <see cref="TypeConverter"/>.
     /// </summary>
-    public record class Options(bool IncludeInterfaces = false, bool EnumAsUnderlyingType = false, int MaxDepth = 50);
+    public record class Options(bool IncludeInterfaces = false, bool EnumAsUnderlyingType = false, int MaxDepth = 50)
+    {
+        /// <summary>
+        /// Gets the default options.
+        /// </summary>
+        public static Options Default { get; } = new();
+    }
 }

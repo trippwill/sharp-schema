@@ -128,17 +128,22 @@ internal class FallbackTypeHandler : TypeHandler
             if (requiredProperties is not null)
             {
                 builder = builder
-                .Required(requiredProperties);
+                    .Required(requiredProperties);
             }
 
-            if (type.TryGetCustomAttributeData(typeof(SchemaMinAttribute), out CustomAttributeData? minCad))
+            if (type.TryGetCustomAttributeData<SchemaPropertiesRangeAttribute>(out CustomAttributeData? rangeCad))
             {
-                builder = builder.MinProperties((uint)minCad.GetConstructorArgument<int>(0));
-            }
+                uint min = rangeCad.GetConstructorArgument<uint>(0);
+                if (min > 0)
+                {
+                    builder = builder.MinProperties(min);
+                }
 
-            if (type.TryGetCustomAttributeData(typeof(SchemaMaxAttribute), out CustomAttributeData? maxCad))
-            {
-                builder = builder.MaxProperties((uint)maxCad.GetConstructorArgument<int>(0));
+                uint max = rangeCad.GetConstructorArgument<uint>(1);
+                if (max < uint.MaxValue)
+                {
+                    builder = builder.MaxProperties(max);
+                }
             }
 
             return builder.AdditionalProperties(false);

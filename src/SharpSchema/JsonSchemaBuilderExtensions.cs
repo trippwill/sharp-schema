@@ -210,29 +210,24 @@ public static class JsonSchemaBuilderExtensions
             type = type.GetGenericArguments().FirstOrDefault() ?? Assumes.NotReachable<Type>();
         }
 
-        // if the property type is a number and has a range, set the minimum and maximum values
-        if (type.IsNumber()
-            && property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.RangeAttribute") is { ConstructorArguments: { Count: 2 } rangeArguments })
+        // if the property type is a number
+        if (type.IsNumber())
         {
-            if (rangeArguments[0].Value is int minInt)
+            // if the property has a value range attribute, set the minimum and maximum values
+            if (property.TryGetCustomAttributeData<SchemaValueRangeAttribute>(out CustomAttributeData? rangeCad))
             {
-                builder = builder
-                    .Minimum(minInt)
-                    .Maximum((int)rangeArguments[1].Value!);
-            }
-            else if (rangeArguments[0].Value is double minDouble)
-            {
-                builder = builder
-                    .Minimum(decimal.CreateSaturating(minDouble))
-                    .Maximum(decimal.CreateSaturating((double)rangeArguments[1].Value!));
-            }
-            else
-            {
-                Assumes.NotReachable();
-            }
+                double min = rangeCad.GetConstructorArgument<double>(0);
+                if (!double.IsNaN(min))
+                {
+                    builder = builder.Minimum(decimal.CreateSaturating(min));
+                }
 
-            return builder;
+                double max = rangeCad.GetConstructorArgument<double>(1);
+                if (!double.IsNaN(max))
+                {
+                    builder = builder.Maximum(decimal.CreateSaturating(max));
+                }
+            }
         }
 
         // if the property is a string
@@ -246,46 +241,18 @@ public static class JsonSchemaBuilderExtensions
             }
 
             // if the property has a string length attribute, set the minimum and maximum lengths
-            if (property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.StringLengthAttribute") is { ConstructorArguments: { Count: 1 } lengthArguments })
+            if (property.TryGetCustomAttributeData<SchemaLengthRangeAttribute>(out CustomAttributeData? lengthCad))
             {
-                if (lengthArguments[0].Value is uint length)
+                uint min = lengthCad.GetConstructorArgument<uint>(0);
+                if (min > 0)
                 {
-                    builder = builder
-                        .MinLength(length)
-                        .MaxLength(length);
+                    builder = builder.MinLength(min);
                 }
-                else
-                {
-                    Assumes.NotReachable();
-                }
-            }
 
-            // if the property has a max length attribute, set the maximum length
-            if (property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.MaxLengthAttribute") is { ConstructorArguments: { Count: 1 } maxLengthArguments })
-            {
-                if (maxLengthArguments[0].Value is uint maxLength)
+                uint max = lengthCad.GetConstructorArgument<uint>(1);
+                if (max < uint.MaxValue)
                 {
-                    builder = builder.MaxLength(maxLength);
-                }
-                else
-                {
-                    Assumes.NotReachable();
-                }
-            }
-
-            // if the property has a min length attribute, set the minimum length
-            if (property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.MinLengthAttribute") is { ConstructorArguments: { Count: 1 } minLengthArguments })
-            {
-                if (minLengthArguments[0].Value is uint minLength)
-                {
-                    builder = builder.MinLength(minLength);
-                }
-                else
-                {
-                    Assumes.NotReachable();
+                    builder = builder.MaxLength(max);
                 }
             }
 
@@ -294,17 +261,19 @@ public static class JsonSchemaBuilderExtensions
 
         if (!property.PropertyType.IsValueType)
         {
-            // if the property has a min length attribute, set the minimum properties
-            if (property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.MinLengthAttribute") is { ConstructorArguments: { Count: 1 } minLengthArguments })
+            // if the property has a properties range attribute, set the minimum and maximum properties
+            if (property.TryGetCustomAttributeData<SchemaPropertiesRangeAttribute>(out CustomAttributeData? rangeCad))
             {
-                if (minLengthArguments[0].Value is uint minLength)
+                uint min = rangeCad.GetConstructorArgument<uint>(0);
+                if (min > 0)
                 {
-                    builder = builder.MinProperties(minLength);
+                    builder = builder.MinProperties(min);
                 }
-                else
+
+                uint max = rangeCad.GetConstructorArgument<uint>(1);
+                if (max < uint.MaxValue)
                 {
-                    Assumes.NotReachable();
+                    builder = builder.MaxProperties(max);
                 }
             }
         }

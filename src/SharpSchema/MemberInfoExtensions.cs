@@ -14,6 +14,19 @@ public static class MemberInfoExtensions
     /// <summary>
     /// Tries to get the <see cref="CustomAttributeData"/> for the specified <see cref="MemberInfo"/> and attribute type.
     /// </summary>
+    /// <typeparam name="T">The type of the attribute.</typeparam>
+    /// <param name="memberInfo">The <see cref="MemberInfo"/> to check.</param>
+    /// <param name="attributeData">When this method returns, contains the <see cref="CustomAttributeData"/> for the specified attribute type, if found; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the <see cref="CustomAttributeData"/> for the specified attribute type is found; otherwise, <see langword="false"/>.</returns>
+    public static bool TryGetCustomAttributeData<T>(this MemberInfo memberInfo, [NotNullWhen(true)] out CustomAttributeData? attributeData)
+        where T : Attribute
+    {
+        return memberInfo.TryGetCustomAttributeData(typeof(T), out attributeData);
+    }
+
+    /// <summary>
+    /// Tries to get the <see cref="CustomAttributeData"/> for the specified <see cref="MemberInfo"/> and attribute type.
+    /// </summary>
     /// <param name="memberInfo">The <see cref="MemberInfo"/> to check.</param>
     /// <param name="attributeType">The attribute type.</param>
     /// <param name="attributeData">When this method returns, contains the <see cref="CustomAttributeData"/> for the specified attribute type, if found; otherwise, <see langword="null"/>.</param>

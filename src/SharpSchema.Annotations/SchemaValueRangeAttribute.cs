@@ -9,15 +9,16 @@ namespace SharpSchema.Annotations;
 /// <remarks>
 /// This attribute can be used to define the minimum and maximum values allowed for a property in a schema.
 /// </remarks>
-public class SchemaValueRangeAttribute(double minValue = double.NaN, double maxValue = double.NaN) : SchemaAttribute
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+public class SchemaValueRangeAttribute : SchemaAttribute
 {
     /// <summary>
-    /// Gets the minimum value allowed for the property.
+    /// Gets or sets the minimum value allowed for the property.
     /// </summary>
-    public double MinValue { get; } = minValue;
+    public double Min { get; set; }
 
     /// <summary>
-    /// Gets the maximum value allowed for the property.
+    /// Gets or sets the maximum value allowed for the property.
     /// </summary>
-    public double MaxValue { get; } = maxValue;
+    public double Max { get; set; }
 }

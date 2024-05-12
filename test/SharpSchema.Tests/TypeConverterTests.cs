@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Json.Schema;
@@ -79,7 +80,7 @@ public class TypeConverterTests
         Assert.Equal(expectedIsValid, results.IsValid);
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1204:Static elements should appear before instance elements", Justification = "Test Code")]
+    [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1204:Static elements should appear before instance elements", Justification = "Test Code")]
     public static TheoryData<string, string, bool> SchemaEvaluate_WithInput_ReturnsExpectedResult_Data() => new()
     {
         {
@@ -190,7 +191,7 @@ public class TypeConverterTests
         public decimal IgnoredProperty { get; set; }
 
         [JsonInclude]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Test Code")]
+        [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Test Code")]
         private string? IncludedPrivateProperty { get; set; }
     }
 

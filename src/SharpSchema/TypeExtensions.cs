@@ -158,4 +158,62 @@ public static class TypeExtensions
             }
         }
     }
+
+    /// <summary>
+    /// Determines whether the specified <see cref="Type"/> is a probable dictionary.
+    /// </summary>
+    /// <param name="type">The <see cref="Type"/> to check.</param>
+    /// <param name="keyType">When this method returns, contains the key type of the dictionary, if successful; otherwise, <see langword="null"/>.</param>
+    /// <param name="valueType">When this method returns, contains the value type of the dictionary, if successful; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the type is a probable dictionary; otherwise, <see langword="false"/>.</returns>
+    internal static bool IsProbableDictionary(this Type type, [NotNullWhen(true)] out Type? keyType, [NotNullWhen(true)] out Type? valueType)
+    {
+        keyType = null;
+        valueType = null;
+
+        if (!type.IsGenericType)
+        {
+            return false;
+        }
+
+        Type? inspectedType = type;
+
+        while (inspectedType is not null)
+        {
+            if (IsProbableDictionaryImpl(inspectedType, out keyType, out valueType))
+            {
+                return true;
+            }
+
+            inspectedType = inspectedType.BaseType;
+        }
+
+        return false;
+
+        static bool IsProbableDictionaryImpl(Type type, [NotNullWhen(true)] out Type? keyType, [NotNullWhen(true)] out Type? valueType)
+        {
+            keyType = null;
+            valueType = null;
+
+            Type[] interfaces = type.GetInterfaces();
+
+            foreach (Type iface in interfaces)
+            {
+                if (iface.IsGenericType &&
+                    iface.GetGenericTypeDefinition().Name == typeof(IEnumerable<>).Name &&
+                    iface.GenericTypeArguments.SingleOrDefault() is Type pairType &&
+                    pairType.IsGenericType &&
+                    pairType.GetGenericTypeDefinition().Name == typeof(KeyValuePair<,>).Name)
+                {
+                    Type[] args = pairType.GetGenericArguments();
+                    keyType = args[0];
+                    valueType = args[1];
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
 }

@@ -4,13 +4,16 @@
 namespace SharpSchema.Annotations;
 
 /// <summary>
-/// Indicates whether a property is required in a schema.
+/// Applies a format to a schema property.
 /// </summary>
+/// <remarks>
+/// This attribute is used to specify the format of a schema.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class SchemaRequiredAttribute(bool isRequired = true) : SchemaAttribute
+public class SchemaFormatAttribute(string format) : SchemaAttribute
 {
     /// <summary>
-    /// Gets a value indicating whether the property is required.
+    /// Gets the format of the schema.
     /// </summary>
-    public bool IsRequired { get; } = isRequired;
+    public string Format { get; } = format;
 }

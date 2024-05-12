@@ -10,6 +10,7 @@ using Json.Schema;
 using Xunit;
 using Xunit.Abstractions;
 using SharpSchema.Annotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SharpSchema.Tests;
 
@@ -361,10 +362,10 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
     }
 
     [Fact]
-    public void AddType_WithAmbientSchema_ReturnsObjectSchemaWithProperties()
+    public void AddType_WithOverrideSchema_ReturnsObjectSchemaWithProperties()
     {
         // Arrange
-        Type type = typeof(AmbientClass);
+        Type type = typeof(OverrideClass);
 
         // Act
         JsonSchema result = new JsonSchemaBuilder().AddType(type, new ConverterContext());
@@ -375,7 +376,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         Assert.Contains("name", result.GetProperties()!);
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test Code")]
+    [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test Code")]
     private enum TestEnum
     {
         Value1,
@@ -385,13 +386,13 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
 
     private class PropertyAnnotationTestObject
     {
-        [Display(Name = "Object Age", Description = "The age of the object")]
+        [SchemaMeta(Title = "Object Age", Description = "The age of the object")]
         public int? NullableProperty { get; set; }
 
-        [Description("This is for a $comment property")]
+        [SchemaMeta(Comment = "This is for a $comment property")]
         public int NonNullableProperty { get; set; }
 
-        [Display(Name = "Annotated Property", Description = "This is an annotated property.")]
+        [SchemaMeta(Title = "Annotated Property", Description = "This is an annotated property.")]
         public string AnnotatedProperty { get; set; } = string.Empty;
 
         [SchemaRequired]
@@ -415,15 +416,15 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         public decimal IgnoredProperty { get; set; }
 
         [JsonInclude]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Test Code")]
+        [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Test Code")]
         private string? IncludedPrivateProperty { get; set; }
 
         [JsonRequired]
         [JsonInclude]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Test Code")]
+        [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Test Code")]
         private PropertyAnnotationTestObject? ForceRequiredReference { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Test Code")]
+        [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Test Code")]
         private string? PrivateProperty { get; set; }
 
         // Indexers are ignored
@@ -447,8 +448,8 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         public float Height { get; set; }
     }
 
-    [AmbientValue(Schema)]
-    private class AmbientClass
+    [SchemaOverride(Schema)]
+    private class OverrideClass
     {
         private const string Schema = /* lang=json */"""
         {

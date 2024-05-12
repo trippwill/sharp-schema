@@ -4,26 +4,33 @@
 using System.Reflection;
 using System.Text.Json;
 using Json.Schema;
+using SharpSchema.Annotations;
 
 namespace SharpSchema.TypeHandlers;
 
 /// <summary>
-/// Handles ambient value types.
+/// Handles override value types.
 /// </summary>
-internal class AmbientValueTypeHandler : TypeHandler
+internal class OverrideValueTypeHandler : TypeHandler
 {
     /// <inheritdoc/>
     public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
     {
-        if (!type.TryGetAmbientValue(out string? ambientValue) || ambientValue is null)
+        if (!type.TryGetCustomAttributeData<SchemaOverrideAttribute>(out CustomAttributeData? attribute))
         {
             return Result.NotHandled(builder);
         }
 
         try
         {
-            var ambientSchema = JsonSchema.FromText(ambientValue);
-            foreach (IJsonSchemaKeyword keyword in ambientSchema.Keywords ?? Enumerable.Empty<IJsonSchemaKeyword>())
+            string? overrideValue = attribute.GetConstructorArgument<string>(0);
+            if (overrideValue is null)
+            {
+                return Result.Fault(builder, "Override value is null.");
+            }
+
+            var overrideSchema = JsonSchema.FromText(overrideValue);
+            foreach (IJsonSchemaKeyword keyword in overrideSchema.Keywords ?? Enumerable.Empty<IJsonSchemaKeyword>())
             {
                 builder.Add(keyword);
             }

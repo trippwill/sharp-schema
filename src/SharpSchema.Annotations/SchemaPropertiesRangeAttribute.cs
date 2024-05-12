@@ -9,15 +9,16 @@ namespace SharpSchema.Annotations;
 /// <remarks>
 /// This attribute can be used to specify the minimum and maximum number of properties allowed in a schema.
 /// </remarks>
-public class SchemaPropertiesRangeAttribute(uint minProperties = 0, uint maxProperties = uint.MaxValue) : SchemaAttribute
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field)]
+public class SchemaPropertiesRangeAttribute : SchemaAttribute
 {
     /// <summary>
-    /// Gets the minimum number of properties allowed in a schema.
+    /// Gets or sets the minimum number of properties allowed in a schema.
     /// </summary>
-    public uint MinProperties { get; } = minProperties;
+    public uint Min { get; set; }
 
     /// <summary>
-    /// Gets the maximum number of properties allowed in a schema.
+    /// Gets or sets the maximum number of properties allowed in a schema.
     /// </summary>
-    public uint MaxProperties { get; } = maxProperties;
+    public uint Max { get; set; }
 }

@@ -94,10 +94,24 @@ public class SchemaAttributeTests(ITestOutputHelper outputHelper) : TestBase(out
         Assert.Equal(10, propertySchema.GetMaximum());
     }
 
-    [SchemaPropertiesRange(SchemaMinPropertiesValue, SchemaMaxPropertiesValue)]
+    [Fact]
+    public void SchemaLengthRange_Applies_ToPropertySchema()
+    {
+        TypeConverter converter = new();
+
+        JsonSchema schema = converter.Convert(RootTypeContext.FromType<ValueRangeObject>());
+        this.OutputSchema(schema);
+
+        JsonSchema? propertySchema = schema.GetProperties()?.Values.ElementAt(1);
+        Assert.NotNull(propertySchema);
+        Assert.Equal(1U, propertySchema.GetMinLength());
+        Assert.Equal(10U, propertySchema.GetMaxLength());
+    }
+
+    [SchemaPropertiesRange(Min = SchemaMinPropertiesValue, Max = SchemaMaxPropertiesValue)]
     private class MinMaxObject
     {
-        [SchemaPropertiesRange(SchemaMinPropertiesValue, SchemaMaxPropertiesValue)]
+        [SchemaPropertiesRange(Min = SchemaMinPropertiesValue, Max = SchemaMaxPropertiesValue)]
         public required IgnoreObject TestProperty { get; init; }
     }
 
@@ -125,7 +139,10 @@ public class SchemaAttributeTests(ITestOutputHelper outputHelper) : TestBase(out
 
     private class ValueRangeObject
     {
-        [SchemaValueRange(1, 10)]
+        [SchemaValueRange(Min = 1, Max = 10)]
         public int TestProperty { get; }
+
+        [SchemaLengthRange(Min = 1, Max = 10)]
+        public required string TestProperty2 { get; init; }
     }
 }

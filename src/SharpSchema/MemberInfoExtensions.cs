@@ -64,10 +64,30 @@ public static class MemberInfoExtensions
             }
         }
 
-        Type? baseType = memberInfo.DeclaringType?.BaseType;
+        Type? baseType = memberInfo.DeclaringType;
         while (baseType is not null)
         {
-            MemberInfo[] membersInfos = baseType.GetMember(memberInfo.Name);
+            foreach (Type type in baseType.GetInterfaces())
+            {
+                if (TryGetCustomAttributesDataFromTypeMember(type, memberInfo.Name, attributeFullName, out attributeData))
+                {
+                    return true;
+                }
+            }
+
+            if (TryGetCustomAttributesDataFromTypeMember(baseType, memberInfo.Name, attributeFullName, out attributeData))
+            {
+                return true;
+            }
+
+            baseType = baseType.BaseType;
+        }
+
+        return attributeData is not null;
+
+        static bool TryGetCustomAttributesDataFromTypeMember(Type type, string memberName, string attributeFullName, [NotNullWhen(true)] out CustomAttributeData? attributeData)
+        {
+            MemberInfo[] membersInfos = type.GetMember(memberName);
             foreach (MemberInfo member in membersInfos)
             {
                 foreach (CustomAttributeData cad in member.GetCustomAttributesData())
@@ -80,10 +100,9 @@ public static class MemberInfoExtensions
                 }
             }
 
-            baseType = baseType.BaseType;
+            attributeData = null;
+            return false;
         }
-
-        return attributeData is not null;
     }
 
     /// <summary>

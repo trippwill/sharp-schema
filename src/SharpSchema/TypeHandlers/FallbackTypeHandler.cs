@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Json.Schema;
 using SharpSchema.Annotations;
@@ -131,16 +133,15 @@ internal class FallbackTypeHandler : TypeHandler
                     .Required(requiredProperties);
             }
 
+            // if the property has a properties range attribute, set the minimum and maximum properties
             if (type.TryGetCustomAttributeData<SchemaPropertiesRangeAttribute>(out CustomAttributeData? rangeCad))
             {
-                uint min = rangeCad.GetConstructorArgument<uint>(0);
-                if (min > 0)
+                if (rangeCad.TryGetNamedArgument(nameof(SchemaPropertiesRangeAttribute.Min), out uint min))
                 {
                     builder = builder.MinProperties(min);
                 }
 
-                uint max = rangeCad.GetConstructorArgument<uint>(1);
-                if (max < uint.MaxValue)
+                if (rangeCad.TryGetNamedArgument(nameof(SchemaPropertiesRangeAttribute.Max), out uint max))
                 {
                     builder = builder.MaxProperties(max);
                 }
@@ -210,6 +211,24 @@ internal class FallbackTypeHandler : TypeHandler
 
         static JsonSchemaBuilder GetPropertySchema(PropertyInfo property, string normalizedName, ConverterContext context, ref List<string>? requiredProperties)
         {
+            if (property.TryGetCustomAttributeData<SchemaOverrideAttribute>(out CustomAttributeData? cad))
+            {
+                string? overrideValue = cad.GetConstructorArgument<string>(0);
+                if (overrideValue is null)
+                {
+                    throw new Exception("Override value is null.");
+                }
+
+                JsonSchemaBuilder builder = new JsonSchemaBuilder();
+                var overrideSchema = JsonSchema.FromText(overrideValue);
+                foreach (IJsonSchemaKeyword keyword in overrideSchema.Keywords ?? Enumerable.Empty<IJsonSchemaKeyword>())
+                {
+                    builder.Add(keyword);
+                }
+
+                return builder;
+            }
+
             JsonSchemaBuilder propertySchema = new JsonSchemaBuilder()
                 .AddPropertyInfo(property, context, out bool isRequired);
 

@@ -21,7 +21,7 @@ public static class JsonSchemaBuilderExtensions
     private static readonly TypeHandler[] TypeHandlers =
     [
         new NullableValueTypeHandler(),
-        new AmbientValueTypeHandler(),
+        new OverrideValueTypeHandler(),
         new StringFormatTypeHandler(),
         new EnumAsStringTypeHandler(),
         new TypeCodeTypeHandler(),
@@ -107,7 +107,7 @@ public static class JsonSchemaBuilderExtensions
                             propertyAttributeData: property.GetCustomAttributesData())
                         .AddPropertyConstraints(property),
                     new JsonSchemaBuilder()
-                    .Type(SchemaValueType.Null));
+                        .Type(SchemaValueType.Null));
         }
         else
         {
@@ -134,7 +134,8 @@ public static class JsonSchemaBuilderExtensions
     /// <returns>The updated JSON schema builder.</returns>
     internal static JsonSchemaBuilder AddArrayType(this JsonSchemaBuilder builder, Type itemType, ConverterContext context)
     {
-        JsonSchemaBuilder itemSchema = new JsonSchemaBuilder().AddType(itemType, context, isRootType: false);
+        JsonSchemaBuilder itemSchema = new JsonSchemaBuilder()
+            .AddType(itemType, context, isRootType: false);
 
         return builder
             .Comment($"{itemType.Name}[]")
@@ -151,8 +152,7 @@ public static class JsonSchemaBuilderExtensions
     /// <returns>The updated JSON schema builder.</returns>
     internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, Type type)
     {
-        IList<CustomAttributeData> customAttributeData = type.GetCustomAttributesData();
-        return builder.AddCommonAnnotations(customAttributeData, type.Name);
+        return builder.AddCommonAnnotations(type, type.Name);
     }
 
     /// <summary>
@@ -163,39 +163,30 @@ public static class JsonSchemaBuilderExtensions
     /// <returns>The updated JSON schema builder.</returns>
     private static JsonSchemaBuilder AddPropertyAnnotations(this JsonSchemaBuilder builder, PropertyInfo property)
     {
-        IList<CustomAttributeData> customAttributeData = property.GetCustomAttributesData();
-        return builder.AddCommonAnnotations(customAttributeData);
+        return builder.AddCommonAnnotations(property);
     }
 
-    private static JsonSchemaBuilder AddCommonAnnotations(this JsonSchemaBuilder builder, IList<CustomAttributeData> customAttributeData, string? commentFallback = null)
+    private static JsonSchemaBuilder AddCommonAnnotations(this JsonSchemaBuilder builder, MemberInfo info, string? commentFallback = null)
     {
-        if (customAttributeData
-            .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DescriptionAttribute") is { ConstructorArguments: { Count: 1 } descriptionArguments })
+        if (info.TryGetCustomAttributeData<SchemaMetaAttribute>(out CustomAttributeData? cad))
         {
-            string description = (string)descriptionArguments[0].Value!;
-            builder = builder.Comment(description);
-        }
-        else if (commentFallback is not null)
-        {
-            builder = builder.Comment(commentFallback);
-        }
-
-        // if the type has a DisplayAttribute, add it to the schema
-        if (customAttributeData
-            .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.DisplayAttribute") is { NamedArguments: { Count: > 0 } displayArguments })
-        {
-            CustomAttributeNamedArgument nameArgument = displayArguments.FirstOrDefault(descriptionData => descriptionData.MemberName == "Name");
-            if (nameArgument != default)
+            if (cad.TryGetNamedArgument(nameof(SchemaMetaAttribute.Title), out string? title))
             {
-                string name = (string)nameArgument.TypedValue.Value!;
-                builder = builder.Title(name);
+                builder = builder.Title(title);
             }
 
-            CustomAttributeNamedArgument descriptionArgument = displayArguments.FirstOrDefault(descriptionData => descriptionData.MemberName == "Description");
-            if (descriptionArgument != default)
+            if (cad.TryGetNamedArgument(nameof(SchemaMetaAttribute.Description), out string? description))
             {
-                string description = (string)descriptionArgument.TypedValue.Value!;
                 builder = builder.Description(description);
+            }
+
+            if (cad.TryGetNamedArgument(nameof(SchemaMetaAttribute.Comment), out string? commentValue))
+            {
+                builder = builder.Comment(commentValue);
+            }
+            else if (commentFallback is not null)
+            {
+                builder = builder.Comment(commentFallback);
             }
         }
 
@@ -216,14 +207,12 @@ public static class JsonSchemaBuilderExtensions
             // if the property has a value range attribute, set the minimum and maximum values
             if (property.TryGetCustomAttributeData<SchemaValueRangeAttribute>(out CustomAttributeData? rangeCad))
             {
-                double min = rangeCad.GetConstructorArgument<double>(0);
-                if (!double.IsNaN(min))
+                if (rangeCad.TryGetNamedArgument(nameof(SchemaValueRangeAttribute.Min), out double min))
                 {
                     builder = builder.Minimum(decimal.CreateSaturating(min));
                 }
 
-                double max = rangeCad.GetConstructorArgument<double>(1);
-                if (!double.IsNaN(max))
+                if (rangeCad.TryGetNamedArgument(nameof(SchemaValueRangeAttribute.Max), out double max))
                 {
                     builder = builder.Maximum(decimal.CreateSaturating(max));
                 }
@@ -233,24 +222,41 @@ public static class JsonSchemaBuilderExtensions
         // if the property is a string
         if (type.Name == typeof(string).Name)
         {
-            // if the property has a regular expression attribute, set the pattern
-            if (property.GetCustomAttributesData()
-                .FirstOrDefault(cad => cad.AttributeType.FullName == "System.ComponentModel.DataAnnotations.RegularExpressionAttribute") is { ConstructorArguments: { Count: 1 } regexArguments })
+            // if the property has a format attribute, set the format
+            if (property.TryGetCustomAttributeData<SchemaFormatAttribute>(out CustomAttributeData? formatCad))
             {
-                builder = builder.Pattern((string)regexArguments[0].Value!);
+                string? format = formatCad.GetConstructorArgument<string>(0);
+                if (format is not null)
+                {
+                    builder = builder.Format(format);
+                }
+            }
+
+            // if the property has a regex attribute, set the pattern
+            if (property.TryGetCustomAttributeData<SchemaRegexAttribute>(out CustomAttributeData? regexCad))
+            {
+                if (regexCad.TryGetNamedArgument(nameof(SchemaRegexAttribute.ApplyToPropertyName), out bool? applyToPropertyName))
+                {
+                    if (!applyToPropertyName.Value)
+                    {
+                        string? pattern = regexCad.GetConstructorArgument<string>(0);
+                        if (pattern is not null)
+                        {
+                            builder = builder.Pattern(pattern);
+                        }
+                    }
+                }
             }
 
             // if the property has a string length attribute, set the minimum and maximum lengths
             if (property.TryGetCustomAttributeData<SchemaLengthRangeAttribute>(out CustomAttributeData? lengthCad))
             {
-                uint min = lengthCad.GetConstructorArgument<uint>(0);
-                if (min > 0)
+                if (lengthCad.TryGetNamedArgument(nameof(SchemaLengthRangeAttribute.Min), out uint min))
                 {
                     builder = builder.MinLength(min);
                 }
 
-                uint max = lengthCad.GetConstructorArgument<uint>(1);
-                if (max < uint.MaxValue)
+                if (lengthCad.TryGetNamedArgument(nameof(SchemaLengthRangeAttribute.Max), out uint max))
                 {
                     builder = builder.MaxLength(max);
                 }
@@ -264,14 +270,12 @@ public static class JsonSchemaBuilderExtensions
             // if the property has a properties range attribute, set the minimum and maximum properties
             if (property.TryGetCustomAttributeData<SchemaPropertiesRangeAttribute>(out CustomAttributeData? rangeCad))
             {
-                uint min = rangeCad.GetConstructorArgument<uint>(0);
-                if (min > 0)
+                if (rangeCad.TryGetNamedArgument(nameof(SchemaPropertiesRangeAttribute.Min), out uint min))
                 {
                     builder = builder.MinProperties(min);
                 }
 
-                uint max = rangeCad.GetConstructorArgument<uint>(1);
-                if (max < uint.MaxValue)
+                if (rangeCad.TryGetNamedArgument(nameof(SchemaPropertiesRangeAttribute.Max), out uint max))
                 {
                     builder = builder.MaxProperties(max);
                 }

@@ -18,18 +18,7 @@ namespace SharpSchema;
 /// </summary>
 public static class JsonSchemaBuilderExtensions
 {
-    private static readonly TypeHandler[] TypeHandlers =
-    [
-        new NullableValueTypeHandler(),
-        new OverrideValueTypeHandler(),
-        new StringFormatTypeHandler(),
-        new EnumAsStringTypeHandler(),
-        new TypeCodeTypeHandler(),
-        new ArrayTypeHandler(),
-        new DictionaryTypeHandler(),
-        new EnumerableTypeHandler(),
-        new FallbackTypeHandler(),
-    ];
+    private static readonly CachingTypeHandler CachingTypeHandler = new();
 
     /// <summary>
     /// Converts a <see cref="Type"/> to a JSON schema.
@@ -53,15 +42,10 @@ public static class JsonSchemaBuilderExtensions
 
         try
         {
-            foreach (TypeHandler typeHandler in TypeHandlers)
+            TypeHandler.Result result = CachingTypeHandler.TryHandle(builder, context, type, isRootType, propertyAttributeData);
+            if (result.ResultKind == TypeHandler.ResultKind.Handled)
             {
-                TypeHandler.Result result = typeHandler.TryHandle(builder, context, type, isRootType, propertyAttributeData);
-                (builder, bool isHandled) = result.Unwrap();
-
-                if (isHandled)
-                {
-                    return builder;
-                }
+                return result.Builder;
             }
 
             return Assumes.NotReachable<JsonSchemaBuilder>();

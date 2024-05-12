@@ -12,6 +12,35 @@ namespace SharpSchema;
 public static class MemberInfoExtensions
 {
     /// <summary>
+    /// Tries to get the <see cref="CustomAttributeData"/> from the attribute data collection and attribute type.
+    /// </summary>
+    /// <typeparam name="T">The type of the attribute.</typeparam>
+    /// <param name="attributeDatas">The list of <see cref="CustomAttributeData"/> instances to search.</param>
+    /// <param name="attributeData">When this method returns, contains the <see cref="CustomAttributeData"/> for the specified attribute type, if found; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the <see cref="CustomAttributeData"/> for the specified attribute type is found; otherwise, <see langword="false"/>.</returns>
+    public static bool TryGetCustomAttributeData<T>(this IList<CustomAttributeData>? attributeDatas, [NotNullWhen(true)] out CustomAttributeData? attributeData)
+        where T : Attribute
+    {
+        if (attributeDatas is null)
+        {
+            attributeData = null;
+            return false;
+        }
+
+        foreach (CustomAttributeData cad in attributeDatas)
+        {
+            if (cad.AttributeType.Name == typeof(T).Name)
+            {
+                attributeData = cad;
+                return true;
+            }
+        }
+
+        attributeData = null;
+        return false;
+    }
+
+    /// <summary>
     /// Tries to get the <see cref="CustomAttributeData"/> for the specified <see cref="MemberInfo"/> and attribute type.
     /// </summary>
     /// <typeparam name="T">The type of the attribute.</typeparam>
@@ -84,6 +113,8 @@ public static class MemberInfoExtensions
         }
 
         return attributeData is not null;
+
+        //// -- local functions --
 
         static bool TryGetCustomAttributesDataFromTypeMember(Type type, string memberName, string attributeFullName, [NotNullWhen(true)] out CustomAttributeData? attributeData)
         {

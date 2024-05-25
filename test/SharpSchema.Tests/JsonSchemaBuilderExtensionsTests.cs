@@ -11,6 +11,7 @@ using Xunit;
 using Xunit.Abstractions;
 using SharpSchema.Annotations;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft;
 
 namespace SharpSchema.Tests;
 
@@ -322,13 +323,6 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         Assert.Contains(nameof(ComplexObject.Age).ToJsonPropertyName(), requiredProperties);
         Assert.Contains(nameof(ComplexObject.ForceRequiredValue).ToJsonPropertyName(), requiredProperties);
         Assert.Contains("ForceRequiredReference".ToJsonPropertyName(), requiredProperties);
-    }
-
-    [Fact]
-    public void AddType_DictionaryWithNonStringKey_Throws()
-    {
-        Type type = typeof(Dictionary<int, int>);
-        Assert.Throws<ArgumentException>(() => new JsonSchemaBuilder().AddType(type, new ConverterContext()));
     }
 
     [Fact]

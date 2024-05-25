@@ -21,7 +21,10 @@ internal class DictionaryTypeHandler : TypeHandler
             return Result.NotHandled(builder);
         }
 
-        Requires.Argument(keyType.Name == typeof(string).Name, nameof(type), "Only dictionaries with string keys are supported.");
+        if (keyType.Name != typeof(string).Name)
+        {
+            return Result.NotHandled(builder, "Only dictionaries with string keys are supported.");
+        }
 
         JsonSchemaBuilder keySchema = new JsonSchemaBuilder()
             .AddType(keyType, context, isRootType = false);

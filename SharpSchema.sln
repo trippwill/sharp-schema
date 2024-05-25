@@ -38,9 +38,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B71D66EE-B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Tests", "test\SharpSchema.Tests\SharpSchema.Tests.csproj", "{05BC9AD0-2900-494D-902D-BEFBEA541C40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpSchema.Tool", "src\SharpSchema.Tool\SharpSchema.Tool.csproj", "{3C3F6483-7168-4816-B0D9-F46BD3B20132}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Tool", "src\SharpSchema.Tool\SharpSchema.Tool.csproj", "{3C3F6483-7168-4816-B0D9-F46BD3B20132}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpSchema.Annotations", "src\SharpSchema.Annotations\SharpSchema.Annotations.csproj", "{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Annotations", "src\SharpSchema.Annotations\SharpSchema.Annotations.csproj", "{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpSchema.Annotations.Source", "src\SharpSchema.Annotations.Source\SharpSchema.Annotations.Source.csproj", "{636AF0A7-ABCF-428B-9E81-F42A998A0A09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +66,10 @@ Global
 		{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{636AF0A7-ABCF-428B-9E81-F42A998A0A09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{636AF0A7-ABCF-428B-9E81-F42A998A0A09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{636AF0A7-ABCF-428B-9E81-F42A998A0A09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{636AF0A7-ABCF-428B-9E81-F42A998A0A09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{05BC9AD0-2900-494D-902D-BEFBEA541C40} = {B71D66EE-BDBC-4BF5-95D8-89CF71656414}
 		{3C3F6483-7168-4816-B0D9-F46BD3B20132} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
 		{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
+		{636AF0A7-ABCF-428B-9E81-F42A998A0A09} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E3944F6A-384B-4B0F-B93F-3BD513DC57BD}

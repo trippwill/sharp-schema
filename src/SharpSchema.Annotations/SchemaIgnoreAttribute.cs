@@ -7,6 +7,10 @@ namespace SharpSchema.Annotations;
 /// Specifies that the annotated element should be ignored during schema generation.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Struct)]
-public class SchemaIgnoreAttribute : Attribute
+#if ASSEMBLY
+public class SchemaIgnoreAttribute : SchemaAttribute
+#else
+internal class SchemaIgnoreAttribute : SchemaAttribute
+#endif
 {
 }

@@ -10,7 +10,11 @@ namespace SharpSchema.Annotations;
 /// This attribute can be used to define the minimum and maximum values allowed for a property in a schema.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+#if ASSEMBLY
 public class SchemaValueRangeAttribute : SchemaAttribute
+#else
+internal class SchemaValueRangeAttribute : SchemaAttribute
+#endif
 {
     /// <summary>
     /// Gets or sets the minimum value allowed for the property.

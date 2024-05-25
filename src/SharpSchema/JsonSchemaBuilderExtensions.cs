@@ -43,6 +43,11 @@ public static class JsonSchemaBuilderExtensions
         try
         {
             TypeHandler.Result result = CachingTypeHandler.TryHandle(builder, context, type, isRootType, propertyAttributeData);
+            if (result.ResultKind == TypeHandler.ResultKind.Fault)
+            {
+                throw new InvalidOperationException(string.Join(Environment.NewLine, result.Messages));
+            }
+
             if (result.ResultKind == TypeHandler.ResultKind.Handled)
             {
                 return result.Builder;

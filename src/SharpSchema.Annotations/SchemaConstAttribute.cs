@@ -7,7 +7,11 @@ namespace SharpSchema.Annotations;
 /// Specifies a constant value for a property or field in a schema.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class SchemaConstAttribute(object value) : Attribute
+#if ASSEMBLY
+public class SchemaConstAttribute(object value) : SchemaAttribute
+#else
+internal class SchemaConstAttribute(object value) : SchemaAttribute
+#endif
 {
     /// <summary>
     /// Gets the constant value.

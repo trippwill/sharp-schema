@@ -6,6 +6,10 @@ namespace SharpSchema.Annotations;
 /// <summary>
 /// Represents a base class for schema attributes.
 /// </summary>
+#if ASSEMBLY
 public abstract class SchemaAttribute : Attribute
+#else
+internal abstract class SchemaAttribute : Attribute
+#endif
 {
 }

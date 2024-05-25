@@ -9,7 +9,11 @@ namespace SharpSchema.Annotations;
 /// <remarks>
 /// This attribute can be used to define the minimum and maximum length of a schema.
 /// </remarks>
+#if ASSEMBLY
 public class SchemaLengthRangeAttribute : SchemaAttribute
+#else
+internal class SchemaLengthRangeAttribute : SchemaAttribute
+#endif
 {
     /// <summary>
     /// Gets or sets the minimum length allowed for the schema.

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <DefineConstants>SOURCE</DefineConstants>
+    <IsPackable>true</IsPackable>
+    <PackageId>SharpSchema.Annotations.Source</PackageId>
+    <Product>SharpSchema</Product>
+    <Description>Source-only Annotations library for SharpSchema project.</Description>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="..\SharpSchema.Annotations\**\*.cs" Pack="true" PackagePath="content\;contentFiles\cs\netstandard2.0\" />
+  </ItemGroup>
+</Project>

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace SharpSchema.Annotations;
 
 /// <summary>
@@ -10,7 +12,7 @@ namespace SharpSchema.Annotations;
 /// This attribute is used to specify a regular expression pattern that a property value must match in order to be considered valid.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-#if ASSEMBLY
+#if SHARPSCHEMA_ASSEMBLY
 public class SchemaRegexAttribute(string pattern) : SchemaAttribute
 #else
 internal class SchemaRegexAttribute(string pattern) : SchemaAttribute

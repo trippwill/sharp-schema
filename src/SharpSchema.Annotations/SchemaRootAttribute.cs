@@ -1,13 +1,15 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace SharpSchema.Annotations;
 
 /// <summary>
 /// Marks a class or struct as a schema root.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-#if ASSEMBLY
+#if SHARPSCHEMA_ASSEMBLY
 public class SchemaRootAttribute : SchemaAttribute
 #else
 internal class SchemaRootAttribute : SchemaAttribute

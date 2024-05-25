@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace SharpSchema.Annotations;
 
 /// <summary>
@@ -10,7 +12,7 @@ namespace SharpSchema.Annotations;
 /// This attribute is used to specify a custom value for a schema.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field)]
-#if ASSEMBLY
+#if SHARPSCHEMA_ASSEMBLY
 public class SchemaOverrideAttribute(string value) : SchemaAttribute
 #else
 internal class SchemaOverrideAttribute(string value) : SchemaAttribute

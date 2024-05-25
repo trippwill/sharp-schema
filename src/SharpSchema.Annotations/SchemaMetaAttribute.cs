@@ -7,7 +7,11 @@ namespace SharpSchema.Annotations;
 /// Represents a schema meta attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Enum)]
-public class SchemaMetaAttribute : Attribute
+#if ASSEMBLY
+public class SchemaMetaAttribute : SchemaAttribute
+#else
+internal class SchemaMetaAttribute : SchemaAttribute
+#endif
 {
     /// <summary>
     /// Gets or sets the title of the schema.

@@ -7,7 +7,11 @@ namespace SharpSchema.Annotations;
 /// Marks a class or struct as a schema root.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+#if ASSEMBLY
 public class SchemaRootAttribute : SchemaAttribute
+#else
+internal class SchemaRootAttribute : SchemaAttribute
+#endif
 {
     /// <summary>
     /// Gets or sets the file name of the schema.

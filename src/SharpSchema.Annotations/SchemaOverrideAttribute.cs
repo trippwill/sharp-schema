@@ -10,7 +10,11 @@ namespace SharpSchema.Annotations;
 /// This attribute is used to specify a custom value for a schema.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field)]
-public class SchemaOverrideAttribute(string value) : Attribute
+#if ASSEMBLY
+public class SchemaOverrideAttribute(string value) : SchemaAttribute
+#else
+internal class SchemaOverrideAttribute(string value) : SchemaAttribute
+#endif
 {
     /// <summary>
     /// Gets the overridden value for the schema.

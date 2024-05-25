@@ -5,6 +5,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>sharpschema</ToolCommandName>
+    <PackageId>SharpSchema.Tool</PackageId>
+    <Description>SharpSchema.Tool is a .NET command-line tool for generating JSON schemas from .NET types.</Description>
   </PropertyGroup>
 
   <ItemGroup>

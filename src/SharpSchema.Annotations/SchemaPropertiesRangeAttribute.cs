@@ -10,7 +10,11 @@ namespace SharpSchema.Annotations;
 /// This attribute can be used to specify the minimum and maximum number of properties allowed in a schema.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field)]
+#if ASSEMBLY
 public class SchemaPropertiesRangeAttribute : SchemaAttribute
+#else
+internal class SchemaPropertiesRangeAttribute : SchemaAttribute
+#endif
 {
     /// <summary>
     /// Gets or sets the minimum number of properties allowed in a schema.

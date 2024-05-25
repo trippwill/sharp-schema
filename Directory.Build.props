@@ -30,7 +30,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)strongname.snk</AssemblyOriginatorKeyFile>
 
-    <!-- <PackageProjectUrl>https://github.com/ORG/REPO</PackageProjectUrl> -->
+    <PackageProjectUrl>https://github.com/tripwill/sharp-schema</PackageProjectUrl> 
     <Company>Charles Willis</Company>
     <Authors>Charles Willis</Authors>
     <Copyright>© Charles Willis. All rights reserved.</Copyright>

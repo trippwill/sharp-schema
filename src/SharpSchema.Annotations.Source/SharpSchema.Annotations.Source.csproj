@@ -7,7 +7,7 @@
     <Description>Source-only Annotations library for SharpSchema project.</Description>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <DefineConstants>SOURCE</DefineConstants>
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\SharpSchema.Annotations\**\*.cs" Pack="true" PackagePath="content\;contentFiles\cs\netstandard2.0\" />

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <DefineConstants>SOURCE</DefineConstants>
+    <DefineConstants>SHARPSCHEMA_SOURCE</DefineConstants>
     <IsPackable>true</IsPackable>
     <PackageId>SharpSchema.Annotations.Source</PackageId>
     <Product>SharpSchema</Product>

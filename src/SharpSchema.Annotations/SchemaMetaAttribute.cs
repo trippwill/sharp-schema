@@ -1,13 +1,15 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace SharpSchema.Annotations;
 
 /// <summary>
 /// Represents a schema meta attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Enum)]
-#if ASSEMBLY
+#if SHARPSCHEMA_ASSEMBLY
 public class SchemaMetaAttribute : SchemaAttribute
 #else
 internal class SchemaMetaAttribute : SchemaAttribute

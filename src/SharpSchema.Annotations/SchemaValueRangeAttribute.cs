@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace SharpSchema.Annotations;
 
 /// <summary>
@@ -10,7 +12,7 @@ namespace SharpSchema.Annotations;
 /// This attribute can be used to define the minimum and maximum values allowed for a property in a schema.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-#if ASSEMBLY
+#if SHARPSCHEMA_ASSEMBLY
 public class SchemaValueRangeAttribute : SchemaAttribute
 #else
 internal class SchemaValueRangeAttribute : SchemaAttribute

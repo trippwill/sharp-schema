@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace SharpSchema.Annotations;
 
 /// <summary>
@@ -9,7 +11,8 @@ namespace SharpSchema.Annotations;
 /// <remarks>
 /// This attribute can be used to define the minimum and maximum length of a schema.
 /// </remarks>
-#if ASSEMBLY
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+#if SHARPSCHEMA_ASSEMBLY
 public class SchemaLengthRangeAttribute : SchemaAttribute
 #else
 internal class SchemaLengthRangeAttribute : SchemaAttribute

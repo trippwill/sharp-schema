@@ -12,7 +12,7 @@
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="System.Reflection.MetadataLoadContext" Version="8.0.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.7" />
-    <PackageVersion Include="xunit" Version="2.7.0" />
+    <PackageVersion Include="xunit" Version="2.8.0" />
   </ItemGroup>
   <ItemGroup>
     <GlobalPackageReference Include="CSharpIsNullAnalyzer" Version="0.1.495" />

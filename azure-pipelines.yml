@@ -25,8 +25,8 @@ parameters:
 variables:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   BuildConfiguration: Release
-  #codecov_token: # Get a new one from https://codecov.io/
-  #ci_feed: # Azure Artifacts feed URL
+  codecov_token: a5d6525d-278c-4a53-81fd-1c316760b60f # Get a new one from https://codecov.io/
+  ci_feed: https://pkgs.dev.azure.com/trippwill/_packaging/trippwill/nuget/v3/index.json # Azure Artifacts feed URL
   NUGET_PACKAGES: $(Agent.TempDirectory)/.nuget/packages/
 
 jobs:

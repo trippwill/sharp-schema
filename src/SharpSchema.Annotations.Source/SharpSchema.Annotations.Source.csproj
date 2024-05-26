@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Nullable>disable</Nullable>
     <DefineConstants>SHARPSCHEMA_SOURCE</DefineConstants>
     <IsPackable>true</IsPackable>
     <PackageId>SharpSchema.Annotations.Source</PackageId>
@@ -11,6 +12,6 @@
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\SharpSchema.Annotations\**\*.cs" Pack="true" PackagePath="content\;contentFiles\cs\netstandard2.0\" />
+    <Compile Include="..\SharpSchema.Annotations\**\*.cs" Pack="true" PackagePath="content\;contentFiles\cs\netstandard2.0\" />
   </ItemGroup>
 </Project>

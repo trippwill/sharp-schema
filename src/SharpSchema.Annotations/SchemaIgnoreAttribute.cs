@@ -3,6 +3,8 @@
 
 using System;
 
+#nullable enable
+
 namespace SharpSchema.Annotations;
 
 /// <summary>

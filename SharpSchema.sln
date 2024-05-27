@@ -42,7 +42,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Tool", "src\Sha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Annotations", "src\SharpSchema.Annotations\SharpSchema.Annotations.csproj", "{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpSchema.Annotations.Source", "src\SharpSchema.Annotations.Source\SharpSchema.Annotations.Source.csproj", "{636AF0A7-ABCF-428B-9E81-F42A998A0A09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Annotations.Source", "src\SharpSchema.Annotations.Source\SharpSchema.Annotations.Source.csproj", "{636AF0A7-ABCF-428B-9E81-F42A998A0A09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

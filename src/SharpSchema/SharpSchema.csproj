@@ -5,6 +5,7 @@
     <PackageId>SharpSchema</PackageId>
     <Product>SharpSchema</Product>
     <Description>Core library for the SharpSchema project.</Description>
+    <DefineConstants>SHARPSCHEMA_ASSEMBLY</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net" />

@@ -1,0 +1,68 @@
+name: Release
+
+on: workflow_dispatch
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: deployables-Linux
+          path: path/to/save/artifact
+          workflow: CI
+          branch: main
+          run: |
+            echo "The artifact has been downloaded successfully."
+
+      - name: Install unzip
+        run: sudo apt-get install unzip
+
+      - name: Unzip artifact
+        run: unzip path/to/save/artifact/deployables-Linux -d path/to/unzip/artifact
+
+      - name: Extract version
+        id: get_version
+        run: |
+          VERSION=$(ls path/to/unzip/artifact/SharpSchema.*.nupkg | sed -n -e 's/^.*SharpSchema\.\(.*\)\.nupkg/\1/p')
+          echo "::set-output name=version::${VERSION}"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: Release ${{ steps.get_version.outputs.version }}
+          draft: true
+
+      - name: Attach artifacts to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./path/to/unzip/artifact/*.nupkg
+          asset_name: artifact.nupkg
+          asset_content_type: application/octet-stream
+
+      - name: Attach symbols to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./path/to/unzip/artifact/*.snupkg
+          asset_name: artifact.snupkg
+          asset_content_type: application/octet-stream
+
+      - name: Publish NuGet packages
+        uses: nuget/setup-nuget@v1
+      - name: Push NuGet packages
+        run: |
+          for file in path/to/unzip/artifact/*.nupkg; do
+            dotnet nuget push $file --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+          done

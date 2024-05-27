@@ -16,7 +16,7 @@ jobs:
           response=$(curl \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/trippwill/sharp-schema/actions/workflows/9258273695/runs?branch=main")
+            "https://api.github.com/repos/trippwill/sharp-schema/actions/workflows/9257916714/runs?branch=main")
 
           # Get the workflow_run_id of the latest successful run
           workflow_run_id=$(echo "$response" | jq -r '.workflow_runs[] | select(.conclusion=="success") | .id' | head -1)

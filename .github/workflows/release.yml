@@ -7,21 +7,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: deployables-Linux
-          path: path/to/save/artifact
-          workflow: CI
-          branch: main
-          run: |
-            echo "The artifact has been downloaded successfully."
-
       - name: Install unzip
         run: sudo apt-get install unzip
 
-      - name: Unzip artifact
-        run: unzip path/to/save/artifact/deployables-Linux -d path/to/unzip/artifact
+      - name: Download a workflow artifact
+        run: |
+          # Fetch the list of workflow runs for the CI workflow
+          response=$(curl \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/trippwill/sharp-schema/actions/workflows/9258273695/runs?branch=main")
+
+          # Get the workflow_run_id of the latest successful run
+          workflow_run_id=$(echo "$response" | jq -r '.workflow_runs[] | select(.conclusion=="success") | .id' | head -1)
+
+          # Fetch the list of artifacts for the specified workflow run
+          response=$(curl \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/trippwill/sharp-schema/actions/runs/$workflow_run_id/artifacts")
+
+          # Get the download_url of the artifact
+          download_url=$(echo "$response" | jq -r '.artifacts[] | select(.name=="deployables-Linux") | .archive_download_url')
+
+          # Download the artifact
+          curl \
+            -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -o artifact.zip \
+            "$download_url"
+
+          # Extract the artifact
+          unzip artifact.zip -d path/to/unzip/artifact
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract version
         id: get_version

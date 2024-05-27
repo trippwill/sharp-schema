@@ -12,9 +12,18 @@ public class ExampleTests(ITestOutputHelper outputHelper) : TestBase(outputHelpe
     [Fact]
     public void SimplePerson()
     {
-        var typeContext = RootTypeContext.FromType(typeof(Examples.SimplePerson));
-        TypeConverter converter = new();
-        JsonSchema schema = converter.Convert(typeContext);
+        var typeContext = RootTypeContext.FromType<Examples.SimplePerson>();
+        JsonSchema schema = new TypeConverter().Convert(typeContext);
+        this.OutputSchema(schema);
+
+        Assert.True(true);
+    }
+
+    [Fact]
+    public void SimpleOffice()
+    {
+        RootTypeContext typeContext = RootTypeContext.FromType<Examples.SimpleOffice>() with { CommonNamespace = "SharpSchema.Tests" };
+        JsonSchema schema = new TypeConverter().Convert(typeContext);
         this.OutputSchema(schema);
 
         Assert.True(true);

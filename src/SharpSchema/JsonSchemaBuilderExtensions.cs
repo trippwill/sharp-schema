@@ -18,7 +18,7 @@ namespace SharpSchema;
 /// </summary>
 public static class JsonSchemaBuilderExtensions
 {
-    private static readonly CachingTypeHandler CachingTypeHandler = new();
+    private static readonly AggregateTypeHandler CachingTypeHandler = new();
 
     /// <summary>
     /// Converts a <see cref="Type"/> to a JSON schema.
@@ -110,7 +110,6 @@ public static class JsonSchemaBuilderExtensions
         }
 
         return builder
-            .Title(property.Name.Titleize())
             .AddPropertyAnnotations(property);
     }
 

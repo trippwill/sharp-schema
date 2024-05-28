@@ -5,6 +5,7 @@ using System;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Humanizer;
 using Json.Schema;
 using SharpSchema.Annotations;
 
@@ -231,6 +232,11 @@ internal class FallbackTypeHandler : TypeHandler
 
             JsonSchemaBuilder propertySchema = new JsonSchemaBuilder()
                 .AddPropertyInfo(property, context, out bool isRequired);
+
+            if (propertySchema.Get<TitleKeyword>() is null)
+            {
+                propertySchema = propertySchema.Title(property.Name.Titleize());
+            }
 
             if (isRequired)
             {

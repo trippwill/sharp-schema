@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 
 namespace SharpSchema;
@@ -71,7 +72,7 @@ public static class MemberInfoExtensions
     }
 
     /// <summary>
-    /// Tries to get the <see cref="CustomAttributeData"/> for the specified <see cref="Type"/> and attribute type.
+    /// Tries to get the <see cref="CustomAttributeData"/> for the specified <see cref="MemberInfo"/> and attribute type.
     /// </summary>
     /// <param name="memberInfo">The <see cref="MemberInfo"/> to check.</param>
     /// <param name="attributeFullName">The full name of the attribute type.</param>
@@ -93,7 +94,34 @@ public static class MemberInfoExtensions
             }
         }
 
-        Type? baseType = memberInfo.DeclaringType;
+        Type? baseType;
+
+        // If the MemberInfo is for a Type, iterate through the base types for the attribute.
+        if (memberInfo is Type typeInfo)
+        {
+            baseType = typeInfo.BaseType;
+            while (baseType is not null)
+            {
+                if (baseType.TryGetCustomAttributeData(attributeFullName, out attributeData))
+                {
+                    return true;
+                }
+
+                baseType = baseType.BaseType;
+            }
+
+            return false;
+        }
+
+        // If the MemberInfo is for a PropertyInfo, or FieldInfo, iterate through the base types of the
+        // declaring type, so see if the attribute is declared on a member of the same name.
+        baseType = memberInfo switch
+        {
+            PropertyInfo pi => pi.DeclaringType?.BaseType,
+            FieldInfo fi => fi.DeclaringType?.BaseType,
+            _ => null,
+        };
+
         while (baseType is not null)
         {
             foreach (Type type in baseType.GetInterfaces())
@@ -134,25 +162,5 @@ public static class MemberInfoExtensions
             attributeData = null;
             return false;
         }
-    }
-
-    /// <summary>
-    /// Tries to get the ambient value for the specified <see cref="MemberInfo"/>.
-    /// </summary>
-    /// <param name="memberInfo">The <see cref="MemberInfo"/> to check.</param>
-    /// <param name="ambientValue">The ambient value if present.</param>
-    /// <returns><see langword="true"/> if the ambient value is found; otherwise, <see langword="false"/>.</returns>
-    internal static bool TryGetAmbientValue(this MemberInfo memberInfo, [NotNullWhen(true)] out string? ambientValue)
-    {
-        if (memberInfo.TryGetCustomAttributeData("System.ComponentModel.AmbientValueAttribute", out CustomAttributeData? ambientValueAttribute)
-            && ambientValueAttribute.ConstructorArguments.Count == 1
-            && ambientValueAttribute.ConstructorArguments[0].Value is string value)
-        {
-            ambientValue = value;
-            return true;
-        }
-
-        ambientValue = null;
-        return false;
     }
 }

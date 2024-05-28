@@ -7,9 +7,9 @@ using Json.Schema;
 namespace SharpSchema.TypeHandlers;
 
 /// <summary>
-/// A type handler that provides caching functionality for JSON schema builders.
+/// A type handler that aggregates the individual type handlers.
 /// </summary>
-internal class CachingTypeHandler : TypeHandler
+internal class AggregateTypeHandler : TypeHandler
 {
     private static readonly TypeHandler[] TypeHandlers =
     [
@@ -24,8 +24,6 @@ internal class CachingTypeHandler : TypeHandler
         new FallbackTypeHandler(),
     ];
 
-    private readonly Dictionary<CacheKey, JsonSchemaBuilder> cache = [];
-
     /// <summary>
     /// Tries to handle the specified type and generate a JSON schema builder.
     /// </summary>
@@ -37,11 +35,6 @@ internal class CachingTypeHandler : TypeHandler
     /// <returns>A result indicating whether the type was handled successfully or not.</returns>
     public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
     {
-        if (this.cache.TryGetValue(new CacheKey(type, isRootType, propertyAttributeData), out JsonSchemaBuilder? cachedBuilder))
-        {
-            return Result.Handled(cachedBuilder);
-        }
-
         try
         {
             foreach (TypeHandler typeHandler in TypeHandlers)
@@ -51,7 +44,6 @@ internal class CachingTypeHandler : TypeHandler
 
                 if (isHandled)
                 {
-                    this.cache[new CacheKey(type, isRootType, propertyAttributeData)] = builder;
                     return Result.Handled(builder);
                 }
             }
@@ -61,22 +53,6 @@ internal class CachingTypeHandler : TypeHandler
         catch (Exception ex)
         {
             return Result.Fault(builder, ex.Message);
-        }
-    }
-
-    private readonly record struct CacheKey(Type Type, bool IsRootType, IList<CustomAttributeData>? PropertyAttributeData)
-    {
-        public bool Equals(CacheKey other) =>
-            this.Type == other.Type &&
-            this.IsRootType == other.IsRootType &&
-            SafeSequenceEqual(this.PropertyAttributeData, other.PropertyAttributeData);
-
-        public override int GetHashCode() =>
-            HashCode.Combine(this.Type, this.IsRootType, this.PropertyAttributeData);
-
-        private static bool SafeSequenceEqual<T>(IEnumerable<T>? first, IEnumerable<T>? second)
-        {
-            return first?.SequenceEqual(second ?? []) ?? false;
         }
     }
 }

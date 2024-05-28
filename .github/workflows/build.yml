@@ -112,10 +112,3 @@ jobs:
         timeout-minutes: 3
         continue-on-error: true
         if: always()
-      - name: 📢 Create draft release
-        if: github.ref == 'refs/heads/main' && matrix.os == 'ubuntu-20.04' && success()
-        uses: actions/create-release@v1
-        with:
-          tag_name: v${{ env.GitBuildVersion }}
-          draft: true
-          files: ${{ runner.temp }}/_artifacts/deployables/deployable-Linux

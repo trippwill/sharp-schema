@@ -7,8 +7,9 @@
   ],
   "cloudBuild": {
     "setVersionVariables": true,
-    "buildNumber": {
-      "enabled": true
-    }
+    "setAllVariables": true
+  },
+  "release": {
+    "firstUnstableTag": "beta"
   }
 }

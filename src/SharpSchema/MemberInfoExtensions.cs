@@ -117,8 +117,8 @@ public static class MemberInfoExtensions
         // declaring type, so see if the attribute is declared on a member of the same name.
         baseType = memberInfo switch
         {
-            PropertyInfo pi => pi.DeclaringType?.BaseType,
-            FieldInfo fi => fi.DeclaringType?.BaseType,
+            PropertyInfo pi => pi.DeclaringType,
+            FieldInfo fi => fi.DeclaringType,
             _ => null,
         };
 

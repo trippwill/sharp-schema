@@ -46,11 +46,3 @@ public class Person
 ```
 
 In this example, the `Person` class will be translated into a JSON Schema with an ID of "http://example.com/schemas/Person". The `FirstName` and `LastName` properties will have titles in the schema, and the `InternalId` property will be ignored.
-
-## Contributing
-
-If you have any issues or want to contribute, please open an issue or a pull request on the [GitHub repository](https://github.com/yourusername/SharpSchema.Annotations).
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

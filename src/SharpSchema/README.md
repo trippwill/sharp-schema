@@ -25,7 +25,7 @@ A schema root class or struct must be annotated with `SharpSchema.Annotations.Sc
     1. A `Nullable<T>` will be optional.
     1. A `T?` will be optional.
     1. Use `SharpSchema.Annotations.SchemaRequiredAttribute` to make a property with a nullable type required.
-        1. This will generate a `OneOf` schema, allowing either the schema of the type, or `null`. The property will also be listed as `required`. 
+        1. This will generate a `OneOf` schema, allowing either the schema of the type, or `null`. The property will also be listed as `required`.
     1. Use `SharpSchema.Annotations.SchemaRequiredAttribute(false)` to make a property with a non-nullable type optional.
 
 1. All public properties with a public getter will be part of the generated schema.
@@ -94,7 +94,6 @@ public class Example
 }
 ```
 
-
 ### Arrays and Enumerable
 
 ### Dictionaries
@@ -106,7 +105,7 @@ public class Example
 1. All integral types are emitted as `integers`.
 1. Floating point types and `decimal` are emitted as `number`.
 1. All number schema also have min/max values clamped to the valid .NET range for the type.
-  1. The range can be overridden using the `SharpSchema.Annotations.ValueRangeAttribute`.
+    1. The range can be overridden using the `SharpSchema.Annotations.ValueRangeAttribute`.
 
 ### Abstract Types & Interfaces
 

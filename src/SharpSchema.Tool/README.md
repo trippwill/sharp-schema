@@ -1,7 +1,5 @@
 # SharpSchema.Tool
 
-SharpSchema.Tool is a .NET command-line tool for generating JSON schemas from .NET types.
-
 ## Installation
 
 You can install SharpSchema.Tool globally using the following command:
@@ -9,6 +7,8 @@ You can install SharpSchema.Tool globally using the following command:
 dotnet tool install -g SharpSchema.Tool
 
 This will make the `sharpschema` command available globally in your command line.
+
+[More about .NET tools packages](https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools)
 
 ## Usage
 
@@ -27,16 +27,16 @@ This will output the JSON schema to the console. If you want to save the schema 
 
 `sharpschema generate -a ./bin/Debug/net8.0/MyAssembly.dll -c MyNamespace.MyType  -o .`
 
-## Integration into a Build
+### Adding reference assemblies
 
-You can integrate SharpSchema.Tool into your build process by adding a post-build event that runs the `sharpschema` command. In your `.csproj` file, you can add the following:
+Use `-r <assembly-path>` to add a reference assembly required to load the primary assembly. Use one `-r` for each reference assembly.
 
-```
-<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-  <Exec Command="dotnet tool run sharpschema generate -a $(TargetPath) -c MyNamespace.MyType -o ." />
-</Target>
-```
+If many reference assemblies are in a single directory, use `-d <path-to-directory>` to add all the assemblies in that directory as reference assemblies. The `-t` option can be used to set the directory recursion depth.
 
-This will run the `sharpschema` command after every build, generating a JSON schema for `MyNamespace.MyType` and saving it to `schema.json`.
+For example, when the primary assembly is a .NET Framework assemply, you may want to reference all the assemblies in the BCL:
 
-Please replace `MyNamespace.MyType` with the actual type you want to generate a schema for.
+`sharpschema generate -a ./bin/Debug/net8.0/MyAssembly.dll -c MyNamespace.MyType  -o . -d "C:\Windows\Microsoft.NET\Framework\v4.0.30319" -t 2`
+
+## Other options
+
+Run `sharpschema --help` for the full list of available options.

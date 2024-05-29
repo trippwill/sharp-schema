@@ -2,7 +2,7 @@
 
 SharpSchema is a .NET library and command-line tool for generating JSON schemas from .NET types.
 
-It leverages the excellent and unparalled [JsonSchema.NET library](https://github.com/gregsdennis/json-everything).
+It leverages the excellent [JsonSchema.NET library](https://github.com/gregsdennis/json-everything).
 
 The CLI tool requires .NET SDK 8.
 

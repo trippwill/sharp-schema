@@ -41,6 +41,13 @@ public static class TypeExtensions
     };
 
     /// <summary>
+    /// Whether the specified <see cref="Type"/> is a numeric schema type.
+    /// </summary>
+    /// <param name="type">The type.</param>
+    /// <returns>Whether the type is numeric.</returns>
+    public static bool IsSchemaNumeric(this Type type) => Type.GetTypeCode(type).ToSchemaValueType() is SchemaValueType.Integer or SchemaValueType.Number;
+
+    /// <summary>
     /// Converts a <see cref="Type"/> to a definition name for JSON schema.
     /// </summary>
     /// <param name="type">The <see cref="Type"/> to convert.</param>

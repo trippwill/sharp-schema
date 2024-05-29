@@ -21,6 +21,13 @@ internal class OverrideValueTypeHandler : TypeHandler
             return Result.NotHandled(builder);
         }
 
+        string definitionName = type.ToDefinitionName(context);
+        if (context.Defs.TryGetValue(definitionName, out _))
+        {
+            return Result.Handled(builder
+                .Ref(definitionName.ToJsonDefUri()));
+        }
+
         try
         {
             string? overrideValue = attribute.GetConstructorArgument<string>(0);
@@ -29,13 +36,18 @@ internal class OverrideValueTypeHandler : TypeHandler
                 return Result.Fault(builder, "Override value is null.");
             }
 
+            JsonSchemaBuilder overrideBuilder = new();
+
             var overrideSchema = JsonSchema.FromText(overrideValue);
             foreach (IJsonSchemaKeyword keyword in overrideSchema.Keywords ?? Enumerable.Empty<IJsonSchemaKeyword>())
             {
-                builder.Add(keyword);
+                overrideBuilder.Add(keyword);
             }
 
-            return Result.Handled(builder);
+            context.Defs.Add(definitionName, overrideBuilder);
+
+            return Result.Handled(builder
+                .Ref(definitionName.ToJsonDefUri()));
         }
         catch (JsonException ex)
         {

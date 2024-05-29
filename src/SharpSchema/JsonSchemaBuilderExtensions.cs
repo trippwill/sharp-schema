@@ -3,8 +3,6 @@
 
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using Humanizer;
 using Json.More;
 using Json.Schema;
 using Microsoft;
@@ -18,7 +16,7 @@ namespace SharpSchema;
 /// </summary>
 public static class JsonSchemaBuilderExtensions
 {
-    private static readonly AggregateTypeHandler CachingTypeHandler = new();
+    private static readonly AggregateTypeHandler AggregateTypeHandler = new();
 
     /// <summary>
     /// Converts a <see cref="Type"/> to a JSON schema.
@@ -42,7 +40,7 @@ public static class JsonSchemaBuilderExtensions
 
         try
         {
-            TypeHandler.Result result = CachingTypeHandler.TryHandle(builder, context, type, isRootType, propertyAttributeData);
+            TypeHandler.Result result = AggregateTypeHandler.TryHandle(builder, context, type, isRootType, propertyAttributeData);
             if (result.ResultKind == TypeHandler.ResultKind.Fault)
             {
                 throw new InvalidOperationException(string.Join(Environment.NewLine, result.Messages));

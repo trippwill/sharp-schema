@@ -16,20 +16,34 @@ internal class EnumerableTypeHandler : TypeHandler
     /// <inheritdoc/>
     public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
     {
-        if (!type.IsGenericType)
+        if (!type.IsGenericType && !type.IsArray)
         {
             return Result.NotHandled(builder);
         }
 
-        Type genericTypeDefinition = type.GetGenericTypeDefinition();
-        Type[] genericArguments = type.GetGenericArguments();
+        Type? elementType;
 
-        if (!genericTypeDefinition.ImplementsAnyInterface((typeof(IEnumerable).Namespace, typeof(IEnumerable).Name)))
+        if (type.IsGenericType)
+        {
+            Type genericTypeDefinition = type.GetGenericTypeDefinition();
+            Type[] genericArguments = type.GetGenericArguments();
+
+            if (!genericTypeDefinition.ImplementsAnyInterface((typeof(IEnumerable).Namespace, typeof(IEnumerable).Name)))
+            {
+                return Result.NotHandled(builder);
+            }
+
+            elementType = genericArguments.Single();
+        }
+        else
+        {
+            elementType = type.GetElementType();
+        }
+
+        if (elementType is null)
         {
             return Result.NotHandled(builder);
         }
-
-        Type elementType = genericArguments.Single();
 
         try
         {

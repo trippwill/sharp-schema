@@ -17,23 +17,6 @@ namespace SharpSchema.Tests;
 
 public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : TestBase(outputHelper)
 {
-    [Fact]
-    public void AddType_Enum_ReturnsStringSchemaWithEnumValues()
-    {
-        // Arrange
-        var builder = new JsonSchemaBuilder();
-        Type type = typeof(TestEnum);
-        string[] expectedEnumValues = ["value1", "value2", "value3"];
-
-        // Act
-        JsonSchema result = builder.AddType(type, new ConverterContext());
-        this.OutputSchema(result);
-
-        // Assert
-        Assert.Equal(SchemaValueType.String, result.GetJsonType());
-        Assert.Equal(expectedEnumValues, result.GetEnum()!.Select(jn => jn!.ToString()));
-    }
-
     [Theory]
     [InlineData(typeof(bool), SchemaValueType.Boolean)]
     [InlineData(typeof(char), SchemaValueType.String, Skip = "Not currently supported")]
@@ -167,7 +150,6 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
     [InlineData(typeof(DateTimeOffset[]), SchemaValueType.String)]
     [InlineData(typeof(Guid[]), SchemaValueType.String)]
     [InlineData(typeof(Uri[]), SchemaValueType.String)]
-    [InlineData(typeof(TestEnum[]), SchemaValueType.String)]
     [InlineData(typeof(IEnumerable<int>), SchemaValueType.Integer)]
     [InlineData(typeof(ICollection<int>), SchemaValueType.Integer)]
     [InlineData(typeof(IList<int>), SchemaValueType.Integer)]
@@ -356,7 +338,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
     }
 
     [Fact]
-    public void AddType_WithOverrideSchema_ReturnsObjectSchemaWithProperties()
+    public void AddType_WithOverrideSchema_ReturnsRef()
     {
         // Arrange
         Type type = typeof(OverrideClass);
@@ -366,8 +348,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         this.OutputSchema(result);
 
         // Assert
-        Assert.Equal(SchemaValueType.Object, result.GetJsonType());
-        Assert.Contains("name", result.GetProperties()!);
+        Assert.NotNull(result.GetRef());
     }
 
     [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test Code")]

@@ -22,6 +22,13 @@ internal class EnumAsStringTypeHandler : TypeHandler
             return Result.NotHandled(builder);
         }
 
+        string definitionName = type.ToDefinitionName(context);
+        if (context.Defs.TryGetValue(definitionName, out _))
+        {
+            return Result.Handled(builder
+                .Ref(definitionName.ToJsonDefUri()));
+        }
+
         string[] enumNames = Enum.GetNames(type);
         ImmutableArray<string>.Builder kebabCaseEnumNames = ImmutableArray.CreateBuilder<string>(enumNames.Length);
         for (int i = 0; i < enumNames.Length; i++)
@@ -44,11 +51,15 @@ internal class EnumAsStringTypeHandler : TypeHandler
             kebabCaseEnumNames.Add(enumNames[i].Kebaberize());
         }
 
-        builder = builder
+        JsonSchemaBuilder enumBuilder = new JsonSchemaBuilder()
             .Comment(type.Name)
             .Type(SchemaValueType.String)
-            .Enum(kebabCaseEnumNames.ToImmutable());
+            .Enum(kebabCaseEnumNames.ToImmutable())
+            .AddTypeAnnotations(type);
 
-        return Result.Handled(builder);
+        context.Defs.Add(definitionName, enumBuilder);
+
+        return Result.Handled(builder
+            .Ref(definitionName.ToJsonDefUri()));
     }
 }

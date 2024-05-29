@@ -18,7 +18,6 @@ internal class AggregateTypeHandler : TypeHandler
         new StringFormatTypeHandler(),
         new EnumAsStringTypeHandler(),
         new TypeCodeTypeHandler(),
-        new ArrayTypeHandler(),
         new DictionaryTypeHandler(),
         new EnumerableTypeHandler(),
         new FallbackTypeHandler(),

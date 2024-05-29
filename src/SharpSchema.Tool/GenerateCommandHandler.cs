@@ -3,8 +3,8 @@
 
 using System.CommandLine;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
-using Json.More;
 using Json.Schema;
 using static SharpSchema.Tool.GenerateCommandHandler;
 
@@ -56,21 +56,19 @@ internal class GenerateCommandHandler(IConsole console, LoaderOptions loaderOpti
                     .Convert(rootTypeContext)
                     .Build();
 
-                string schemaString = JsonSerializer.Serialize(
-                    schema.ToJsonDocument().RootElement,
-                    new JsonSerializerOptions
-                    {
-                        WriteIndented = writerOptions.WriteIndented,
-                        Encoder = writerOptions.StrictJsonEscaping
+                byte[] schemaBytes = schema.SerializeToUtf8Bytes(new JsonSerializerOptions
+                {
+                    WriteIndented = writerOptions.WriteIndented,
+                    Encoder = writerOptions.StrictJsonEscaping
                             ? System.Text.Encodings.Web.JavaScriptEncoder.Default
                             : System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    });
+                });
 
                 string fileName = rootTypeContext.Filename ?? $"{rootTypeContext.Type.Name}.schema.json";
 
                 if (writerOptions.OutputDirectory is null)
                 {
-                    console.Out.Write(schemaString);
+                    console.Out.Write(Encoding.UTF8.GetString(schemaBytes));
                 }
                 else
                 {
@@ -87,7 +85,7 @@ internal class GenerateCommandHandler(IConsole console, LoaderOptions loaderOpti
                         continue;
                     }
 
-                    File.WriteAllText(outputFile.FullName, schemaString);
+                    File.WriteAllBytes(outputFile.FullName, schemaBytes);
                     console.Out.Write($"Schema written to {outputFile.FullName}\n");
                 }
             }

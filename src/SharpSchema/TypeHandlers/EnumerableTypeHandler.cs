@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Reflection;
 using Json.Schema;
+using SharpSchema.Annotations;
 
 namespace SharpSchema.TypeHandlers;
 
@@ -29,7 +30,18 @@ internal class EnumerableTypeHandler : TypeHandler
         }
 
         Type elementType = genericArguments.Single();
-        builder = builder.AddArrayType(elementType, context);
-        return Result.Handled(builder);
+
+        try
+        {
+            builder = builder
+                .AddTypeAnnotations(type)
+                .AddArrayType(elementType, context, propertyAttributeData);
+
+            return Result.Handled(builder);
+        }
+        catch (Exception ex)
+        {
+            return Result.Fault(builder, ex.Message);
+        }
     }
 }

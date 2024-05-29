@@ -91,7 +91,7 @@ public static class JsonSchemaBuilderExtensions
                             property.PropertyType,
                             context,
                             isRootType: false,
-                            propertyAttributeData: property.GetCustomAttributesData())
+                            propertyAttributeData: property.GetAllCustomAttributeData(includeInherited: true))
                         .AddPropertyConstraints(property),
                     new JsonSchemaBuilder()
                         .Type(SchemaValueType.Null));
@@ -103,7 +103,7 @@ public static class JsonSchemaBuilderExtensions
                     property.PropertyType,
                     context,
                     isRootType: false,
-                    propertyAttributeData: property.GetCustomAttributesData())
+                    propertyAttributeData: property.GetAllCustomAttributeData(includeInherited: true))
                 .AddPropertyConstraints(property);
         }
 
@@ -112,22 +112,61 @@ public static class JsonSchemaBuilderExtensions
     }
 
     /// <summary>
+    /// Serializes a <see cref="JsonSchema"/> to a UTF-8 encoded byte array.
+    /// </summary>
+    /// <param name="schema">The schema to serialize.</param>
+    /// <param name="options">The serializer options. If not provided, the formatting is indented by default.</param>
+    /// <returns>The array of bytes.</returns>
+    public static byte[] SerializeToUtf8Bytes(this JsonSchema schema, JsonSerializerOptions? options = null)
+    {
+        options ??= new JsonSerializerOptions
+        {
+            WriteIndented = true,
+        };
+
+        return JsonSerializer.SerializeToUtf8Bytes(
+            schema.ToJsonDocument().RootElement,
+            options);
+    }
+
+    /// <summary>
     /// Adds an array type to the JSON schema builder.
     /// </summary>
     /// <param name="builder">The JSON schema builder.</param>
     /// <param name="itemType">The type of the array items.</param>
     /// <param name="context">The converter context.</param>
+    /// <param name="propertyAttributeData">The property attribute data.</param>
     /// <returns>The updated JSON schema builder.</returns>
-    internal static JsonSchemaBuilder AddArrayType(this JsonSchemaBuilder builder, Type itemType, ConverterContext context)
+    internal static JsonSchemaBuilder AddArrayType(this JsonSchemaBuilder builder, Type itemType, ConverterContext context, IList<CustomAttributeData>? propertyAttributeData = null)
     {
         JsonSchemaBuilder itemSchema = new JsonSchemaBuilder()
             .AddType(itemType, context, isRootType: false);
 
-        return builder
+        builder = builder
             .Comment($"{itemType.Name}[]")
             .Type(SchemaValueType.Array)
-            .Items(itemSchema)
-            .AdditionalItems(false);
+            .Items(itemSchema);
+
+        if (propertyAttributeData.TryGetCustomAttributeData<SchemaItemsRangeAttribute>(out CustomAttributeData? cad))
+        {
+            if (cad.TryGetNamedArgument(nameof(SchemaItemsRangeAttribute.Min), out uint? minItems))
+            {
+                builder = builder.MinItems(minItems.Value);
+            }
+
+            if (cad.TryGetNamedArgument(nameof(SchemaItemsRangeAttribute.Max), out uint? maxItems))
+            {
+                builder = builder.MaxItems(maxItems.Value);
+            }
+
+            if (cad.TryGetNamedArgument(nameof(SchemaItemsRangeAttribute.UniqueItems), out bool? uniqueItems) &&
+                uniqueItems == true)
+            {
+                builder = builder.UniqueItems(true);
+            }
+        }
+
+        return builder;
     }
 
     /// <summary>
@@ -182,13 +221,13 @@ public static class JsonSchemaBuilderExtensions
     private static JsonSchemaBuilder AddPropertyConstraints(this JsonSchemaBuilder builder, PropertyInfo property)
     {
         Type type = property.PropertyType;
-        if (type.IsGenericType && type.GetGenericTypeDefinition().Name == typeof(Nullable<>).Name)
+        if (type.TryUnwrapNullable(out Type? unwrapped))
         {
-            type = type.GetGenericArguments().FirstOrDefault() ?? Assumes.NotReachable<Type>();
+            type = unwrapped;
         }
 
         // if the property type is a number
-        if (type.IsNumber())
+        if (type.IsSchemaNumeric())
         {
             // if the property has a value range attribute, set the minimum and maximum values
             if (property.TryGetCustomAttributeData<SchemaValueRangeAttribute>(out CustomAttributeData? rangeCad))

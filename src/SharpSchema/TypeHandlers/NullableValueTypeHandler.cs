@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using Json.Schema;
+using SharpMeta;
 
 namespace SharpSchema.TypeHandlers;
 

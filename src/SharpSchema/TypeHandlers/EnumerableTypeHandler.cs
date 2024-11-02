@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Reflection;
 using Json.Schema;
+using SharpMeta;
 using SharpSchema.Annotations;
 
 namespace SharpSchema.TypeHandlers;

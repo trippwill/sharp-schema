@@ -6,6 +6,7 @@ using System.Text.Json;
 using Json.More;
 using Json.Schema;
 using Microsoft;
+using SharpMeta;
 using SharpSchema.Annotations;
 using SharpSchema.TypeHandlers;
 

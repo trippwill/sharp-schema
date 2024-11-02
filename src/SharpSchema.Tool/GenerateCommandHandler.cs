@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Json;
 using Json.More;
 using Json.Schema;
+using SharpMeta;
 using static SharpSchema.Tool.GenerateCommandHandler;
 
 namespace SharpSchema.Tool;
@@ -26,7 +27,13 @@ internal class GenerateCommandHandler(IConsole console, LoaderOptions loaderOpti
         ExitCode exitCode = ExitCode.Success;
         try
         {
-            using AssemblyLoader loader = new(console, loaderOptions.DirectoryRecursionDepth, [.. loaderOptions.ReferenceFiles, assemblyFile], [.. loaderOptions.ReferenceDirectories]);
+            using AssemblyLoadContext loader = new(
+                console.Error.Write,
+                loaderOptions.DirectoryRecursionDepth,
+                [.. loaderOptions.ReferenceFiles, assemblyFile],
+                [.. loaderOptions.ReferenceDirectories],
+                includeExecutingCoreAssembly: false,
+                includeExecutingRuntimeAssemblies: false);
 
             Assembly assembly = loader.LoadAssembly(assemblyFile);
 

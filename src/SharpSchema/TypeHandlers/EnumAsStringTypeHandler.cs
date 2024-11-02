@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Reflection;
 using Humanizer;
 using Json.Schema;
+using SharpMeta;
 using SharpSchema.Annotations;
 
 namespace SharpSchema.TypeHandlers;

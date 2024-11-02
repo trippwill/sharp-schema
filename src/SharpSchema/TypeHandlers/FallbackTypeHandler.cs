@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Json.Schema;
+using SharpMeta;
 using SharpSchema.Annotations;
 
 namespace SharpSchema.TypeHandlers;

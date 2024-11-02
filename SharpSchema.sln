@@ -44,6 +44,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Annotations", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Annotations.Source", "src\SharpSchema.Annotations.Source\SharpSchema.Annotations.Source.csproj", "{636AF0A7-ABCF-428B-9E81-F42A998A0A09}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{7DF0F79D-3609-4DCF-8F10-EAB6ED6A782C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +84,7 @@ Global
 		{3C3F6483-7168-4816-B0D9-F46BD3B20132} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
 		{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
 		{636AF0A7-ABCF-428B-9E81-F42A998A0A09} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
+		{7DF0F79D-3609-4DCF-8F10-EAB6ED6A782C} = {1CE9670B-D5FF-46A7-9D00-24E70E6ED48B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E3944F6A-384B-4B0F-B93F-3BD513DC57BD}

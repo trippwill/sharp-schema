@@ -27,13 +27,17 @@ internal class GenerateCommandHandler(IConsole console, LoaderOptions loaderOpti
         ExitCode exitCode = ExitCode.Success;
         try
         {
-            using AssemblyLoader loader = new(
-                console.Error.Write,
-                loaderOptions.DirectoryRecursionDepth,
-                [.. loaderOptions.ReferenceFiles, assemblyFile],
-                [.. loaderOptions.ReferenceDirectories],
-                includeExecutingCoreAssembly: false,
-                includeExecutingRuntimeAssemblies: false);
+            using MetadataLoadContext loader = SharpAssemblyResolver
+                .CreateBuilder(SharpResolverLogger.Console)
+                .AddReferenceDirectories(
+                    new EnumerationOptions
+                    {
+                        RecurseSubdirectories = loaderOptions.DirectoryRecursionDepth > 0,
+                        MaxRecursionDepth = loaderOptions.DirectoryRecursionDepth,
+                    },
+                    loaderOptions.ReferenceDirectories)
+                .AddReferenceFiles(loaderOptions.ReferenceFiles)
+                .ToAssemblyResolver();
 
             Assembly assembly = loader.LoadAssembly(assemblyFile);
 

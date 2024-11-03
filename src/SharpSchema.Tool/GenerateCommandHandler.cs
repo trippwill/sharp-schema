@@ -27,7 +27,7 @@ internal class GenerateCommandHandler(IConsole console, LoaderOptions loaderOpti
         ExitCode exitCode = ExitCode.Success;
         try
         {
-            using AssemblyLoadContext loader = new(
+            using AssemblyLoader loader = new(
                 console.Error.Write,
                 loaderOptions.DirectoryRecursionDepth,
                 [.. loaderOptions.ReferenceFiles, assemblyFile],

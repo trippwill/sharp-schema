@@ -1,13 +1,13 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - validate/*
-      - v*
+      - release/*
   pull_request:
-  workflow_dispatch:
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true

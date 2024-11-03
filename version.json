@@ -3,12 +3,12 @@
   "version": "0.3-beta",
   "publicReleaseRefSpec": [
     "^refs/heads/main$",
-    "^refs/heads/v\\d+(?:\\.\\d+)?$"
+    "^refs/tags/v\\d+(?:\\.\\d+){0,2}(?:-.+)?$"
   ],
   "cloudBuild": {
-    "setAllVariables": true
+    "setVersionVariables": false
   },
   "release": {
-    "firstUnstableTag": "beta"
+    "branchName": "release/v{version}"
   }
 }

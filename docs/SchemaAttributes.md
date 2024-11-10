@@ -150,6 +150,3 @@ Specifies a value range for a schema property.
 [SchemaValueRange(Min = 1.0, Max = 100.0)]
 public double ValueRangeProperty { get; set; }
 ```
-
-
-

@@ -45,6 +45,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Annotations.Source", "src\SharpSchema.Annotations.Source\SharpSchema.Annotations.Source.csproj", "{636AF0A7-ABCF-428B-9E81-F42A998A0A09}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{7DF0F79D-3609-4DCF-8F10-EAB6ED6A782C}"
+	ProjectSection(SolutionItems) = preProject
+		docs\ConversionRules.md = docs\ConversionRules.md
+		docs\SchemaAttributes.md = docs\SchemaAttributes.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

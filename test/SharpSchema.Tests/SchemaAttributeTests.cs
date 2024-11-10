@@ -108,6 +108,17 @@ public class SchemaAttributeTests(ITestOutputHelper outputHelper) : TestBase(out
         Assert.Equal(10U, propertySchema.GetMaxLength());
     }
 
+    [Fact]
+    public void SchemaRegexPattern_Applies_ToPropertySchema()
+    {
+        TypeConverter converter = new();
+        JsonSchema schema = converter.Convert(RootTypeContext.FromType<RegexObject>());
+        this.OutputSchema(schema);
+        JsonSchema? propertySchema = schema.GetProperties()?.Values.First();
+        Assert.NotNull(propertySchema);
+        Assert.Equal("^[a-zA-Z0-9]*$", propertySchema.GetPatternValue());
+    }
+
     [SchemaPropertiesRange(Min = SchemaMinPropertiesValue, Max = SchemaMaxPropertiesValue)]
     private class MinMaxObject
     {
@@ -145,4 +156,6 @@ public class SchemaAttributeTests(ITestOutputHelper outputHelper) : TestBase(out
         [SchemaLengthRange(Min = 1, Max = 10)]
         public required string TestProperty2 { get; init; }
     }
+
+    private record RegexObject([property: SchemaRegex("^[a-zA-Z0-9]*$")] string TestProperty);
 }

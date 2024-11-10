@@ -261,15 +261,16 @@ public static class JsonSchemaBuilderExtensions
             // if the property has a regex attribute, set the pattern
             if (property.TryGetCustomAttributeData<SchemaRegexAttribute>(out CustomAttributeData? regexCad))
             {
-                if (regexCad.TryGetNamedArgument(nameof(SchemaRegexAttribute.ApplyToPropertyName), out bool? applyToPropertyName))
+                bool applyToPropertyName = regexCad.TryGetNamedArgument(nameof(SchemaRegexAttribute.ApplyToPropertyName), out bool? applyToPropertyNameValue)
+                    ? applyToPropertyNameValue.Value
+                    : false;
+
+                if (!applyToPropertyName)
                 {
-                    if (!applyToPropertyName.Value)
+                    string? pattern = regexCad.GetConstructorArgument<string>(0);
+                    if (pattern is not null)
                     {
-                        string? pattern = regexCad.GetConstructorArgument<string>(0);
-                        if (pattern is not null)
-                        {
-                            builder = builder.Pattern(pattern);
-                        }
+                        builder = builder.Pattern(pattern);
                     }
                 }
             }

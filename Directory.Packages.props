@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="JsonSchema.Net" Version="7.2.3" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Validation" Version="17.8.8" />
     <PackageVersion Include="SharpMeta" Version="0.2.5-rc" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />

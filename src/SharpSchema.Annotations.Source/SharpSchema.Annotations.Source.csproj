@@ -12,6 +12,6 @@
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\SharpSchema.Annotations\**\*.cs" Pack="true" PackagePath="content\;contentFiles\cs\netstandard2.0\" />
+    <Compile Include="..\SharpSchema.Annotations\**\*.cs" Pack="true" PackagePath="content\SharpSchema\;contentFiles\cs\netstandard2.0\SharpSchema\" />
   </ItemGroup>
 </Project>

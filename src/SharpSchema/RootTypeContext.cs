@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Reflection;
+using libanvl;
 using SharpMeta;
 using SharpSchema.Annotations;
 
@@ -26,13 +27,15 @@ public record struct RootTypeContext(Type Type, string? Filename, string? Id, st
     /// <returns>A new instance of <see cref="RootTypeContext"/>.</returns>
     public static RootTypeContext FromType(Type type)
     {
-        if (type.TryGetCustomAttributeData(typeof(SchemaRootAttribute), out CustomAttributeData? cad))
+        Opt<CustomAttributeData> rootAttribute = type.GetCustomAttributeData<SchemaRootAttribute>();
+        if (rootAttribute)
         {
+            CustomAttributeData cad = rootAttribute.Unwrap();
             return new(
                 type,
-                Filename: cad.GetNamedArgument<string>("Filename"),
-                Id: cad.GetNamedArgument<string>("Id"),
-                CommonNamespace: cad.GetNamedArgument<string>("CommonNamespace"));
+                Filename: cad.GetNamedArgument<string>(nameof(SchemaRootAttribute.Filename)),
+                Id: cad.GetNamedArgument<string>(nameof(SchemaRootAttribute.Id)),
+                CommonNamespace: cad.GetNamedArgument<string>(nameof(SchemaRootAttribute.CommonNamespace)));
         }
 
         return new(type, null, null, null);

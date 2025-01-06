@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Reflection;
 using Humanizer;
 using Json.Schema;
+using libanvl;
 using SharpMeta;
 using SharpSchema.Annotations;
 
@@ -16,7 +17,12 @@ namespace SharpSchema.TypeHandlers;
 internal class EnumAsStringTypeHandler : TypeHandler
 {
     /// <inheritdoc/>
-    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public override Result TryHandle(
+        JsonSchemaBuilder builder,
+        ConverterContext context,
+        Type type,
+        bool isRootType,
+        Opt<PropertyInfo> propertyInfo)
     {
         if (!type.IsEnum || context.EnumAsUnderlyingType)
         {
@@ -56,7 +62,7 @@ internal class EnumAsStringTypeHandler : TypeHandler
             .Comment(type.Name)
             .Type(SchemaValueType.String)
             .Enum(kebabCaseEnumNames.ToImmutable())
-            .AddTypeAnnotations(type);
+            .AddTypeAnnotations(context, type);
 
         context.Defs.Add(definitionName, enumBuilder);
 

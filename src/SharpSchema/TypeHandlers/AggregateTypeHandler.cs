@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
 using System.Reflection;
 using Json.Schema;
+using libanvl;
 
 namespace SharpSchema.TypeHandlers;
 
@@ -30,15 +32,15 @@ internal class AggregateTypeHandler : TypeHandler
     /// <param name="context">The converter context.</param>
     /// <param name="type">The type to handle.</param>
     /// <param name="isRootType">Indicates whether the type is the root type.</param>
-    /// <param name="propertyAttributeData">The custom attribute data for the properties.</param>
+    /// <param name="owningProperty">The owning property.</param>
     /// <returns>A result indicating whether the type was handled successfully or not.</returns>
-    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType, Opt<PropertyInfo> owningProperty)
     {
         try
         {
             foreach (TypeHandler typeHandler in TypeHandlers)
             {
-                Result result = typeHandler.TryHandle(builder, context, type, isRootType, propertyAttributeData);
+                Result result = typeHandler.TryHandle(builder, context, type, isRootType, owningProperty);
                 (builder, bool isHandled) = result.Unwrap();
 
                 if (isHandled)

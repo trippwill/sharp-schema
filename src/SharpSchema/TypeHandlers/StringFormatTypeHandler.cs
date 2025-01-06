@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using Json.Schema;
+using libanvl;
 
 namespace SharpSchema.TypeHandlers;
 
@@ -40,7 +41,12 @@ internal class StringFormatTypeHandler : TypeHandler
     };
 
     /// <inheritdoc/>
-    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public override Result TryHandle(
+        JsonSchemaBuilder builder,
+        ConverterContext context,
+        Type type,
+        bool isRootType,
+        Opt<PropertyInfo> propertyInfo)
     {
         // handle specific types with string formats
         if (!StringFormatSchemas.TryGetValue(type.Name, out Func<JsonSchemaBuilder, JsonSchemaBuilder>? stringFormatSchema))

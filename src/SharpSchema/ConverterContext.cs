@@ -36,6 +36,21 @@ public class ConverterContext
     public bool EnumAsUnderlyingType { get; init; } = false;
 
     /// <summary>
+    /// Gets a value indicating whether to parse documentation XML files for schema metadata.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The summary field becomes the schema title.<br/>
+    ///         The remarks field becomes the schema description.
+    ///     </para>
+    ///     <para>
+    ///         When enabled, the schema title and description can be overridden
+    ///         by using <see cref="SharpSchema.Annotations.SchemaMetaAttribute"/>.
+    ///     </para>
+    /// </remarks>
+    public bool ParseDocComments { get; init; } = false;
+
+    /// <summary>
     /// Gets the default namespace for type schema generation.
     /// </summary>
     public string? DefaultNamespace { get; init; }

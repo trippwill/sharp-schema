@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using Json.Schema;
+using libanvl;
 
 namespace SharpSchema;
 
@@ -39,9 +40,9 @@ internal abstract class TypeHandler
     /// <param name="context">The global converter context.</param>
     /// <param name="type">The type to handle.</param>
     /// <param name="isRootType">Indicates whether the type is the root type.</param>
-    /// <param name="propertyAttributeData">The custom attribute data for the owning property of the type.</param>
+    /// <param name="owningProperty">The owning property.</param>
     /// <returns>A <see cref="Result"/> indicating whether the type was handled and any messages.</returns>
-    public abstract Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null);
+    public abstract Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType, Opt<PropertyInfo> owningProperty);
 
     /// <summary>
     /// The result of a type handling operation.

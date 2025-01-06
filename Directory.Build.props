@@ -27,9 +27,6 @@
     <!-- Local builds should embed PDBs so we never lose them when a subsequent build occurs. -->
     <DebugType Condition=" '$(CI)' != 'true' and '$(TF_BUILD)' != 'true' ">embedded</DebugType>
 
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)strongname.snk</AssemblyOriginatorKeyFile>
-
     <PackageProjectUrl>https://github.com/tripwill/sharp-schema</PackageProjectUrl> 
     <Company>Charles Willis</Company>
     <Authors>Charles Willis</Authors>

@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using Json.Schema;
+using libanvl;
 using SharpMeta;
 
 namespace SharpSchema.TypeHandlers;
@@ -13,7 +14,12 @@ namespace SharpSchema.TypeHandlers;
 internal class NullableValueTypeHandler : TypeHandler
 {
     /// <inheritdoc/>
-    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType, IList<CustomAttributeData>? propertyAttributeData = null)
+    public override Result TryHandle(
+        JsonSchemaBuilder builder,
+        ConverterContext context,
+        Type type,
+        bool isRootType,
+        Opt<PropertyInfo> propertyInfo)
     {
         if (!type.TryUnwrapNullable(out Type? underlyingType))
         {
@@ -22,7 +28,7 @@ internal class NullableValueTypeHandler : TypeHandler
 
         try
         {
-            builder = builder.AddType(underlyingType, context, isRootType, propertyAttributeData);
+            builder = builder.AddType(context, underlyingType, isRootType, propertyInfo);
             return Result.Handled(builder);
         }
         catch (Exception ex)

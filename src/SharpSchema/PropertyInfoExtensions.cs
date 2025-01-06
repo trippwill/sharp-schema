@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using System.Text.Json.Serialization;
+using libanvl;
 using SharpMeta;
 using SharpSchema.Annotations;
 
@@ -26,12 +27,12 @@ internal static class PropertyInfoExtensions
             return true;
         }
 
-        if (property.TryGetCustomAttributeData(typeof(SchemaIgnoreAttribute), out _))
+        if (property.TryGetCustomAttributeData<SchemaIgnoreAttribute>(out _))
         {
             return true;
         }
 
-        if (property.TryGetCustomAttributeData(typeof(JsonIgnoreAttribute), out CustomAttributeData? ignoreAttributeData))
+        if (property.TryGetCustomAttributeData<JsonIgnoreAttribute>(out CustomAttributeData? ignoreAttributeData))
         {
             if (ignoreAttributeData.TryGetNamedArgument("Condition", out int condition))
             {
@@ -53,7 +54,7 @@ internal static class PropertyInfoExtensions
     {
         string name = property.Name.ToJsonPropertyName();
 
-        if (property.TryGetCustomAttributeData(typeof(JsonPropertyNameAttribute), out CustomAttributeData? cad) &&
+        if (property.TryGetCustomAttributeData<JsonPropertyNameAttribute>(out CustomAttributeData? cad) &&
             cad.TryGetConstructorArgument(0, out string? jsonName))
         {
             name = jsonName;
@@ -72,32 +73,37 @@ internal static class PropertyInfoExtensions
     {
         isNullable = property.IsNullable();
 
-        if (property.TryGetCustomAttributeData(typeof(SchemaRequiredAttribute), out CustomAttributeData? cad))
+        Opt<CustomAttributeData> schemaRequiredAttribute = property.GetCustomAttributeData<SchemaRequiredAttribute>();
+        if (schemaRequiredAttribute)
         {
-            return cad.GetConstructorArgument<bool>(0);
+            Opt<bool> required = schemaRequiredAttribute.Select(sra => sra.GetConstructorArgument<bool>(0));
+            return required.Unwrap();
         }
 
-        if (property.TryGetCustomAttributeData(typeof(JsonRequiredAttribute), out _))
+        if (property.IsRequiredMember())
         {
             return true;
         }
 
-        if (property.TryGetCustomAttributeData(typeof(JsonIgnoreAttribute), out CustomAttributeData? ignoreAttributeData))
+        Opt<CustomAttributeData> jsonRequiredAttribute = property.GetCustomAttributeData<JsonRequiredAttribute>();
+        if (jsonRequiredAttribute)
         {
-            if (ignoreAttributeData.TryGetNamedArgument("Condition", out int condition))
-            {
-                return condition switch
+            return true;
+        }
+
+        Opt<CustomAttributeData> jsonIgnoreAttribute = property.GetCustomAttributeData<JsonIgnoreAttribute>();
+        if (jsonIgnoreAttribute)
+        {
+            Opt<int> condition = jsonIgnoreAttribute.Select(jia => jia.GetNamedArgument<int?>("Condition"));
+            return condition.Match(
+                c => c switch
                 {
                     (int)JsonIgnoreCondition.Always => false,
                     (int)JsonIgnoreCondition.WhenWritingDefault => false,
                     (int)JsonIgnoreCondition.WhenWritingNull => false,
                     _ => true,
-                };
-            }
-            else
-            {
-                return false;
-            }
+                },
+                () => false);
         }
 
         return !isNullable;

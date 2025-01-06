@@ -2,11 +2,14 @@
 <Project>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <RepoRootPath>$(MSBuildThisFileDirectory)</RepoRootPath>
-    <BaseIntermediateOutputPath>$(RepoRootPath)obj\$([MSBuild]::MakeRelative($(RepoRootPath), $(MSBuildProjectDirectory)))\</BaseIntermediateOutputPath>
-    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(RepoRootPath)bin\$(MSBuildProjectName)\</BaseOutputPath>
-    <PackageOutputPath>$(RepoRootPath)bin\Packages\$(Configuration)\</PackageOutputPath>
-    <LangVersion>12</LangVersion>
+    <RepoRootPath>$(MSBuildThisFileDirectory)out\</RepoRootPath>
+    <BaseOutputPath>$(RepoRootPath)bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(RepoRootPath)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <PackageOutputPath>$(RepoRootPath)pkg\$(Configuration)\</PackageOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -16,59 +19,29 @@
 
     <!-- https://github.com/dotnet/msbuild/blob/main/documentation/ProjectReference-Protocol.md#setplatform-negotiation -->
     <EnableDynamicPlatformResolution>true</EnableDynamicPlatformResolution>
+  </PropertyGroup>
 
-    <!-- Opt in till https://github.com/NuGet/Home/issues/9803 makes this the default. -->
-    <!-- Opt back out until an SDK with the fix for https://github.com/NuGet/Home/issues/12177 is generally available. -->
-    <RestoreUseStaticGraphEvaluation>false</RestoreUseStaticGraphEvaluation>
-
-    <!-- This entire repo has just one version.json file, so compute the version once and share with all projects in a large build. -->
+  <PropertyGroup>
     <GitVersionBaseDirectory>$(MSBuildThisFileDirectory)</GitVersionBaseDirectory>
-
-    <!-- Local builds should embed PDBs so we never lose them when a subsequent build occurs. -->
-    <DebugType Condition=" '$(CI)' != 'true' and '$(TF_BUILD)' != 'true' ">embedded</DebugType>
-
-    <PackageProjectUrl>https://github.com/tripwill/sharp-schema</PackageProjectUrl> 
-    <Company>Charles Willis</Company>
-    <Authors>Charles Willis</Authors>
-    <Copyright>© Charles Willis. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/trippwill/sharp-schema</PackageProjectUrl>
+    <Company>trippwill</Company>
+    <Authors>The contributors of the SharpSchema project.</Authors>
+    <Copyright>© The contributors of the SharpSchema project. All rights reserved.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType Condition=" '$(CI)' != 'true' ">embedded</DebugType>
     <IncludeSymbols Condition=" '$(DebugType)' != 'embedded' ">true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
-  <ItemGroup>
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" />
-  </ItemGroup>
-
   <ItemDefinitionGroup>
-    <!-- We always want MSBuild properties generated that point at the restored location of each package. -->
     <PackageReference GeneratePathProperty="true" />
   </ItemDefinitionGroup>
 
-  <Target Name="PrepareReleaseNotes" BeforeTargets="GenerateNuspec" DependsOnTargets="GetBuildVersion">
-    <PropertyGroup>
-      <PackageReleaseNotes Condition="'$(PackageProjectUrl)'!=''">$(PackageProjectUrl)/releases/tag/v$(Version)</PackageReleaseNotes>
-    </PropertyGroup>
-  </Target>
+  <ItemGroup>
+    <!-- Avoid compile error about missing namespace when combining ImplicitUsings with .NET Framework target frameworks. -->
+    <Using Remove="System.Net.Http" Condition="'$(TargetFrameworkIdentifier)'=='.NETFramework'" />
+  </ItemGroup>
 
-  <PropertyGroup Condition="'$(IsWpfTempProject)' == ''">
-    <IsWpfTempProject>false</IsWpfTempProject>
-    <IsWpfTempProject Condition="$(MSBuildProjectName.EndsWith('_wpftmp'))">true</IsWpfTempProject>
-  </PropertyGroup>
-
-  <!--
-    Inspired by https://github.com/dotnet/arcade/blob/cbfa29d4e859622ada3d226f90f103f659665d31/src/Microsoft.DotNet.Arcade.Sdk/tools/Workarounds.props#L14-L31
-
-    Disable Source Link and Xliff in WPF temp projects to avoid generating non-deterministic file names to obj dir.
-    The project name is non-deterministic and is included in the Source Link json file name and xlf directory names.
-    It's also not necessary to generate these assets.
-  -->
-  <PropertyGroup Condition="'$(IsWpfTempProject)' == 'true'">
-    <EnableSourceLink>false</EnableSourceLink>
-    <EmbedUntrackedSources>false</EmbedUntrackedSources>
-    <DeterministicSourcePaths>false</DeterministicSourcePaths>
-    <EnableXlfLocalization>false</EnableXlfLocalization>
-  </PropertyGroup>
 </Project>

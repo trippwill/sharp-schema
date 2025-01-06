@@ -1,4 +1,4 @@
-# README.md
+# SharpSchema Attributes
 
 ## SharpSchema Annotations
 
@@ -10,7 +10,7 @@ Specifies a constant value for a schema property.
 
 **Example:**
 
-```
+```csharp
 [SchemaConst(42)]
 public int ConstantValue { get; set; }
 ```
@@ -21,7 +21,7 @@ Specifies a value for an enum member in a schema.
 
 **Example:**
 
-```
+```csharp
 public enum Status
 {
     [SchemaEnumValue("active")]
@@ -37,7 +37,7 @@ Specifies a format for a schema property.
 
 **Example:**
 
-```
+```csharp
 [SchemaFormat("date-time")]
 public string Timestamp { get; set; }
 ```
@@ -48,7 +48,7 @@ Indicates that a property should be ignored in the schema.
 
 **Example:**
 
-```
+```csharp
 [SchemaIgnore]
 public string IgnoredProperty { get; set; }
 ```
@@ -59,7 +59,7 @@ Specifies the minimum and maximum length for a schema property.
 
 **Example:**
 
-```
+```csharp
 [SchemaLengthRange(Min = 5, Max = 10)]
 public string LengthRestrictedProperty { get; set; }
 ```
@@ -70,7 +70,7 @@ Provides metadata for a schema.
 
 **Example:**
 
-```
+```csharp
 [SchemaMeta(Title = "Person", Description = "Represents a person.")]
 public class Person
 {
@@ -84,7 +84,7 @@ Overrides the schema with a custom value.
 
 **Example:**
 
-```
+```csharp
 [SchemaOverride("{ 'type': 'string', 'maxLength': 50 }")]
 public string CustomSchemaProperty { get; set; }
 ```
@@ -95,7 +95,7 @@ Specifies the minimum and maximum number of properties allowed in a schema.
 
 **Example:**
 
-```
+```csharp
 [SchemaPropertiesRange(Min = 1, Max = 5)]
 public class PropertyRangeClass
 {
@@ -110,7 +110,7 @@ Specifies a regular expression pattern that a property value must match.
 
 **Example:**
 
-```
+```csharp
 [SchemaRegex("^[a-zA-Z0-9]*$")]
 public string AlphanumericProperty { get; set; }
 ```
@@ -121,7 +121,7 @@ Indicates whether a property is required in a schema.
 
 **Example:**
 
-```
+```csharp
 [SchemaRequired]
 public string RequiredProperty { get; set; }
 ```
@@ -132,7 +132,7 @@ Marks a class or struct as a schema root.
 
 **Example:**
 
-```
+```csharp
 [SchemaRoot(Filename = "person.schema.json", Id = "http://example.com/person")]
 public class Person
 {
@@ -146,7 +146,7 @@ Specifies a value range for a schema property.
 
 **Example:**
 
-```
+```csharp
 [SchemaValueRange(Min = 1.0, Max = 100.0)]
 public double ValueRangeProperty { get; set; }
 ```

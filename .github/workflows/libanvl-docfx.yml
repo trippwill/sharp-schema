@@ -1,0 +1,23 @@
+name: Docs
+
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+  pages: write
+
+on:
+  push:
+    branches:
+    - "main"
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish-docs:
+    uses: libanvl/ci/.github/workflows/dotnet-docfx.yml@main
+    with:
+      environment: 'github-pages'
+    secrets: inherit

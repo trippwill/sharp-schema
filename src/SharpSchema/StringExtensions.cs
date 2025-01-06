@@ -30,4 +30,21 @@ public static class StringExtensions
     /// <param name="value">The string value to convert.</param>
     /// <returns>The converted JSON definition location.</returns>
     public static Uri ToJsonDefUri(this string value) => new($"#/$defs/{value}", UriKind.RelativeOrAbsolute);
+
+    /// <summary>
+    /// Converts "&lt;para&gt;" to double new-line, and "&lt;br/&gt;" to single new-line.
+    /// </summary>
+    /// <param name="value">The doc string.</param>
+    /// <returns>The parsed doc string.</returns>
+    public static string? ParseDocString(this string? value)
+    {
+        return string.IsNullOrEmpty(value)
+            ? value
+            : new System.Text.StringBuilder(value)
+                .Replace("<para>", string.Empty)
+                .Replace("</para>", "\n\n")
+                .Replace("<br/>", "\n")
+                .Replace("<br />", "\n")
+                .ToString();
+    }
 }

@@ -4,8 +4,8 @@
 using System.Collections;
 using System.Reflection;
 using Json.Schema;
+using libanvl;
 using SharpMeta;
-using SharpSchema.Annotations;
 
 namespace SharpSchema.TypeHandlers;
 
@@ -15,7 +15,12 @@ namespace SharpSchema.TypeHandlers;
 internal class EnumerableTypeHandler : TypeHandler
 {
     /// <inheritdoc/>
-    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public override Result TryHandle(
+        JsonSchemaBuilder builder,
+        ConverterContext context,
+        Type type,
+        bool isRootType,
+        Opt<PropertyInfo> owningProperty)
     {
         if (!type.IsGenericType && !type.IsArray)
         {
@@ -29,7 +34,7 @@ internal class EnumerableTypeHandler : TypeHandler
             Type genericTypeDefinition = type.GetGenericTypeDefinition();
             Type[] genericArguments = type.GetGenericArguments();
 
-            if (!genericTypeDefinition.ImplementsAnyInterface((typeof(IEnumerable).Namespace, typeof(IEnumerable).Name)))
+            if (!genericTypeDefinition.ImplementsAnyInterface(typeof(IEnumerable).FullName))
             {
                 return Result.NotHandled(builder);
             }
@@ -49,8 +54,8 @@ internal class EnumerableTypeHandler : TypeHandler
         try
         {
             builder = builder
-                .AddTypeAnnotations(type)
-                .AddArrayType(elementType, context, propertyAttributeData);
+                .AddTypeAnnotations(context, type)
+                .AddArrayType(context, elementType, owningProperty);
 
             return Result.Handled(builder);
         }

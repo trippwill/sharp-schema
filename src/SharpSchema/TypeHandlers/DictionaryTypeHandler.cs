@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using Json.Schema;
+using libanvl;
 using SharpMeta;
 using SharpSchema.Annotations;
 
@@ -14,7 +15,12 @@ namespace SharpSchema.TypeHandlers;
 internal class DictionaryTypeHandler : TypeHandler
 {
     /// <inheritdoc/>
-    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public override Result TryHandle(
+        JsonSchemaBuilder builder,
+        ConverterContext context,
+        Type type,
+        bool isRootType,
+        Opt<PropertyInfo> propertyInfo)
     {
         if (!type.IsProbableDictionary(out Type? keyType, out Type? valueType))
         {
@@ -27,12 +33,12 @@ internal class DictionaryTypeHandler : TypeHandler
         }
 
         JsonSchemaBuilder keySchema = new JsonSchemaBuilder()
-            .AddType(keyType, context, isRootType = false);
+            .AddType(context, keyType);
 
         // if the property has a regular expression attribute that applies to the property name, use that as the key pattern
-        if (propertyAttributeData is not null)
+        if (propertyInfo.IsSome && propertyInfo.Unwrap().GetAllCustomAttributeData(includeInherited: true) is IList<CustomAttributeData> cads)
         {
-            if (propertyAttributeData.FirstOrDefault(cad => cad.AttributeType.FullName == typeof(SchemaRegexAttribute).FullName) is CustomAttributeData regexCad)
+            if (cads.FirstOrDefault(cad => cad.AttributeType.FullName == typeof(SchemaRegexAttribute).FullName) is CustomAttributeData regexCad)
             {
                 if (regexCad.TryGetNamedArgument(nameof(SchemaRegexAttribute.ApplyToPropertyName), out bool applyToPropertyName) && applyToPropertyName)
                 {
@@ -50,7 +56,7 @@ internal class DictionaryTypeHandler : TypeHandler
                 .Type(SchemaValueType.Object)
                 .PropertyNames(keySchema)
                 .AdditionalProperties(new JsonSchemaBuilder()
-                    .AddType(valueType, context, isRootType: false))
+                    .AddType(context: context, type: valueType))
             : builder
                 .Comment($"[{keyType.Name}]")
                 .Type(SchemaValueType.Object)

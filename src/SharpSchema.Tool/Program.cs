@@ -108,6 +108,11 @@ internal class Program
             description: "Use the underlying type of an enum in the schema instead of strings.",
             getDefaultValue: () => false);
 
+        Option<bool> parseDocCommentsOptions = new(
+            "--parse-doc-comments",
+            description: "Parse XML documentation comments.",
+            getDefaultValue: () => false);
+
         Option<int> maxDepthOption = new(
             "--max-depth",
             description: "The maximum depth to traverse when converting types.",
@@ -151,6 +156,7 @@ internal class Program
             directoryRecursionDepthOption,
             includeInterfacesOption,
             enumAsUnderlyingTypeOption,
+            parseDocCommentsOptions,
             maxDepthOption,
             outputOption,
             prettyPrintedOption,
@@ -165,12 +171,13 @@ internal class Program
 
             GenerateCommandHandler.LoaderOptions loaderOptions = new(
                 ic.ParseResult.GetValueForOption(directoryRecursionDepthOption),
-                [.. ic.ParseResult.GetValueForOption(referenceOption), assemblyFile],
-                [.. ic.ParseResult.GetValueForOption(referenceDirectoryOption)]);
+                [.. ic.ParseResult.GetValueForOption(referenceOption) ?? [], assemblyFile],
+                [.. ic.ParseResult.GetValueForOption(referenceDirectoryOption) ?? []]);
 
             GenerateCommandHandler.ConverterOptions converterOptions = new(
                 ic.ParseResult.GetValueForOption(includeInterfacesOption),
                 ic.ParseResult.GetValueForOption(enumAsUnderlyingTypeOption),
+                ic.ParseResult.GetValueForOption(parseDocCommentsOptions),
                 ic.ParseResult.GetValueForOption(maxDepthOption));
 
             GenerateCommandHandler.WriterOptions writerOptions = new(

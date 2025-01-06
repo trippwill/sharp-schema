@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Humanizer;
 using Json.Schema;
+using libanvl;
 using SharpMeta;
 using SharpSchema.Annotations;
 
@@ -20,12 +22,12 @@ internal class FallbackTypeHandler : TypeHandler
         JsonSchemaBuilder builder,
         ConverterContext context,
         Type type,
-        bool isRootType = false,
-        IList<CustomAttributeData>? propertyAttributeData = null)
+        bool isRootType,
+        Opt<PropertyInfo> propertyInfo)
     {
         try
         {
-            builder = AddObjectType(builder, context, type, isRootType, propertyAttributeData);
+            builder = AddObjectType(builder, context, type, isRootType);
             return Result.Handled(builder);
         }
         catch (Exception ex)
@@ -38,8 +40,7 @@ internal class FallbackTypeHandler : TypeHandler
         JsonSchemaBuilder builder,
         ConverterContext context,
         Type type,
-        bool isTopLevel,
-        IList<CustomAttributeData>? propertyAttributeData = null)
+        bool isTopLevel)
     {
         // handle other generics
         if (type.IsGenericType)
@@ -49,7 +50,7 @@ internal class FallbackTypeHandler : TypeHandler
             // add oneOf for generic types
             string genericTypeDefinitionName = genericTypeDefinition.ToDefinitionName(context);
             string definitionName = type.ToDefinitionName(context);
-            Uri refPath = new($"#/$defs/{definitionName}", UriKind.RelativeOrAbsolute);
+            Uri refPath = definitionName.ToJsonDefUri();
 
             if (context.Defs.TryGetValue(genericTypeDefinitionName, out JsonSchemaBuilder? genericTypeBuilder))
             {
@@ -69,7 +70,7 @@ internal class FallbackTypeHandler : TypeHandler
             else
             {
                 genericTypeBuilder = new JsonSchemaBuilder()
-                    .AddTypeAnnotations(type)
+                    .AddTypeAnnotations(context, type)
                     .OneOf(new JsonSchemaBuilder()
                         .Ref(refPath));
 
@@ -96,20 +97,19 @@ internal class FallbackTypeHandler : TypeHandler
             AddToInterfaces(type, context, defName, context.Defs);
         }
 
-        return builder
-            .Ref($"#/$defs/{defName}");
+        return builder.Ref(defName.ToJsonDefUri());
 
         //// -- local function --
 
         static JsonSchemaBuilder AddCustomObjectType(JsonSchemaBuilder builder, Type type, ConverterContext context)
         {
-            builder = builder.AddTypeAnnotations(type);
+            builder = builder.AddTypeAnnotations(context, type);
 
             if (type.IsAbstract)
             {
                 var concreteTypeSchemas = type
                     .GetSubTypes()
-                    .Select(t => new JsonSchemaBuilder().AddType(t, context, isRootType: false).Build())
+                    .Select(t => new JsonSchemaBuilder().AddType(context: context, type: t).Build())
                     .ToList();
 
                 if (concreteTypeSchemas.Count == 0)
@@ -129,21 +129,23 @@ internal class FallbackTypeHandler : TypeHandler
 
             if (requiredProperties is not null)
             {
-                builder = builder
-                    .Required(requiredProperties);
+                builder = builder.Required(requiredProperties);
             }
 
             // if the property has a properties range attribute, set the minimum and maximum properties
-            if (type.TryGetCustomAttributeData<SchemaPropertiesRangeAttribute>(out CustomAttributeData? rangeCad))
+            Opt<CustomAttributeData> typeCad = type.GetCustomAttributeData<SchemaPropertiesRangeAttribute>();
+            if (typeCad.IsSome)
             {
-                if (rangeCad.TryGetNamedArgument(nameof(SchemaPropertiesRangeAttribute.Min), out uint min))
+                Opt<uint> min = typeCad.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Min)));
+                if (min.IsSome)
                 {
-                    builder = builder.MinProperties(min);
+                    builder = builder.MinProperties(min.Unwrap());
                 }
 
-                if (rangeCad.TryGetNamedArgument(nameof(SchemaPropertiesRangeAttribute.Max), out uint max))
+                Opt<uint> max = typeCad.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Max)));
+                if (max.IsSome)
                 {
-                    builder = builder.MaxProperties(max);
+                    builder = builder.MaxProperties(max.Unwrap());
                 }
             }
 
@@ -213,13 +215,10 @@ internal class FallbackTypeHandler : TypeHandler
         {
             if (property.TryGetCustomAttributeData<SchemaOverrideAttribute>(out CustomAttributeData? cad))
             {
-                string? overrideValue = cad.GetConstructorArgument<string>(0);
-                if (overrideValue is null)
-                {
-                    throw new Exception("Override value is null.");
-                }
+                string? overrideValue = cad.GetConstructorArgument<string>(0)
+                    ?? throw new Exception("Override value is null.");
 
-                JsonSchemaBuilder builder = new JsonSchemaBuilder();
+                JsonSchemaBuilder builder = new();
                 var overrideSchema = JsonSchema.FromText(overrideValue);
                 foreach (IJsonSchemaKeyword keyword in overrideSchema.Keywords ?? Enumerable.Empty<IJsonSchemaKeyword>())
                 {
@@ -230,7 +229,7 @@ internal class FallbackTypeHandler : TypeHandler
             }
 
             JsonSchemaBuilder propertySchema = new JsonSchemaBuilder()
-                .AddPropertyInfo(property, context, out bool isRequired);
+                .AddPropertyInfo(context, property, out bool isRequired);
 
             if (propertySchema.Get<TitleKeyword>() is null)
             {
@@ -247,7 +246,11 @@ internal class FallbackTypeHandler : TypeHandler
         }
     }
 
-    private static void AddToInterfaces(Type type, ConverterContext context, string defName, IDictionary<string, JsonSchemaBuilder> defs)
+    private static void AddToInterfaces(
+        Type type,
+        ConverterContext context,
+        string defName,
+        SortedDictionary<string, JsonSchemaBuilder> defs)
     {
         foreach (Type iface in type.GetInterfaces())
         {
@@ -272,7 +275,7 @@ internal class FallbackTypeHandler : TypeHandler
                 IReadOnlyCollection<JsonSchema>? existingOneOf = ifaceSchema.GetOneOf();
                 List<JsonSchema> oneOf = existingOneOf is null ? new() : new(existingOneOf);
                 oneOf.Add(new JsonSchemaBuilder()
-                    .Ref($"#/$defs/{defName}"));
+                    .Ref(defName.ToJsonDefUri()));
 
                 defs[ifaceDefName] = ifaceSchemaBuilder
                     .OneOf(oneOf);
@@ -280,9 +283,9 @@ internal class FallbackTypeHandler : TypeHandler
             else
             {
                 ifaceSchemaBuilder = new JsonSchemaBuilder()
-                    .AddTypeAnnotations(iface)
+                    .AddTypeAnnotations(context, iface)
                     .OneOf(new JsonSchemaBuilder()
-                        .Ref($"#/$defs/{defName}"));
+                        .Ref(defName.ToJsonDefUri()));
 
                 defs.Add(ifaceDefName, ifaceSchemaBuilder);
             }

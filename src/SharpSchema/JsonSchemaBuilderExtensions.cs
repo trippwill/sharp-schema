@@ -3,8 +3,9 @@
 
 using System.Reflection;
 using System.Text.Json;
-using Json.More;
+using System.Text.Json.Nodes;
 using Json.Schema;
+using libanvl;
 using Microsoft;
 using SharpMeta;
 using SharpSchema.Annotations;
@@ -20,15 +21,108 @@ public static class JsonSchemaBuilderExtensions
     private static readonly AggregateTypeHandler AggregateTypeHandler = new();
 
     /// <summary>
-    /// Converts a <see cref="Type"/> to a JSON schema.
+    /// Adds type information to the JSON schema builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    /// <param name="type">The <see cref="Type"/> to convert.</param>
     /// <param name="context">The converter context.</param>
-    /// <param name="isRootType">Indicates whether the current type is the top-level type.</param>
-    /// <param name="propertyAttributeData">The attribute data from the owning property.</param>
+    /// <param name="rootTypeContext">The <see cref="Type"/> to convert.</param>
     /// <returns>The JSON schema represented by a <see cref="JsonSchemaBuilder"/>.</returns>
-    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, Type type, ConverterContext context, bool isRootType = true, IList<CustomAttributeData>? propertyAttributeData = null)
+    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, ConverterContext context, RootTypeContext rootTypeContext)
+    {
+        return builder.AddType(context, rootTypeContext.Type, isRootType: true, owningProperty: null);
+    }
+
+    /// <summary>
+    /// Adds type information to the JSON schema builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="context">The converter context.</param>
+    /// <param name="type">The <see cref="Type"/> to convert.</param>
+    /// <returns>The JSON schema represented by a <see cref="JsonSchemaBuilder"/>.</returns>
+    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, ConverterContext context, Type type)
+    {
+        return builder.AddType(context, type, isRootType: false, owningProperty: null);
+    }
+
+    /// <summary>
+    /// Adds type information to the JSON schema builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="context">The converter context.</param>
+    /// <param name="type">The <see cref="Type"/> to convert.</param>
+    /// <param name="owningProperty">The owning property.</param>
+    /// <returns>The JSON schema represented by a <see cref="JsonSchemaBuilder"/>.</returns>
+    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, ConverterContext context, Type type, PropertyInfo owningProperty)
+    {
+        return builder.AddType(context, type, isRootType: false, owningProperty: owningProperty);
+    }
+
+    /// <summary>
+    /// Adds property information to the JSON schema builder.
+    /// </summary>
+    /// <param name="builder">The JSON schema builder.</param>
+    /// <param name="context">The converter context.</param>
+    /// <param name="property">The <see cref="PropertyInfo"/> representing the property.</param>
+    /// <param name="isRequired">Indicates whether the property is required.</param>
+    /// <returns>The updated JSON schema builder.</returns>
+    public static JsonSchemaBuilder AddPropertyInfo(this JsonSchemaBuilder builder, ConverterContext context, PropertyInfo property, out bool isRequired)
+    {
+        ArgumentNullException.ThrowIfNull(property, nameof(property));
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+        isRequired = false;
+
+        if (property.IsRequired(out bool isNullable))
+        {
+            isRequired = true;
+        }
+
+        Opt<JsonNode> constNode = Opt.From(property.GetCustomAttributeData<SchemaConstAttribute>())
+            .Select(cad => cad.GetConstructorArgument<object>(0))
+            .Select(value => JsonSerializer.SerializeToNode(value));
+
+        if (constNode)
+        {
+            isRequired = true;
+            builder = builder.Const(constNode);
+        }
+        else if (isNullable)
+        {
+            builder = builder
+                .OneOf(
+                    new JsonSchemaBuilder()
+                        .AddType(
+                            context,
+                            property.PropertyType,
+                            property)
+                        .AddPropertyConstraints(property),
+                    new JsonSchemaBuilder()
+                        .Type(SchemaValueType.Null));
+        }
+        else
+        {
+            builder = builder
+                .AddType(
+                    context,
+                    property.PropertyType,
+                    property)
+                .AddPropertyConstraints(property);
+        }
+
+        return builder
+            .AddPropertyAnnotations(context, property);
+    }
+
+    /// <summary>
+    /// Adds type information to the JSON schema builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="context">The converter context.</param>
+    /// <param name="type">The <see cref="Type"/> to convert.</param>
+    /// <param name="isRootType">Indicates whether the current type is the top-level type.</param>
+    /// <param name="owningProperty">The owning property.</param>
+    /// <returns>The JSON schema represented by a <see cref="JsonSchemaBuilder"/>.</returns>
+    internal static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType, PropertyInfo? owningProperty)
     {
         Requires.NotNull(builder, nameof(builder));
         Requires.NotNull(type, nameof(type));
@@ -41,18 +135,19 @@ public static class JsonSchemaBuilderExtensions
 
         try
         {
-            TypeHandler.Result result = AggregateTypeHandler.TryHandle(builder, context, type, isRootType, propertyAttributeData);
-            if (result.ResultKind == TypeHandler.ResultKind.Fault)
-            {
-                throw new InvalidOperationException(string.Join(Environment.NewLine, result.Messages));
-            }
+            TypeHandler.Result result = AggregateTypeHandler.TryHandle(
+                builder,
+                context,
+                type,
+                isRootType,
+                owningProperty);
 
-            if (result.ResultKind == TypeHandler.ResultKind.Handled)
+            return result.ResultKind switch
             {
-                return result.Builder;
-            }
-
-            return Assumes.NotReachable<JsonSchemaBuilder>();
+                TypeHandler.ResultKind.Fault => throw new InvalidOperationException(string.Join(Environment.NewLine, result.Messages)),
+                TypeHandler.ResultKind.Handled => result.Builder,
+                _ => Assumes.NotReachable<JsonSchemaBuilder>(),
+            };
         }
         finally
         {
@@ -61,109 +156,50 @@ public static class JsonSchemaBuilderExtensions
     }
 
     /// <summary>
-    /// Adds property information to the JSON schema builder.
-    /// </summary>
-    /// <param name="builder">The JSON schema builder.</param>
-    /// <param name="property">The <see cref="PropertyInfo"/> representing the property.</param>
-    /// <param name="context">The converter context.</param>
-    /// <param name="isRequired">Indicates whether the property is required.</param>
-    /// <returns>The updated JSON schema builder.</returns>
-    public static JsonSchemaBuilder AddPropertyInfo(this JsonSchemaBuilder builder, PropertyInfo property, ConverterContext context, out bool isRequired)
-    {
-        isRequired = false;
-
-        if (property.IsRequired(out bool isNullable))
-        {
-            isRequired = true;
-        }
-
-        if (property.TryGetCustomAttributeData(typeof(SchemaConstAttribute), out CustomAttributeData? cad) &&
-            cad.TryGetConstructorArgument(0, out object? value))
-        {
-            isRequired = true;
-            builder = builder.Const(JsonSerializer.SerializeToNode(value));
-        }
-        else if (isNullable)
-        {
-            builder = builder
-                .OneOf(
-                    new JsonSchemaBuilder()
-                        .AddType(
-                            property.PropertyType,
-                            context,
-                            isRootType: false,
-                            propertyAttributeData: property.GetAllCustomAttributeData(includeInherited: true))
-                        .AddPropertyConstraints(property),
-                    new JsonSchemaBuilder()
-                        .Type(SchemaValueType.Null));
-        }
-        else
-        {
-            builder = builder
-                .AddType(
-                    property.PropertyType,
-                    context,
-                    isRootType: false,
-                    propertyAttributeData: property.GetAllCustomAttributeData(includeInherited: true))
-                .AddPropertyConstraints(property);
-        }
-
-        return builder
-            .AddPropertyAnnotations(property);
-    }
-
-    /// <summary>
-    /// Serializes a <see cref="JsonSchema"/> to a UTF-8 encoded byte array.
-    /// </summary>
-    /// <param name="schema">The schema to serialize.</param>
-    /// <param name="options">The serializer options. If not provided, the formatting is indented by default.</param>
-    /// <returns>The array of bytes.</returns>
-    public static byte[] SerializeToUtf8Bytes(this JsonSchema schema, JsonSerializerOptions? options = null)
-    {
-        options ??= new JsonSerializerOptions
-        {
-            WriteIndented = true,
-        };
-
-        return JsonSerializer.SerializeToUtf8Bytes(
-            schema.ToJsonDocument().RootElement,
-            options);
-    }
-
-    /// <summary>
     /// Adds an array type to the JSON schema builder.
     /// </summary>
     /// <param name="builder">The JSON schema builder.</param>
-    /// <param name="itemType">The type of the array items.</param>
     /// <param name="context">The converter context.</param>
-    /// <param name="propertyAttributeData">The property attribute data.</param>
+    /// <param name="itemType">The type of the array items.</param>
+    /// <param name="owningProperty">The owning property.</param>
     /// <returns>The updated JSON schema builder.</returns>
-    internal static JsonSchemaBuilder AddArrayType(this JsonSchemaBuilder builder, Type itemType, ConverterContext context, IList<CustomAttributeData>? propertyAttributeData = null)
+    internal static JsonSchemaBuilder AddArrayType(this JsonSchemaBuilder builder, ConverterContext context, Type itemType, Opt<PropertyInfo> owningProperty)
     {
         JsonSchemaBuilder itemSchema = new JsonSchemaBuilder()
-            .AddType(itemType, context, isRootType: false);
+            .AddType(context: context, type: itemType);
 
         builder = builder
             .Comment($"{itemType.Name}[]")
             .Type(SchemaValueType.Array)
             .Items(itemSchema);
 
-        if (propertyAttributeData.TryGetCustomAttributeData<SchemaItemsRangeAttribute>(out CustomAttributeData? cad))
+        Opt<CustomAttributeData> rangeAttributeData = owningProperty
+            .Select(pi => pi.GetCustomAttributeData<SchemaItemsRangeAttribute>());
+
+        if (rangeAttributeData)
         {
-            if (cad.TryGetNamedArgument(nameof(SchemaItemsRangeAttribute.Min), out uint? minItems))
+            Opt<uint> minItems = rangeAttributeData
+                .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaItemsRangeAttribute.Min)));
+
+            if (minItems)
             {
-                builder = builder.MinItems(minItems.Value);
+                builder = builder.MinItems(minItems.Unwrap());
             }
 
-            if (cad.TryGetNamedArgument(nameof(SchemaItemsRangeAttribute.Max), out uint? maxItems))
+            Opt<uint> maxItems = rangeAttributeData
+                .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaItemsRangeAttribute.Max)));
+
+            if (maxItems)
             {
-                builder = builder.MaxItems(maxItems.Value);
+                builder = builder.MaxItems(maxItems.Unwrap());
             }
 
-            if (cad.TryGetNamedArgument(nameof(SchemaItemsRangeAttribute.UniqueItems), out bool? uniqueItems) &&
-                uniqueItems == true)
+            Opt<bool> uniqueItems = rangeAttributeData
+                .Select(cad => cad.GetNamedArgument<bool?>(nameof(SchemaItemsRangeAttribute.UniqueItems)));
+
+            if (uniqueItems)
             {
-                builder = builder.UniqueItems(true);
+                builder = builder.UniqueItems(uniqueItems.Unwrap());
             }
         }
 
@@ -174,46 +210,55 @@ public static class JsonSchemaBuilderExtensions
     /// Adds type annotations to the JSON schema builder based on the provided <see cref="Type"/>.
     /// </summary>
     /// <param name="builder">The JSON schema builder.</param>
+    /// <param name="context">The converter context.</param>
     /// <param name="type">The <see cref="Type"/> to add annotations for.</param>
     /// <returns>The updated JSON schema builder.</returns>
-    internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, Type type)
+    internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, ConverterContext context, Type type)
     {
-        return builder.AddCommonAnnotations(type, type.Name);
+        return builder.AddCommonAnnotations(type, context.ParseDocComments);
     }
 
     /// <summary>
     /// Adds type annotations to the JSON schema builder based on the provided <see cref="PropertyInfo"/>.
     /// </summary>
     /// <param name="builder">The JSON schema builder.</param>
+    /// <param name="context">The converter context.</param>
     /// <param name="property">The <see cref="PropertyInfo"/> to add annotations for.</param>
     /// <returns>The updated JSON schema builder.</returns>
-    private static JsonSchemaBuilder AddPropertyAnnotations(this JsonSchemaBuilder builder, PropertyInfo property)
+    private static JsonSchemaBuilder AddPropertyAnnotations(this JsonSchemaBuilder builder, ConverterContext context, PropertyInfo property)
     {
-        return builder.AddCommonAnnotations(property);
+        return builder.AddCommonAnnotations(property, context.ParseDocComments);
     }
 
-    private static JsonSchemaBuilder AddCommonAnnotations(this JsonSchemaBuilder builder, MemberInfo info, string? commentFallback = null)
+    private static JsonSchemaBuilder AddCommonAnnotations(this JsonSchemaBuilder builder, MemberInfo info, bool parseDocComments)
     {
-        if (info.TryGetCustomAttributeData<SchemaMetaAttribute>(out CustomAttributeData? cad))
+        Opt<CustomAttributeData> meta = info.GetCustomAttributeData<SchemaMetaAttribute>();
+        Opt<DocComments> docComments = parseDocComments ? info.GetDocComments() : Opt<DocComments>.None;
+
+        Opt<string> title = meta
+            .Select(cad => cad.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Title)))
+            .OrThen(docComments.Select(info => info.Summary.ParseDocString()));
+
+        if (title)
         {
-            if (cad.TryGetNamedArgument(nameof(SchemaMetaAttribute.Title), out string? title))
-            {
-                builder = builder.Title(title);
-            }
+            builder = builder.Title(title.Unwrap());
+        }
 
-            if (cad.TryGetNamedArgument(nameof(SchemaMetaAttribute.Description), out string? description))
-            {
-                builder = builder.Description(description);
-            }
+        Opt<string> description = meta
+            .Select(cad => cad.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Description)))
+            .OrThen(docComments.Select(info => info.Remarks.ParseDocString()));
 
-            if (cad.TryGetNamedArgument(nameof(SchemaMetaAttribute.Comment), out string? commentValue))
-            {
-                builder = builder.Comment(commentValue);
-            }
-            else if (commentFallback is not null)
-            {
-                builder = builder.Comment(commentFallback);
-            }
+        if (description)
+        {
+            builder = builder.Description(description.Unwrap());
+        }
+
+        Opt<string> comment = meta
+            .Select(cad => cad.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Comment)));
+
+        if (comment)
+        {
+            builder = builder.Comment(comment.Unwrap());
         }
 
         return builder;
@@ -231,16 +276,25 @@ public static class JsonSchemaBuilderExtensions
         if (type.IsSchemaNumeric())
         {
             // if the property has a value range attribute, set the minimum and maximum values
-            if (property.TryGetCustomAttributeData<SchemaValueRangeAttribute>(out CustomAttributeData? rangeCad))
+            Opt<CustomAttributeData> rangeAttribute = property.GetCustomAttributeData<SchemaValueRangeAttribute>();
+            if (rangeAttribute)
             {
-                if (rangeCad.TryGetNamedArgument(nameof(SchemaValueRangeAttribute.Min), out double min))
+                Opt<decimal> min = rangeAttribute
+                    .Select(cad => cad.GetNamedArgument<double?>(nameof(SchemaValueRangeAttribute.Min)))
+                    .Select(value => decimal.CreateSaturating(value));
+
+                if (min)
                 {
-                    builder = builder.Minimum(decimal.CreateSaturating(min));
+                    builder = builder.Minimum(min.Unwrap());
                 }
 
-                if (rangeCad.TryGetNamedArgument(nameof(SchemaValueRangeAttribute.Max), out double max))
+                Opt<decimal> max = rangeAttribute
+                    .Select(cad => cad.GetNamedArgument<double?>(nameof(SchemaValueRangeAttribute.Max)))
+                    .Select(value => decimal.CreateSaturating(value));
+
+                if (max)
                 {
-                    builder = builder.Maximum(decimal.CreateSaturating(max));
+                    builder = builder.Maximum(max.Unwrap());
                 }
             }
         }
@@ -249,43 +303,48 @@ public static class JsonSchemaBuilderExtensions
         if (type.Name == typeof(string).Name)
         {
             // if the property has a format attribute, set the format
-            if (property.TryGetCustomAttributeData<SchemaFormatAttribute>(out CustomAttributeData? formatCad))
+            Opt<CustomAttributeData> formatAttribute = property.GetCustomAttributeData<SchemaFormatAttribute>();
+            if (formatAttribute)
             {
-                string? format = formatCad.GetConstructorArgument<string>(0);
-                if (format is not null)
+                Opt<string> format = formatAttribute
+                    .Select(cad => cad.GetConstructorArgument<string>(0));
+                if (format)
                 {
-                    builder = builder.Format(format);
+                    builder = builder.Format(format.Unwrap());
                 }
             }
 
             // if the property has a regex attribute, set the pattern
-            if (property.TryGetCustomAttributeData<SchemaRegexAttribute>(out CustomAttributeData? regexCad))
+            Opt<CustomAttributeData> regexAttribute = property.GetCustomAttributeData<SchemaRegexAttribute>();
+            if (regexAttribute)
             {
-                bool applyToPropertyName = regexCad.TryGetNamedArgument(nameof(SchemaRegexAttribute.ApplyToPropertyName), out bool? applyToPropertyNameValue)
-                    ? applyToPropertyNameValue.Value
-                    : false;
+                Opt<bool> applyToPropertyName = regexAttribute.Select(cad => cad.GetNamedArgument<bool>(nameof(SchemaRegexAttribute.ApplyToPropertyName)));
+                bool forPropertyName = applyToPropertyName.IsSome && applyToPropertyName.Unwrap();
 
-                if (!applyToPropertyName)
+                if (!forPropertyName)
                 {
-                    string? pattern = regexCad.GetConstructorArgument<string>(0);
-                    if (pattern is not null)
+                    Opt<string> pattern = regexAttribute.Select(cad => cad.GetConstructorArgument<string>(0));
+                    if (pattern)
                     {
-                        builder = builder.Pattern(pattern);
+                        builder = builder.Pattern(pattern.Unwrap());
                     }
                 }
             }
 
             // if the property has a string length attribute, set the minimum and maximum lengths
-            if (property.TryGetCustomAttributeData<SchemaLengthRangeAttribute>(out CustomAttributeData? lengthCad))
+            Opt<CustomAttributeData> lengthAttribute = property.GetCustomAttributeData<SchemaLengthRangeAttribute>();
+            if (lengthAttribute)
             {
-                if (lengthCad.TryGetNamedArgument(nameof(SchemaLengthRangeAttribute.Min), out uint min))
+                Opt<uint> min = lengthAttribute.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaLengthRangeAttribute.Min)));
+                if (min)
                 {
-                    builder = builder.MinLength(min);
+                    builder = builder.MinLength(min.Unwrap());
                 }
 
-                if (lengthCad.TryGetNamedArgument(nameof(SchemaLengthRangeAttribute.Max), out uint max))
+                Opt<uint> max = lengthAttribute.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaLengthRangeAttribute.Max)));
+                if (max)
                 {
-                    builder = builder.MaxLength(max);
+                    builder = builder.MaxLength(max.Unwrap());
                 }
             }
 
@@ -295,16 +354,19 @@ public static class JsonSchemaBuilderExtensions
         if (!property.PropertyType.IsValueType)
         {
             // if the property has a properties range attribute, set the minimum and maximum properties
-            if (property.TryGetCustomAttributeData<SchemaPropertiesRangeAttribute>(out CustomAttributeData? rangeCad))
+            Opt<CustomAttributeData> rangeAttribute = property.GetCustomAttributeData<SchemaPropertiesRangeAttribute>();
+            if (rangeAttribute)
             {
-                if (rangeCad.TryGetNamedArgument(nameof(SchemaPropertiesRangeAttribute.Min), out uint min))
+                Opt<uint> min = rangeAttribute.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Min)));
+                if (min)
                 {
-                    builder = builder.MinProperties(min);
+                    builder = builder.MinProperties(min.Unwrap());
                 }
 
-                if (rangeCad.TryGetNamedArgument(nameof(SchemaPropertiesRangeAttribute.Max), out uint max))
+                Opt<uint> max = rangeAttribute.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Max)));
+                if (max)
                 {
-                    builder = builder.MaxProperties(max);
+                    builder = builder.MaxProperties(max.Unwrap());
                 }
             }
         }

@@ -68,7 +68,7 @@ public class TypeConverterTests
         _ = caseName;
 
         // Arrange
-        JsonSchema schema = new TypeConverter(new TypeConverter.Options()).Convert(RootTypeContext.FromType(typeof(SchemaRoot)));
+        JsonSchema schema = new TypeConverter(new TypeConverter.Options(expectedIsValid)).Convert(RootTypeContext.FromType(typeof(SchemaRoot)));
 
         // Act
         EvaluationResults results = schema.Evaluate(JsonDocument.Parse(input).RootElement, new EvaluationOptions()

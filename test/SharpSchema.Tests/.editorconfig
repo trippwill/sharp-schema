@@ -8,5 +8,8 @@ indent_style = space
 # Default severity for analyzer diagnostics with category 'StyleCop.CSharp.OrderingRules'
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.OrderingRules.severity = silent
 
+# SA1402: File may only contain a single type
+dotnet_diagnostic.SA1402.severity = silent
+
 [*.xml]
 indent_size = 2

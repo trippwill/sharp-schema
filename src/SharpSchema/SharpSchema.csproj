@@ -6,9 +6,11 @@
     <Product>SharpSchema</Product>
     <Description>Core library for the SharpSchema project.</Description>
     <DefineConstants>SHARPSCHEMA_ASSEMBLY</DefineConstants>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net" />
+    <PackageReference Include="libanvl.opt" />
     <PackageReference Include="Microsoft.VisualStudio.Validation" />
     <PackageReference Include="SharpMeta" />
   </ItemGroup>

@@ -4,6 +4,7 @@
 using System.Reflection;
 using System.Text.Json;
 using Json.Schema;
+using libanvl;
 using SharpMeta;
 using SharpSchema.Annotations;
 
@@ -15,7 +16,12 @@ namespace SharpSchema.TypeHandlers;
 internal class OverrideValueTypeHandler : TypeHandler
 {
     /// <inheritdoc/>
-    public override Result TryHandle(JsonSchemaBuilder builder, ConverterContext context, Type type, bool isRootType = false, IList<CustomAttributeData>? propertyAttributeData = null)
+    public override Result TryHandle(
+        JsonSchemaBuilder builder,
+        ConverterContext context,
+        Type type,
+        bool isRootType,
+        Opt<PropertyInfo> propertyInfo)
     {
         if (!type.TryGetCustomAttributeData<SchemaOverrideAttribute>(out CustomAttributeData? attribute))
         {

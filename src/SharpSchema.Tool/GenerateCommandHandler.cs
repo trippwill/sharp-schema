@@ -14,7 +14,11 @@ namespace SharpSchema.Tool;
 /// <summary>
 /// Represents the command handler for the generate command.
 /// </summary>
-internal class GenerateCommandHandler(IConsole console, LoaderOptions loaderOptions, ConverterOptions converterOptions, WriterOptions writerOptions)
+internal class GenerateCommandHandler(
+    IConsole console,
+    LoaderOptions loaderOptions,
+    ConverterOptions converterOptions,
+    WriterOptions writerOptions)
 {
     /// <summary>
     /// Invokes the generate command.
@@ -60,6 +64,7 @@ internal class GenerateCommandHandler(IConsole console, LoaderOptions loaderOpti
                 {
                     IncludeInterfaces = converterOptions.IncludeInterfaces,
                     EnumAsUnderlyingType = converterOptions.EnumAsUnderlyingType,
+                    ParseDocComments = converterOptions.ParseDocComments,
                     MaxDepth = converterOptions.MaxDept,
                 });
 
@@ -67,7 +72,7 @@ internal class GenerateCommandHandler(IConsole console, LoaderOptions loaderOpti
                     .Convert(rootTypeContext)
                     .Build();
 
-                byte[] schemaBytes = schema.SerializeToUtf8Bytes(new JsonSerializerOptions
+                byte[] schemaBytes = JsonSchemaExtensions.SerializeToUtf8Bytes(schema, new JsonSerializerOptions
                 {
                     WriteIndented = writerOptions.WriteIndented,
                     Encoder = writerOptions.StrictJsonEscaping
@@ -118,15 +123,26 @@ internal class GenerateCommandHandler(IConsole console, LoaderOptions loaderOpti
     /// <summary>
     /// Represents the options for the loader.
     /// </summary>
-    public record struct LoaderOptions(int DirectoryRecursionDepth, FileInfo[] ReferenceFiles, DirectoryInfo[] ReferenceDirectories);
+    public record struct LoaderOptions(
+        int DirectoryRecursionDepth,
+        FileInfo[] ReferenceFiles,
+        DirectoryInfo[] ReferenceDirectories);
 
     /// <summary>
     /// Represents the options for the writer.
     /// </summary>
-    public record struct WriterOptions(DirectoryInfo? OutputDirectory, bool WriteIndented, bool StrictJsonEscaping, bool Overwrite);
+    public record struct WriterOptions(
+        DirectoryInfo? OutputDirectory,
+        bool WriteIndented,
+        bool StrictJsonEscaping,
+        bool Overwrite);
 
     /// <summary>
     /// Represents the options for the converter.
     /// </summary>
-    public record struct ConverterOptions(bool IncludeInterfaces, bool EnumAsUnderlyingType, int MaxDept);
+    public record struct ConverterOptions(
+        bool IncludeInterfaces,
+        bool EnumAsUnderlyingType,
+        bool ParseDocComments,
+        int MaxDept);
 }

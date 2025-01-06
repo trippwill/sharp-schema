@@ -32,14 +32,18 @@ public class TypeConverter(TypeConverter.Options? options = null)
         {
             IncludeInterfaces = options.IncludeInterfaces,
             EnumAsUnderlyingType = options.EnumAsUnderlyingType,
+            ParseDocComments = options.ParseDocComments,
             MaxDepth = options.MaxDepth,
             DefaultNamespace = typeContext.CommonNamespace,
         };
 
-        builder = builder.AddType(typeContext.Type, converterContext, isRootType: true);
+        builder = builder.AddType(converterContext, typeContext);
         if (converterContext.Defs.Count > 0)
         {
-            builder = builder.Defs(converterContext.Defs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build()));
+            builder = builder.Defs(
+                converterContext.Defs.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Build()));
         }
 
         return builder;
@@ -48,7 +52,11 @@ public class TypeConverter(TypeConverter.Options? options = null)
     /// <summary>
     /// Options for the <see cref="TypeConverter"/>.
     /// </summary>
-    public record class Options(bool IncludeInterfaces = false, bool EnumAsUnderlyingType = false, int MaxDepth = 50)
+    public record class Options(
+        bool IncludeInterfaces = false,
+        bool EnumAsUnderlyingType = false,
+        bool ParseDocComments = false,
+        int MaxDepth = 50)
     {
         /// <summary>
         /// Gets the default options.

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Json.Schema;
 using Microsoft;
@@ -60,7 +59,7 @@ public static class TypeExtensions
         Requires.NotNull(context, nameof(context));
 
         string? genericArgs = type.IsGenericType
-            ? $"[{string.Join('_', type.GetGenericArguments().Select(t => t.ToDefinitionName(context)))}]"
+            ? $"{{{string.Join(',', type.GetGenericArguments().Select(t => t.ToDefinitionName(context)))}}}"
             : string.Empty;
 
         string @namespace = type.DeclaringType?.Namespace ?? type.Namespace ?? string.Empty;
@@ -78,8 +77,7 @@ public static class TypeExtensions
         }
 
         string typeName = type.Name.Split('`')[0];
-
-        string finalName = type.DeclaringType is null
+        string finalName = (type.DeclaringType is null || type.IsGenericParameter)
             ? typeName
             : $"{type.DeclaringType.Name}_{typeName}";
 

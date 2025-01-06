@@ -37,10 +37,10 @@
       "modern"
     ],
     "globalMetadata": {
-      "_appName": "libanvl.opt",
-      "_appTitle": "libanvl.opt",
+      "_appName": "SharpSchema",
+      "_appTitle": "SharpSchema",
       "_enableSearch": true,
-      "pdf": false
+      "pdf": true
     }
   }
 }

@@ -31,7 +31,6 @@ jobs:
       push-nuget-feed: true
     secrets:
       NUGET_PUSH_KEY: ${{ secrets.NUGET_PUSH_KEY }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-to-nuget-manual:
     uses: libanvl/ci/.github/workflows/release-to-nuget.yml@main
@@ -42,4 +41,3 @@ jobs:
       push-nuget-feed: ${{ github.event.inputs.skip-nuget-feed != 'false' }}
     secrets:
       NUGET_PUSH_KEY: ${{ secrets.NUGET_PUSH_KEY }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

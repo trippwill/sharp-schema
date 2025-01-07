@@ -29,4 +29,22 @@ public static class JsonSchemaExtensions
             schema.ToJsonDocument().RootElement,
             options);
     }
+
+    /// <summary>
+    /// Serializes a <see cref="JsonSchema"/> to a JSON string.
+    /// </summary>
+    /// <param name="schema">The schema to serialize.</param>
+    /// <param name="options">The serializer options. If not provided, the formatting is indented by default.</param>
+    /// <returns>The JSON string.</returns>
+    public static string SerializeToJson(this JsonSchema schema, JsonSerializerOptions? options = null)
+    {
+        options ??= new JsonSerializerOptions
+        {
+            WriteIndented = true,
+        };
+
+        return JsonSerializer.Serialize(
+            schema.ToJsonDocument().RootElement,
+            options);
+    }
 }

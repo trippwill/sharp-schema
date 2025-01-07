@@ -54,7 +54,7 @@ internal class EnumerableTypeHandler : TypeHandler
         try
         {
             builder = builder
-                .AddTypeAnnotations(context, type)
+                .AddTypeAnnotations(context, type, disallowDocComments: true)
                 .AddArrayType(context, elementType, owningProperty);
 
             return Result.Handled(builder);

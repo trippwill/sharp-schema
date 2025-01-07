@@ -36,17 +36,20 @@ internal class DictionaryTypeHandler : TypeHandler
             .AddType(context, keyType);
 
         // if the property has a regular expression attribute that applies to the property name, use that as the key pattern
-        if (propertyInfo.IsSome && propertyInfo.Unwrap().GetAllCustomAttributeData(includeInherited: true) is IList<CustomAttributeData> cads)
+        Opt<CustomAttributeData> regexCad = propertyInfo
+            .Select(pi => pi.GetCustomAttributeData<SchemaRegexAttribute>());
+
+        Opt<bool> applyToPropertyName = regexCad
+            .Select(cad => cad.GetNamedArgument<bool?>(nameof(SchemaRegexAttribute.ApplyToPropertyName)));
+
+        if (applyToPropertyName && applyToPropertyName.Unwrap())
         {
-            if (cads.FirstOrDefault(cad => cad.AttributeType.FullName == typeof(SchemaRegexAttribute).FullName) is CustomAttributeData regexCad)
+            Opt<string> pattern = regexCad
+                .Select(cad => cad.GetConstructorArgument<string>(0));
+
+            if (pattern)
             {
-                if (regexCad.TryGetNamedArgument(nameof(SchemaRegexAttribute.ApplyToPropertyName), out bool applyToPropertyName) && applyToPropertyName)
-                {
-                    if (regexCad.TryGetConstructorArgument(0, out string? pattern))
-                    {
-                        keySchema = keySchema.Pattern(pattern);
-                    }
-                }
+                keySchema = keySchema.Pattern(pattern.Unwrap());
             }
         }
 

@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
 using SharpSchema.Annotations;
 
 namespace Scenarios.Abstract;
 
+[ExcludeFromCodeCoverage]
 [SchemaMeta(Title = "Person", Description = "A base record representing a person.")]
 internal abstract record Person
 {

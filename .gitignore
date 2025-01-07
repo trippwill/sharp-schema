@@ -408,3 +408,4 @@ FodyWeavers.xsd
 # mac-created file to track user view preferences for a directory
 .DS_Store
 /.github/copilot-instructions.md
+/test/SharpSchema.Tests/test_results.xml

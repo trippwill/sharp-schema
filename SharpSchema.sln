@@ -44,10 +44,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Annotations", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Annotations.Source", "src\SharpSchema.Annotations.Source\SharpSchema.Annotations.Source.csproj", "{636AF0A7-ABCF-428B-9E81-F42A998A0A09}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{7DF0F79D-3609-4DCF-8F10-EAB6ED6A782C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
-		docs\ConversionRules.md = docs\ConversionRules.md
-		docs\SchemaAttributes.md = docs\SchemaAttributes.md
+		.github\workflows\codecov-junit.yml = .github\workflows\codecov-junit.yml
+		.github\workflows\libanvl-docfx.yml = .github\workflows\libanvl-docfx.yml
+		.github\workflows\libanvl-dotnet-ci.yml = .github\workflows\libanvl-dotnet-ci.yml
+		.github\workflows\libanvl-nuget-release.yml = .github\workflows\libanvl-nuget-release.yml
+		.github\workflows\libanvl-test-results.yml = .github\workflows\libanvl-test-results.yml
 	EndProjectSection
 EndProject
 Global
@@ -86,9 +89,9 @@ Global
 		{FB51A855-E477-493F-AA11-0D67269764B9} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
 		{05BC9AD0-2900-494D-902D-BEFBEA541C40} = {B71D66EE-BDBC-4BF5-95D8-89CF71656414}
 		{3C3F6483-7168-4816-B0D9-F46BD3B20132} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
-		{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
+		{24A59CEC-073F-454F-AA88-6ED0D5D1D6FB} = {B71D66EE-BDBC-4BF5-95D8-89CF71656414}
 		{636AF0A7-ABCF-428B-9E81-F42A998A0A09} = {B8A7A172-16A4-462E-8F3E-D387EB2C6963}
-		{7DF0F79D-3609-4DCF-8F10-EAB6ED6A782C} = {1CE9670B-D5FF-46A7-9D00-24E70E6ED48B}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {1CE9670B-D5FF-46A7-9D00-24E70E6ED48B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E3944F6A-384B-4B0F-B93F-3BD513DC57BD}

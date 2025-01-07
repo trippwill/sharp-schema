@@ -47,7 +47,10 @@ internal class DictionaryTypeHandler : TypeHandler
             Opt<string> pattern = regexCad
                 .Select(cad => cad.GetConstructorArgument<string>(0));
 
-            keySchema = keySchema.Pattern(pattern.Unwrap());
+            if (pattern)
+            {
+                keySchema = keySchema.Pattern(pattern.Unwrap());
+            }
         }
 
         builder = valueType is not null

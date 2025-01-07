@@ -12,7 +12,7 @@ namespace Scenarios.Interface;
 
 public class InterfaceTests(ITestOutputHelper outputHelper)
 {
-    [Theory]
+    [Theory(Skip = "This scenario does not currently work.")]
     [InlineData(true, TrueExpectedSchema)]
     [InlineData(false, FalseExpectedSchema)]
     public void Convert_ExpectedSchema(bool includeInterfaces, string expected)

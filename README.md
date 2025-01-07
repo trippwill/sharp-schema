@@ -1,7 +1,9 @@
-# SharpSchema
-
+[![CI](https://github.com/trippwill/sharp-schema/actions/workflows/libanvl-dotnet-ci.yml/badge.svg)](https://github.com/trippwill/sharp-schema/actions/workflows/libanvl-dotnet-ci.yml)
 ![NuGet Version](https://img.shields.io/nuget/v/SharpSchema)
+[![CodeQL](https://github.com/trippwill/sharp-schema/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/trippwill/sharp-schema/actions/workflows/github-code-scanning/codeql)
 [![codecov](https://codecov.io/gh/trippwill/sharp-schema/graph/badge.svg?token=GGB46BYHZ8)](https://codecov.io/gh/trippwill/sharp-schema)
+
+# SharpSchema
 
 SharpSchema is a .NET library and tool for generating JSON schemas from .NET types. It provides a flexible and extensible API for customizing the generated schemas, and includes a command-line tool for generating schemas from compiled .NET assemblies.
 

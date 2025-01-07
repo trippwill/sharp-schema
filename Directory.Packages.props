@@ -18,6 +18,7 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" PrivateAssets="all" />
     <PackageVersion Include="coverlet.collector" Version="6.0.2" PrivateAssets="all" />
     <PackageVersion Include="coverlet.msbuild" Version="6.0.2" PrivateAssets="all" />
+    <PackageVersion Include="JunitXml.TestLogger" Version="5.0.0" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <GlobalPackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all"/>

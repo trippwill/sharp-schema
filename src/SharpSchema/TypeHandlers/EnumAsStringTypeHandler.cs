@@ -62,7 +62,7 @@ internal class EnumAsStringTypeHandler : TypeHandler
             .Comment(type.Name)
             .Type(SchemaValueType.String)
             .Enum(kebabCaseEnumNames.ToImmutable())
-            .AddTypeAnnotations(context, type);
+            .AddTypeAnnotations(context, type, disallowDocComments: false);
 
         context.Defs.Add(definitionName, enumBuilder);
 

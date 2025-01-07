@@ -70,7 +70,7 @@ internal class FallbackTypeHandler : TypeHandler
             else
             {
                 genericTypeBuilder = new JsonSchemaBuilder()
-                    .AddTypeAnnotations(context, type)
+                    .AddTypeAnnotations(context, type, disallowDocComments: false)
                     .OneOf(new JsonSchemaBuilder()
                         .Ref(refPath));
 
@@ -103,7 +103,7 @@ internal class FallbackTypeHandler : TypeHandler
 
         static JsonSchemaBuilder AddCustomObjectType(JsonSchemaBuilder builder, Type type, ConverterContext context)
         {
-            builder = builder.AddTypeAnnotations(context, type);
+            builder = builder.AddTypeAnnotations(context, type, disallowDocComments: false);
 
             if (type.IsAbstract)
             {
@@ -283,7 +283,7 @@ internal class FallbackTypeHandler : TypeHandler
             else
             {
                 ifaceSchemaBuilder = new JsonSchemaBuilder()
-                    .AddTypeAnnotations(context, iface)
+                    .AddTypeAnnotations(context, iface, disallowDocComments: false)
                     .OneOf(new JsonSchemaBuilder()
                         .Ref(defName.ToJsonDefUri()));
 

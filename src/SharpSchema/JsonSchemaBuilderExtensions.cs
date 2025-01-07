@@ -58,6 +58,21 @@ public static class JsonSchemaBuilderExtensions
     }
 
     /// <summary>
+    /// Adds type information to the JSON schema builder based on the provided property.
+    /// </summary>
+    /// <param name="builder">The JSON schema builder.</param>
+    /// <param name="context">The converter context.</param>
+    /// <param name="property">The property information.</param>
+    /// <returns>The updated JSON schema builder.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the property is null.</exception>
+    public static JsonSchemaBuilder AddType(this JsonSchemaBuilder builder, ConverterContext context, PropertyInfo property)
+    {
+        ArgumentNullException.ThrowIfNull(property, nameof(property));
+
+        return builder.AddType(context, property.PropertyType, isRootType: false, owningProperty: property);
+    }
+
+    /// <summary>
     /// Adds property information to the JSON schema builder.
     /// </summary>
     /// <param name="builder">The JSON schema builder.</param>
@@ -93,7 +108,6 @@ public static class JsonSchemaBuilderExtensions
                     new JsonSchemaBuilder()
                         .AddType(
                             context,
-                            property.PropertyType,
                             property)
                         .AddPropertyConstraints(property),
                     new JsonSchemaBuilder()
@@ -104,7 +118,6 @@ public static class JsonSchemaBuilderExtensions
             builder = builder
                 .AddType(
                     context,
-                    property.PropertyType,
                     property)
                 .AddPropertyConstraints(property);
         }
@@ -212,10 +225,11 @@ public static class JsonSchemaBuilderExtensions
     /// <param name="builder">The JSON schema builder.</param>
     /// <param name="context">The converter context.</param>
     /// <param name="type">The <see cref="Type"/> to add annotations for.</param>
+    /// <param name="disallowDocComments">Whether to suppress doc comments for the type.</param>
     /// <returns>The updated JSON schema builder.</returns>
-    internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, ConverterContext context, Type type)
+    internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, ConverterContext context, Type type, bool disallowDocComments)
     {
-        return builder.AddCommonAnnotations(type, context.ParseDocComments);
+        return builder.AddMetaAnnotations(type, !disallowDocComments && context.ParseDocComments);
     }
 
     /// <summary>
@@ -227,10 +241,10 @@ public static class JsonSchemaBuilderExtensions
     /// <returns>The updated JSON schema builder.</returns>
     private static JsonSchemaBuilder AddPropertyAnnotations(this JsonSchemaBuilder builder, ConverterContext context, PropertyInfo property)
     {
-        return builder.AddCommonAnnotations(property, context.ParseDocComments);
+        return builder.AddMetaAnnotations(property, context.ParseDocComments);
     }
 
-    private static JsonSchemaBuilder AddCommonAnnotations(this JsonSchemaBuilder builder, MemberInfo info, bool parseDocComments)
+    private static JsonSchemaBuilder AddMetaAnnotations(this JsonSchemaBuilder builder, MemberInfo info, bool parseDocComments)
     {
         Opt<CustomAttributeData> meta = info.GetCustomAttributeData<SchemaMetaAttribute>();
         Opt<DocComments> docComments = parseDocComments ? info.GetDocComments() : Opt<DocComments>.None;

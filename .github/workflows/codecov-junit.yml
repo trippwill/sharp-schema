@@ -39,10 +39,6 @@ jobs:
     - name: Test
       run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test_results.trx" --results-directory ./test-results
 
-    - name: Convert TRX to JUnit
-      if: ${{ !cancelled() }}
-      run: dotnet tool install -g trx2junit && trx2junit ./test-results/test_results.trx
-
     - name: Upload test results to Codecov
       if: ${{ !cancelled() }}
       uses: codecov/test-results-action@v1

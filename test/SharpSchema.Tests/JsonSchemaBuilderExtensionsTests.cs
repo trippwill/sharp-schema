@@ -2,16 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
-using Humanizer;
 using Json.Schema;
 using Xunit;
 using Xunit.Abstractions;
 using SharpSchema.Annotations;
 using System.Diagnostics.CodeAnalysis;
-using Microsoft;
 
 namespace SharpSchema.Tests;
 
@@ -339,6 +336,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         Value3,
     }
 
+    [ExcludeFromCodeCoverage]
     private class PropertyAnnotationTestObject
     {
         /// <summary>
@@ -363,6 +361,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         public string RequiredProperty { get; set; } = string.Empty;
     }
 
+    [ExcludeFromCodeCoverage]
     [DisplayName("https://schema.org/object-with-properties")]
     private class ComplexObject
     {
@@ -395,23 +394,28 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         public int this[int i] => 0;
     }
 
+    [ExcludeFromCodeCoverage]
     private record TestRecord(int Id, string Name);
 
+    [ExcludeFromCodeCoverage]
     private abstract class AbstractClass
     {
         public string Name { get; set; } = string.Empty;
     }
 
+    [ExcludeFromCodeCoverage]
     private class ConcreteClass1 : AbstractClass
     {
         public int Age { get; set; }
     }
 
+    [ExcludeFromCodeCoverage]
     private class ConcreteClass2 : AbstractClass
     {
         public float Height { get; set; }
     }
 
+    [ExcludeFromCodeCoverage]
     [SchemaOverride(Schema)]
     private class OverrideClass
     {

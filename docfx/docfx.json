@@ -10,7 +10,7 @@
           ]
         }
       ],
-      "dest": "api"
+      "output": "api"
     }
   ],
   "build": {
@@ -37,10 +37,10 @@
       "modern"
     ],
     "globalMetadata": {
-      "_appName": "SharpSchema",
-      "_appTitle": "SharpSchema",
+      "_appName": "[PLACEHOLDER]",
+      "_appTitle": "[PLACEHOLDER]",
       "_enableSearch": true,
-      "pdf": true
+      "pdf": false
     }
   }
 }

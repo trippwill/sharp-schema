@@ -1,5 +1,5 @@
 [![CI](https://github.com/trippwill/sharp-schema/actions/workflows/libanvl-dotnet-ci.yml/badge.svg)](https://github.com/trippwill/sharp-schema/actions/workflows/libanvl-dotnet-ci.yml)
-![NuGet Version](https://img.shields.io/nuget/v/SharpSchema)
+[![NuGet Version](https://img.shields.io/nuget/vpre/SharpSchema.Tool)](https://www.nuget.org/packages/SharpSchema.Tool/)
 [![CodeQL](https://github.com/trippwill/sharp-schema/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/trippwill/sharp-schema/actions/workflows/github-code-scanning/codeql)
 [![codecov](https://codecov.io/gh/trippwill/sharp-schema/graph/badge.svg?token=GGB46BYHZ8)](https://codecov.io/gh/trippwill/sharp-schema)
 

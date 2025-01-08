@@ -11,5 +11,8 @@ dotnet_analyzer_diagnostic.category-StyleCop.CSharp.OrderingRules.severity = sil
 # SA1402: File may only contain a single type
 dotnet_diagnostic.SA1402.severity = silent
 
+# IDE0007: Use implicit type
+csharp_style_var_when_type_is_apparent = true
+
 [*.xml]
 indent_size = 2

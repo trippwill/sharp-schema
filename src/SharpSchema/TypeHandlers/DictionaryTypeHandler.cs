@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
 using System.Reflection;
 using Json.Schema;
 using libanvl;
@@ -29,7 +30,7 @@ internal class DictionaryTypeHandler : TypeHandler
 
         if (keyType.Name != typeof(string).Name)
         {
-            return Result.NotHandled(builder, "Only dictionaries with string keys are supported.");
+            return Result.Fault(builder, $"Type '{type.Name}' cannot be processed. Only dictionaries with string keys are supported.");
         }
 
         JsonSchemaBuilder keySchema = new JsonSchemaBuilder()

@@ -37,6 +37,13 @@ internal enum ExitCode
     OutputFileExists = 4,
 }
 
+internal enum Verbosity
+{
+    Normal,
+    Quiet,
+    Diagnostic,
+}
+
 /// <summary>
 /// Program entry point.
 /// </summary>
@@ -49,6 +56,49 @@ internal class Program
     /// <returns>The exit code of the application.</returns>
     public static async Task<int> Main(string[] args)
     {
+        // Common options
+        Option<Verbosity> verbosityOption = new(
+            ["--verbosity", "-v"],
+            description: "Set the verbosity level. Without a value, sets the level to Diagnostic. [default: Normal]",
+            parseArgument: result =>
+            {
+                if (result.Tokens.Count == 0)
+                    return Verbosity.Diagnostic;
+
+                try
+                {
+                    string value = result.Tokens.Single().Value;
+                    if (Enum.TryParse<Verbosity>(value, ignoreCase: true, out Verbosity verbosity))
+                        return verbosity;
+
+                    if ("quiet".StartsWith(value, StringComparison.OrdinalIgnoreCase))
+                        return Verbosity.Quiet;
+                    else if ("minimal".StartsWith(value, StringComparison.OrdinalIgnoreCase))
+                        return Verbosity.Normal;
+                    else if ("normal".StartsWith(value, StringComparison.OrdinalIgnoreCase))
+                        return Verbosity.Normal;
+                    else if ("detailed".StartsWith(value, StringComparison.OrdinalIgnoreCase))
+                        return Verbosity.Diagnostic;
+                    else if ("diagnostic".StartsWith(value, StringComparison.OrdinalIgnoreCase))
+                        return Verbosity.Diagnostic;
+                }
+                catch (InvalidOperationException)
+                {
+                    result.ErrorMessage = "Invalid verbosity level";
+                }
+
+                return Verbosity.Normal;
+            },
+            isDefault: false)
+        {
+            Arity = ArgumentArity.ZeroOrOne
+        };
+
+        Option<bool> quietOption = new(
+            ["--quiet", "-q"],
+            description: "Suppress all output except for errors. Overrides the --verbosity option.",
+            getDefaultValue: () => false);
+
         // Loader Options
         Option<FileInfo> assemblyOption = new(
             ["--assembly", "-a"],
@@ -80,7 +130,6 @@ internal class Program
             ["--reference", "-r"],
             description: "An assembly to reference.")
         {
-            IsRequired = false,
             Arity = ArgumentArity.ZeroOrMore,
         };
 
@@ -88,7 +137,6 @@ internal class Program
             ["--reference-directory", "-d"],
             description: "A directory containing assemblies to reference.")
         {
-            IsRequired = false,
             Arity = ArgumentArity.ZeroOrMore,
         };
 
@@ -154,7 +202,7 @@ internal class Program
             referenceOption,
             referenceDirectoryOption,
             directoryRecursionDepthOption,
-            includeInterfacesOption,
+            //includeInterfacesOption, Not implemented yet
             enumAsUnderlyingTypeOption,
             parseDocCommentsOptions,
             maxDepthOption,
@@ -162,6 +210,8 @@ internal class Program
             prettyPrintedOption,
             strictJsonEscapingOption,
             overwriteOption,
+            verbosityOption,
+            quietOption,
         };
 
         rootCommand.SetHandler(ic =>
@@ -186,7 +236,18 @@ internal class Program
                 ic.ParseResult.GetValueForOption(strictJsonEscapingOption),
                 ic.ParseResult.GetValueForOption(overwriteOption));
 
-            GenerateCommandHandler handler = new(DefaultConsole.Instance, loaderOptions, converterOptions, writerOptions);
+            bool quiet = ic.ParseResult.GetValueForOption(quietOption);
+
+            Verbosity verbosity = quiet
+                ? Verbosity.Quiet
+                : ic.ParseResult.GetValueForOption(verbosityOption);
+
+            GenerateCommandHandler handler = new(
+                DefaultConsole.Instance,
+                loaderOptions,
+                converterOptions,
+                writerOptions,
+                verbosity);
 
             ic.ExitCode = (int)handler.Invoke(classNames, assemblyFile);
         });

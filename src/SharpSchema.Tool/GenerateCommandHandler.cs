@@ -18,7 +18,8 @@ internal class GenerateCommandHandler(
     IConsole console,
     LoaderOptions loaderOptions,
     ConverterOptions converterOptions,
-    WriterOptions writerOptions)
+    WriterOptions writerOptions,
+    Verbosity verbosity)
 {
     /// <summary>
     /// Invokes the generate command.
@@ -32,7 +33,7 @@ internal class GenerateCommandHandler(
         try
         {
             using MetadataLoadContext loader = SharpAssemblyResolver
-                .CreateBuilder(SharpResolverLogger.Console)
+                .CreateBuilder(ConfigureLogger(console, verbosity))
                 .AddReferenceDirectories(
                     new EnumerationOptions
                     {
@@ -58,7 +59,8 @@ internal class GenerateCommandHandler(
 
                 var rootTypeContext = RootTypeContext.FromType(rootType);
 
-                console.Out.Write($"Generating schema for {rootTypeContext.Type.FullName}...\n");
+                if (verbosity != Verbosity.Quiet)
+                    console.Out.Write($"Generating schema for {rootTypeContext.Type.FullName}...\n");
 
                 TypeConverter converter = new(new TypeConverter.Options
                 {
@@ -102,7 +104,8 @@ internal class GenerateCommandHandler(
                     }
 
                     File.WriteAllBytes(outputFile.FullName, schemaBytes);
-                    console.Out.Write($"Schema written to {outputFile.FullName}\n");
+                    if (verbosity != Verbosity.Quiet)
+                        console.Out.Write($"Schema written to {outputFile.FullName}\n");
                 }
             }
         }
@@ -118,6 +121,34 @@ internal class GenerateCommandHandler(
         }
 
         return exitCode;
+    }
+
+    private static SharpResolverLogger ConfigureLogger(IConsole console, Verbosity verbosity)
+    {
+        switch (verbosity)
+        {
+            case Verbosity.Quiet:
+                return new()
+                {
+                    OnError = m => console.Error.Write(m + '\n'),
+                };
+            case Verbosity.Normal:
+                return new()
+                {
+                    OnError = m => console.Error.Write(m + '\n'),
+                    OnWarning = m => console.Error.Write(m + '\n'),
+                };
+            case Verbosity.Diagnostic:
+                return new()
+                {
+                    OnError = m => console.Error.Write(m + '\n'),
+                    OnWarning = m => console.Error.Write(m + '\n'),
+                    OnInfo = console.WriteLine
+                };
+            default:
+                console.Error.Write("Invalid verbosity level.\n");
+                return SharpResolverLogger.Console;
+        }
     }
 
     /// <summary>

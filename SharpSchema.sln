@@ -30,11 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test-config", "test-config"
 		test\Directory.Build.targets = test\Directory.Build.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B8A7A172-16A4-462E-8F3E-D387EB2C6963}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema", "src\SharpSchema\SharpSchema.csproj", "{FB51A855-E477-493F-AA11-0D67269764B9}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B71D66EE-BDBC-4BF5-95D8-89CF71656414}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpSchema.Tests", "test\SharpSchema.Tests\SharpSchema.Tests.csproj", "{05BC9AD0-2900-494D-902D-BEFBEA541C40}"
 EndProject

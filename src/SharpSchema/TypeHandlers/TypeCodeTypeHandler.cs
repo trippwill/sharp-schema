@@ -96,7 +96,6 @@ internal class TypeCodeTypeHandler : TypeHandler
 
             TypeCode.String => Result.Handled(
                 builder
-                    .Comment("string")
                     .Type(TypeCode.String.ToSchemaValueType())),
 
             TypeCode.UInt16 => Result.Handled(

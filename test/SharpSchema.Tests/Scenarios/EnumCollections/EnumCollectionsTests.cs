@@ -34,7 +34,6 @@ public class EnumCollectionsTests(ITestOutputHelper outputHelper)
       "type": "object",
       "properties": {
         "userName": {
-          "$comment": "string",
           "type": "string",
           "title": "User Name"
         },
@@ -82,7 +81,6 @@ public class EnumCollectionsTests(ITestOutputHelper outputHelper)
       "type": "object",
       "properties": {
         "userName": {
-          "$comment": "string",
           "type": "string",
           "title": "User Name"
         },

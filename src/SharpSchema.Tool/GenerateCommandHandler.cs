@@ -146,7 +146,7 @@ internal class GenerateCommandHandler(
                     OnInfo = console.WriteLine
                 };
             default:
-                console.Error.Write("Invalid verbosity level.\n");
+                console.Error.Write("Invalid verbosity level. Valid levels are: Quiet, Normal, Diagnostic.\n");
                 return SharpResolverLogger.Console;
         }
     }

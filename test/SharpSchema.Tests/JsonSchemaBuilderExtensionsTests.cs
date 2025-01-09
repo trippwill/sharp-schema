@@ -17,7 +17,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
     private static JsonSchema BuildSchema(Type type)
     {
         var builder = new JsonSchemaBuilder();
-        return builder.AddType(new ConverterContext(), RootTypeContext.FromType(type));
+        return builder.AddType(new ConverterContext() { RootTypeAssemblyName = type.Assembly.GetName() }, RootTypeContext.FromType(type));
     }
 
     private static void AssertSchema(
@@ -204,7 +204,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         bool expectedIsRequired = true;
 
         // Act
-        JsonSchema result = builder.AddPropertyInfo(new ConverterContext(), property!, out bool isRequired);
+        JsonSchema result = builder.AddPropertyInfo(new ConverterContext() { RootTypeAssemblyName = property!.PropertyType.Assembly.GetName()}, property!, out bool isRequired);
         this.OutputSchema(result);
 
         // Assert
@@ -220,7 +220,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         bool expectedIsRequired = false;
 
         // Act
-        JsonSchema result = builder.AddPropertyInfo(new ConverterContext(), property!, out bool isRequired);
+        JsonSchema result = builder.AddPropertyInfo(new ConverterContext() { RootTypeAssemblyName = property!.PropertyType.Assembly.GetName() }, property!, out bool isRequired);
         this.OutputSchema(result);
 
         // Assert
@@ -238,7 +238,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         bool expectedIsRequired = true;
 
         // Act
-        JsonSchema result = builder.AddPropertyInfo(new ConverterContext(), property!, out bool isRequired);
+        JsonSchema result = builder.AddPropertyInfo(new ConverterContext() { RootTypeAssemblyName = property!.PropertyType.Assembly.GetName() }, property!, out bool isRequired);
         this.OutputSchema(result);
 
         // Assert
@@ -257,7 +257,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         string expectedDescription = "This is an annotated property.";
 
         // Act
-        JsonSchema result = builder.AddPropertyInfo(new ConverterContext(), property!, out _);
+        JsonSchema result = builder.AddPropertyInfo(new ConverterContext() { RootTypeAssemblyName = property!.PropertyType.Assembly.GetName() }, property!, out _);
         this.OutputSchema(result);
 
         // Assert
@@ -327,6 +327,38 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         // Assert
         Assert.NotNull(result.GetRef());
     }
+    [Fact]
+    public void AddTypeAnnotations_WithDocComments_ReturnsSchemaWithAnnotations()
+    {
+        // Arrange
+        var builder = new JsonSchemaBuilder();
+        var context = new ConverterContext { ParseDocComments = true, RootTypeAssemblyName = typeof(PropertyAnnotationTestObject).Assembly.GetName() };
+        Type type = typeof(PropertyAnnotationTestObject);
+
+        // Act
+        JsonSchema result = builder.AddType(context, RootTypeContext.FromType(type)).AddTypeAnnotations(context, type, disallowDocComments: false);
+        this.OutputSchema(result);
+
+        // Assert
+        Assert.Equal("This is a test of the doc comment loader.", result.GetDescription());
+    }
+
+    [Fact]
+    public void AddTypeAnnotations_WithoutDocComments_ReturnsSchemaWithoutAnnotations()
+    {
+        // Arrange
+        var builder = new JsonSchemaBuilder();
+        var context = new ConverterContext { ParseDocComments = false, RootTypeAssemblyName = typeof(PropertyAnnotationTestObject).Assembly.GetName() };
+        Type type = typeof(PropertyAnnotationTestObject);
+
+        // Act
+        JsonSchema result = builder.AddTypeAnnotations(context, type, disallowDocComments: true);
+        this.OutputSchema(result);
+
+        // Assert
+        Assert.Null(result.GetTitle());
+        Assert.Null(result.GetDescription());
+    }
 
     [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test Code")]
     private enum TestEnum
@@ -336,7 +368,9 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         Value3,
     }
 
-    [ExcludeFromCodeCoverage]
+    /// <remarks>
+    /// This is a test of the doc comment loader.
+    /// </remarks>
     private class PropertyAnnotationTestObject
     {
         /// <summary>
@@ -361,8 +395,6 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         public string RequiredProperty { get; set; } = string.Empty;
     }
 
-    [ExcludeFromCodeCoverage]
-    [DisplayName("https://schema.org/object-with-properties")]
     private class ComplexObject
     {
         public string Name { get; set; } = string.Empty;
@@ -394,28 +426,23 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         public int this[int i] => 0;
     }
 
-    [ExcludeFromCodeCoverage]
     private record TestRecord(int Id, string Name);
 
-    [ExcludeFromCodeCoverage]
     private abstract class AbstractClass
     {
         public string Name { get; set; } = string.Empty;
     }
 
-    [ExcludeFromCodeCoverage]
     private class ConcreteClass1 : AbstractClass
     {
         public int Age { get; set; }
     }
 
-    [ExcludeFromCodeCoverage]
     private class ConcreteClass2 : AbstractClass
     {
         public float Height { get; set; }
     }
 
-    [ExcludeFromCodeCoverage]
     [SchemaOverride(Schema)]
     private class OverrideClass
     {

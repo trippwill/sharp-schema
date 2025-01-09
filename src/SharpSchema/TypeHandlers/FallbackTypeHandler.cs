@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Humanizer;
@@ -112,13 +111,9 @@ internal class FallbackTypeHandler : TypeHandler
                     .Select(t => new JsonSchemaBuilder().AddType(context: context, type: t).Build())
                     .ToList();
 
-                if (concreteTypeSchemas.Count == 0)
-                {
-                    return builder;
-                }
-
-                return builder
-                    .OneOf(concreteTypeSchemas);
+                return concreteTypeSchemas.Count == 0
+                    ? builder
+                    : builder.OneOf(concreteTypeSchemas);
             }
 
             Dictionary<string, JsonSchema> propertySchemas = GetObjectPropertySchemas(type, context, out IEnumerable<string>? requiredProperties);
@@ -134,16 +129,16 @@ internal class FallbackTypeHandler : TypeHandler
 
             // if the property has a properties range attribute, set the minimum and maximum properties
             Opt<CustomAttributeData> typeCad = type.GetCustomAttributeData<SchemaPropertiesRangeAttribute>();
-            if (typeCad.IsSome)
+            if (typeCad)
             {
                 Opt<uint> min = typeCad.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Min)));
-                if (min.IsSome)
+                if (min)
                 {
                     builder = builder.MinProperties(min.Unwrap());
                 }
 
                 Opt<uint> max = typeCad.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Max)));
-                if (max.IsSome)
+                if (max)
                 {
                     builder = builder.MaxProperties(max.Unwrap());
                 }

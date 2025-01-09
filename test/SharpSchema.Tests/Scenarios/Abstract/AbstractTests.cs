@@ -53,7 +53,6 @@ public class AbstractTests(ITestOutputHelper outputHelper)
                 "customerId": {
                   "oneOf": [
                     {
-                      "$comment": "string",
                       "type": "string"
                     },
                     {
@@ -65,7 +64,6 @@ public class AbstractTests(ITestOutputHelper outputHelper)
                 "loyaltyLevel": {
                   "oneOf": [
                     {
-                      "$comment": "string",
                       "type": "string"
                     },
                     {
@@ -75,14 +73,12 @@ public class AbstractTests(ITestOutputHelper outputHelper)
                   "title": "Loyalty Level"
                 },
                 "firstName": {
-                  "$comment": "string",
                   "type": "string",
                   "title": "First Name"
                 },
                 "lastName": {
                   "oneOf": [
                     {
-                      "$comment": "string",
                       "type": "string"
                     },
                     {
@@ -112,24 +108,20 @@ public class AbstractTests(ITestOutputHelper outputHelper)
               "type": "object",
               "properties": {
                 "employeeId": {
-                  "$comment": "string",
                   "type": "string",
                   "title": "Employee Id"
                 },
                 "department": {
-                  "$comment": "string",
                   "type": "string",
                   "title": "Department"
                 },
                 "firstName": {
-                  "$comment": "string",
                   "type": "string",
                   "title": "First Name"
                 },
                 "lastName": {
                   "oneOf": [
                     {
-                      "$comment": "string",
                       "type": "string"
                     },
                     {

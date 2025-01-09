@@ -186,35 +186,26 @@ public static class JsonSchemaBuilderExtensions
             .Type(SchemaValueType.Array)
             .Items(itemSchema);
 
-        Opt<CustomAttributeData> rangeAttributeData = owningProperty
+        Opt<CustomAttributeData> rangeAttribute = owningProperty
             .Select(pi => pi.GetCustomAttributeData<SchemaItemsRangeAttribute>());
 
-        if (rangeAttributeData)
-        {
-            Opt<uint> minItems = rangeAttributeData
-                .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaItemsRangeAttribute.Min)));
+        builder = rangeAttribute
+            .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaItemsRangeAttribute.Min)))
+            .Match(
+                min => builder.MinItems(min),
+                () => builder);
 
-            if (minItems)
-            {
-                builder = builder.MinItems(minItems.Unwrap());
-            }
+        builder = rangeAttribute
+            .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaItemsRangeAttribute.Max)))
+            .Match(
+                max => builder.MaxItems(max),
+                () => builder);
 
-            Opt<uint> maxItems = rangeAttributeData
-                .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaItemsRangeAttribute.Max)));
-
-            if (maxItems)
-            {
-                builder = builder.MaxItems(maxItems.Unwrap());
-            }
-
-            Opt<bool> uniqueItems = rangeAttributeData
-                .Select(cad => cad.GetNamedArgument<bool?>(nameof(SchemaItemsRangeAttribute.UniqueItems)));
-
-            if (uniqueItems)
-            {
-                builder = builder.UniqueItems(uniqueItems.Unwrap());
-            }
-        }
+        builder = rangeAttribute
+            .Select(cad => cad.GetNamedArgument<bool?>(nameof(SchemaItemsRangeAttribute.UniqueItems)))
+            .Match(
+                uniqueItems => builder.UniqueItems(uniqueItems),
+                () => builder);
 
         return builder;
     }
@@ -251,31 +242,25 @@ public static class JsonSchemaBuilderExtensions
         Opt<CustomAttributeData> meta = info.GetCustomAttributeData<SchemaMetaAttribute>();
         Opt<DocComments> docComments = parseDocComments ? info.GetDocComments() : Opt<DocComments>.None;
 
-        Opt<string> title = meta
+        builder = meta
             .Select(cad => cad.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Title)))
-            .OrThen(docComments.Select(info => info.Summary.ParseDocString()));
+            .OrThen(docComments.Select(info => info.Summary.ParseDocString()))
+            .Match(
+                title => builder.Title(title),
+                () => builder);
 
-        if (title)
-        {
-            builder = builder.Title(title.Unwrap());
-        }
-
-        Opt<string> description = meta
+        builder = meta
             .Select(cad => cad.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Description)))
-            .OrThen(docComments.Select(info => info.Remarks.ParseDocString()));
+            .OrThen(docComments.Select(info => info.Remarks.ParseDocString()))
+            .Match(
+                description => builder.Description(description),
+                () => builder);
 
-        if (description)
-        {
-            builder = builder.Description(description.Unwrap());
-        }
-
-        Opt<string> comment = meta
-            .Select(cad => cad.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Comment)));
-
-        if (comment)
-        {
-            builder = builder.Comment(comment.Unwrap());
-        }
+        builder = meta
+            .Select(cad => cad.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Comment)))
+            .Match(
+                comment => builder.Comment(comment),
+                () => builder);
 
         return builder;
     }
@@ -293,49 +278,38 @@ public static class JsonSchemaBuilderExtensions
         {
             // if the property has a value range attribute, set the minimum and maximum values
             Opt<CustomAttributeData> rangeAttribute = property.GetCustomAttributeData<SchemaValueRangeAttribute>();
-            if (rangeAttribute)
-            {
-                Opt<decimal> min = rangeAttribute
-                    .Select(cad => cad.GetNamedArgument<double?>(nameof(SchemaValueRangeAttribute.Min)))
-                    .Select(value => decimal.CreateSaturating(value));
+            builder = rangeAttribute
+                .Select(cad => cad.GetNamedArgument<double?>(nameof(SchemaValueRangeAttribute.Min)))
+                .Match(
+                    min => builder.Minimum(decimal.CreateSaturating(min)),
+                    () => builder);
 
-                if (min)
-                {
-                    builder = builder.Minimum(min.Unwrap());
-                }
-
-                Opt<decimal> max = rangeAttribute
-                    .Select(cad => cad.GetNamedArgument<double?>(nameof(SchemaValueRangeAttribute.Max)))
-                    .Select(value => decimal.CreateSaturating(value));
-
-                if (max)
-                {
-                    builder = builder.Maximum(max.Unwrap());
-                }
-            }
+            builder = rangeAttribute
+                .Select(cad => cad.GetNamedArgument<double?>(nameof(SchemaValueRangeAttribute.Max)))
+                .Match(
+                    max => builder.Maximum(decimal.CreateSaturating(max)),
+                    () => builder);
         }
 
         // if the property is a string
         if (type.Name == typeof(string).Name)
         {
             // if the property has a format attribute, set the format
-            Opt<CustomAttributeData> formatAttribute = property.GetCustomAttributeData<SchemaFormatAttribute>();
-            if (formatAttribute)
-            {
-                Opt<string> format = formatAttribute
-                    .Select(cad => cad.GetConstructorArgument<string>(0));
-                if (format)
-                {
-                    builder = builder.Format(format.Unwrap());
-                }
-            }
+            builder = Opt.From(property.GetCustomAttributeData<SchemaFormatAttribute>())
+                .Select(cad => cad.GetConstructorArgument<string>(0))
+                .Match(
+                    format => builder.Format(format),
+                    () => builder);
 
-            // if the property has a regex attribute, set the pattern
+            // if the property has a regex attribute, set the pattern;
             Opt<CustomAttributeData> regexAttribute = property.GetCustomAttributeData<SchemaRegexAttribute>();
             if (regexAttribute)
             {
                 Opt<bool> applyToPropertyName = regexAttribute.Select(cad => cad.GetNamedArgument<bool>(nameof(SchemaRegexAttribute.ApplyToPropertyName)));
-                bool forPropertyName = applyToPropertyName.IsSome && applyToPropertyName.Unwrap();
+                bool forPropertyName = applyToPropertyName
+                    .Match(
+                        value => value,
+                        () => false);
 
                 if (!forPropertyName)
                 {
@@ -349,20 +323,17 @@ public static class JsonSchemaBuilderExtensions
 
             // if the property has a string length attribute, set the minimum and maximum lengths
             Opt<CustomAttributeData> lengthAttribute = property.GetCustomAttributeData<SchemaLengthRangeAttribute>();
-            if (lengthAttribute)
-            {
-                Opt<uint> min = lengthAttribute.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaLengthRangeAttribute.Min)));
-                if (min)
-                {
-                    builder = builder.MinLength(min.Unwrap());
-                }
+            builder = lengthAttribute
+                .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaLengthRangeAttribute.Min)))
+                .Match(
+                    min => builder.MinLength(min),
+                    () => builder);
 
-                Opt<uint> max = lengthAttribute.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaLengthRangeAttribute.Max)));
-                if (max)
-                {
-                    builder = builder.MaxLength(max.Unwrap());
-                }
-            }
+            builder = lengthAttribute
+                .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaLengthRangeAttribute.Max)))
+                .Match(
+                    max => builder.MaxLength(max),
+                    () => builder);
 
             return builder;
         }
@@ -371,20 +342,17 @@ public static class JsonSchemaBuilderExtensions
         {
             // if the property has a properties range attribute, set the minimum and maximum properties
             Opt<CustomAttributeData> rangeAttribute = property.GetCustomAttributeData<SchemaPropertiesRangeAttribute>();
-            if (rangeAttribute)
-            {
-                Opt<uint> min = rangeAttribute.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Min)));
-                if (min)
-                {
-                    builder = builder.MinProperties(min.Unwrap());
-                }
+            builder = rangeAttribute
+                .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Min)))
+                .Match(
+                    min => builder.MinProperties(min),
+                    () => builder);
 
-                Opt<uint> max = rangeAttribute.Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Max)));
-                if (max)
-                {
-                    builder = builder.MaxProperties(max.Unwrap());
-                }
-            }
+            builder = rangeAttribute
+                .Select(cad => cad.GetNamedArgument<uint?>(nameof(SchemaPropertiesRangeAttribute.Max)))
+                .Match(
+                    max => builder.MaxProperties(max),
+                    () => builder);
         }
 
         return builder;

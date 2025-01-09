@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Reflection;
 using Json.Schema;
 
 namespace SharpSchema;
@@ -11,9 +12,9 @@ namespace SharpSchema;
 public class ConverterContext
 {
     /// <summary>
-    /// Gets the definitions dictionary.
+    /// Gets the root type assembly name.
     /// </summary>
-    public SortedDictionary<string, JsonSchemaBuilder> Defs { get; init; } = [];
+    public required AssemblyName RootTypeAssemblyName { get; init; }
 
     /// <summary>
     /// Gets the maximum depth for schema generation.
@@ -54,4 +55,9 @@ public class ConverterContext
     /// Gets the default namespace for type schema generation.
     /// </summary>
     public string? DefaultNamespace { get; init; }
+
+    /// <summary>
+    /// Gets the definitions dictionary.
+    /// </summary>
+    internal SortedDictionary<string, JsonSchemaBuilder> Defs { get; init; } = [];
 }

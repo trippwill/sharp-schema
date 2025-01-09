@@ -229,7 +229,9 @@ public static class JsonSchemaBuilderExtensions
     /// <returns>The updated JSON schema builder.</returns>
     internal static JsonSchemaBuilder AddTypeAnnotations(this JsonSchemaBuilder builder, ConverterContext context, Type type, bool disallowDocComments)
     {
-        return builder.AddMetaAnnotations(type, !disallowDocComments && context.ParseDocComments);
+        // only parse doc comments for types in the root type assembly
+        bool parseDocComments = !disallowDocComments && context.ParseDocComments && (type.Assembly.GetName().FullName == context.RootTypeAssemblyName.FullName);
+        return builder.AddMetaAnnotations(type, parseDocComments);
     }
 
     /// <summary>

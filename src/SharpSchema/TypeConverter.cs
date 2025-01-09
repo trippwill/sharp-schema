@@ -35,6 +35,7 @@ public class TypeConverter(TypeConverter.Options? options = null)
             ParseDocComments = options.ParseDocComments,
             MaxDepth = options.MaxDepth,
             DefaultNamespace = typeContext.CommonNamespace,
+            RootTypeAssemblyName = typeContext.Type.Assembly.GetName(),
         };
 
         builder = builder.AddType(converterContext, typeContext);

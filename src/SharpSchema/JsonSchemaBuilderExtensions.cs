@@ -240,7 +240,9 @@ public static class JsonSchemaBuilderExtensions
     private static JsonSchemaBuilder AddMetaAnnotations(this JsonSchemaBuilder builder, MemberInfo info, bool parseDocComments)
     {
         Opt<CustomAttributeData> meta = info.GetCustomAttributeData<SchemaMetaAttribute>();
-        Opt<DocComments> docComments = parseDocComments ? info.GetDocComments() : Opt<DocComments>.None;
+        Opt<DocComments> docComments = parseDocComments
+            ? info.GetDocComments()?.Normalize()
+            : Opt<DocComments>.None;
 
         builder = meta
             .Select(cad => cad.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Title)))
@@ -262,6 +264,15 @@ public static class JsonSchemaBuilderExtensions
                 comment => builder.Comment(comment),
                 () => builder);
 
+        builder = docComments
+            .Match(docComments =>
+            {
+                if (docComments.Examples.IsDefaultOrEmpty)
+                    return builder;
+
+                return builder.Examples(docComments.Examples.Select(s => JsonValue.Create(s)));
+            },
+            () => builder);
         return builder;
     }
 

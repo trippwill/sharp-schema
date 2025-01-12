@@ -327,6 +327,7 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         // Assert
         Assert.NotNull(result.GetRef());
     }
+
     [Fact]
     public void AddTypeAnnotations_WithDocComments_ReturnsSchemaWithAnnotations()
     {
@@ -341,6 +342,22 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
 
         // Assert
         Assert.Equal("This is a test of the doc comment loader.", result.GetDescription());
+    }
+
+    [Fact]
+    public void AddPropertyAnnotation_WithComplexComments_Works()
+    {
+        // Arrange
+        var builder = new JsonSchemaBuilder();
+        var context = new ConverterContext { ParseDocComments = true, RootTypeAssemblyName = typeof(PropertyAnnotationTestObject).Assembly.GetName() };
+        System.Reflection.PropertyInfo? property = typeof(PropertyAnnotationTestObject).GetProperty("PropertyWithLotsOfTags");
+        // Act
+        JsonSchema result = builder.AddPropertyInfo(context, property!, out _);
+        this.OutputSchema(result);
+
+        Assert.Contains("This is the first paragraph.", result.GetDescription());
+        Assert.Contains("Gets or sets the property with lots of tags.", result.GetTitle());
+        Assert.NotEmpty(result.GetExamples()!);
     }
 
     [Fact]
@@ -393,6 +410,18 @@ public class JsonSchemaBuilderExtensionsTests(ITestOutputHelper outputHelper) : 
         /// </summary>
         [SchemaRequired, SchemaMeta]
         public string RequiredProperty { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the property with lots of tags.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This is the first paragraph. <br />
+        ///         It <see cref="int"> references a type</see>
+        ///     </para>
+        /// </remarks>
+        /// <example>"propertyWithLotsOfTags" = 76</example>
+        public int PropertyWithLotsOfTags { get; set; }
     }
 
     private class ComplexObject

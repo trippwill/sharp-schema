@@ -1,16 +1,15 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics.CodeAnalysis;
 using SharpSchema.Annotations;
 
 namespace Scenarios.Abstract;
 
-[ExcludeFromCodeCoverage]
-[SchemaMeta(Title = "Person", Description = "A base record representing a person.")]
+/// <summary>Person</summary>
+/// <remarks>A base record representing a person.</remarks>
+[SchemaMeta(Comment = "This is a test class.")]
 internal abstract record Person
 {
-    [SchemaRequired]
     public required string FirstName { get; init; }
 
     [SchemaRequired]

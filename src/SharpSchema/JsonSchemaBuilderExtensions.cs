@@ -241,7 +241,7 @@ public static class JsonSchemaBuilderExtensions
     {
         Opt<CustomAttributeData> meta = info.GetCustomAttributeData<SchemaMetaAttribute>();
         Opt<DocComments> docComments = parseDocComments
-            ? info.GetDocComments()?.Normalize()
+            ? info.GetDocComments()?.NormalizeForSchema()
             : Opt<DocComments>.None;
 
         builder = meta

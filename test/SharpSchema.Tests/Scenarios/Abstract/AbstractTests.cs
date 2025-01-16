@@ -21,7 +21,13 @@ public class AbstractTests(ITestOutputHelper outputHelper)
             CommonNamespace = "Scenarios.Abstract",
         };
 
-        JsonSchema schema = new TypeConverter().Convert(typeContext);
+        TypeConverter.Options options = new()
+        {
+            ParseDocComments = true,
+            MaxDepth = 10,
+        };
+
+        JsonSchema schema = new TypeConverter(options).Convert(typeContext);
         string schemaString = JsonSerializer.Serialize(
             schema.ToJsonDocument().RootElement,
             new JsonSerializerOptions { WriteIndented = true });
@@ -36,6 +42,7 @@ public class AbstractTests(ITestOutputHelper outputHelper)
           "$id": "https://libanvl/test/scenario/abstract",
           "title": "Person",
           "description": "A base record representing a person.",
+          "$comment": "This is a test class.",
           "oneOf": [
             {
               "$ref": "#/$defs/Person_Employee"

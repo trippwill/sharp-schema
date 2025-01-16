@@ -66,6 +66,8 @@ internal class DictionaryTypeHandler : TypeHandler
                 .Type(SchemaValueType.Object)
                 .PropertyNames(keySchema);
 
+        builder = builder.AddTypeAnnotations(context, type, disallowDocComments: false);
+
         return Result.Handled(builder);
     }
 }

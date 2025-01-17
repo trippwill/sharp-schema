@@ -8,7 +8,7 @@ namespace Scenarios.Abstract;
 /// <summary>Person</summary>
 /// <remarks>A base record representing a person.</remarks>
 [SchemaMeta(Comment = "This is a test class.")]
-internal abstract record Person
+public abstract record Person
 {
     public required string FirstName { get; init; }
 

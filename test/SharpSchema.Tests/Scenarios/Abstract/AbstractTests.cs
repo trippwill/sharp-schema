@@ -1,45 +1,19 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Text.Json;
-using Json.More;
-using Json.Schema;
-using SharpSchema;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Scenarios.Abstract;
 
 public class AbstractTests(ITestOutputHelper outputHelper)
+    : ScenarioTestBase<Person>(outputHelper)
 {
-    [Fact]
-    public void Convert_ExpectedSchema()
-    {
-        RootTypeContext typeContext = RootTypeContext.FromType<Person>() with
-        {
-            Id = "https://libanvl/test/scenario/abstract",
-            CommonNamespace = "Scenarios.Abstract",
-        };
+    protected override string CommonNamespace => "Scenarios.Abstract";
 
-        TypeConverter.Options options = new()
-        {
-            ParseDocComments = true,
-            MaxDepth = 10,
-        };
-
-        JsonSchema schema = new TypeConverter(options).Convert(typeContext);
-        string schemaString = JsonSerializer.Serialize(
-            schema.ToJsonDocument().RootElement,
-            new JsonSerializerOptions { WriteIndented = true });
-
-        outputHelper.WriteLine(schemaString);
-        Assert.Equal(ExpectedSchema, schemaString);
-    }
-
-    private const string ExpectedSchema = /*lang=json*/ """
+    protected override string ExpectedSchema => /*lang=json*/ """
         {
           "$schema": "http://json-schema.org/draft-07/schema#",
-          "$id": "https://libanvl/test/scenario/abstract",
+          "$id": "https://libanvl/test/scenario",
           "title": "Person",
           "description": "A base record representing a person.",
           "$comment": "This is a test class.",

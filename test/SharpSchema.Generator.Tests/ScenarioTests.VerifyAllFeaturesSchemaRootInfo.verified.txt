@@ -1,0 +1,335 @@
+﻿{
+  RootType: {
+    Properties: [
+      {
+        MemberType: {
+          Properties: [
+            {
+              MemberType: {
+                Properties: null,
+                TypeSymbol: {},
+                Data: {
+                  Title: Int 32
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: false,
+              PropertySymbol: {},
+              Data: {
+                Title: Length
+              }
+            }
+          ],
+          TypeSymbol: {},
+          Data: {
+            Title: String
+          }
+        },
+        IsRequired: true,
+        IsDeprecated: false,
+        PropertySymbol: {},
+        Data: {
+          Title: Company Name,
+          Description: The name of the company.,
+          Example: Acme Corp
+        }
+      },
+      {
+        MemberType: {
+          Properties: [
+            {
+              MemberType: {
+                Properties: null,
+                TypeSymbol: {},
+                Data: {
+                  Title: Int 32
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: false,
+              PropertySymbol: {},
+              Data: {
+                Title: Capacity
+              }
+            },
+            {
+              MemberType: {
+                Properties: null,
+                TypeSymbol: {},
+                Data: {
+                  Title: Int 32
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: false,
+              PropertySymbol: {},
+              Data: {
+                Title: Count
+              }
+            }
+          ],
+          TypeSymbol: {},
+          Data: {
+            Title: List
+          }
+        },
+        IsRequired: false,
+        IsDeprecated: false,
+        PropertySymbol: {},
+        Data: {
+          Title: Departments,
+          Description: A list of departments in the company.
+        }
+      },
+      {
+        MemberType: {
+          Properties: [
+            {
+              MemberType: {
+                Properties: null,
+                TypeSymbol: {},
+                Data: {
+                  Title: Int 32
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: false,
+              PropertySymbol: {},
+              Data: {
+                Title: Count
+              }
+            },
+            {
+              MemberType: {
+                Properties: [
+                  {
+                    MemberType: {
+                      Properties: null,
+                      TypeSymbol: {},
+                      Data: {
+                        Title: Int 32
+                      }
+                    },
+                    IsRequired: false,
+                    IsDeprecated: false,
+                    PropertySymbol: {},
+                    Data: {
+                      Title: Count
+                    }
+                  }
+                ],
+                TypeSymbol: {},
+                Data: {
+                  Title: Key Collection
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: false,
+              PropertySymbol: {},
+              Data: {
+                Title: Keys
+              }
+            },
+            {
+              MemberType: {
+                Properties: [
+                  {
+                    MemberType: {
+                      Properties: null,
+                      TypeSymbol: {},
+                      Data: {
+                        Title: Int 32
+                      }
+                    },
+                    IsRequired: false,
+                    IsDeprecated: false,
+                    PropertySymbol: {},
+                    Data: {
+                      Title: Count
+                    }
+                  }
+                ],
+                TypeSymbol: {},
+                Data: {
+                  Title: Value Collection
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: false,
+              PropertySymbol: {},
+              Data: {
+                Title: Values
+              }
+            }
+          ],
+          TypeSymbol: {},
+          Data: {
+            Title: Dictionary
+          }
+        },
+        IsRequired: false,
+        IsDeprecated: false,
+        PropertySymbol: {},
+        Data: {
+          Title: Employees,
+          Description: A dictionary of employees by their ID.
+        }
+      },
+      {
+        MemberType: {
+          Properties: [
+            {
+              MemberType: {
+                Properties: [
+                  {
+                    MemberType: {
+                      Properties: null,
+                      TypeSymbol: {},
+                      Data: {
+                        Title: Int 32
+                      }
+                    },
+                    IsRequired: false,
+                    IsDeprecated: false,
+                    PropertySymbol: {},
+                    Data: {
+                      Title: Length
+                    }
+                  }
+                ],
+                TypeSymbol: {},
+                Data: {
+                  Title: String
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: false,
+              PropertySymbol: {},
+              Data: {
+                Title: Street,
+                Description: The street of the address.,
+                Example: 123 Main St
+              }
+            },
+            {
+              MemberType: {
+                Properties: [
+                  {
+                    MemberType: {
+                      Properties: null,
+                      TypeSymbol: {},
+                      Data: {
+                        Title: Int 32
+                      }
+                    },
+                    IsRequired: false,
+                    IsDeprecated: false,
+                    PropertySymbol: {},
+                    Data: {
+                      Title: Length
+                    }
+                  }
+                ],
+                TypeSymbol: {},
+                Data: {
+                  Title: String
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: false,
+              PropertySymbol: {},
+              Data: {
+                Title: City,
+                Description: The city of the address.,
+                Example: Metropolis
+              }
+            },
+            {
+              MemberType: {
+                Properties: [
+                  {
+                    MemberType: {
+                      Properties: null,
+                      TypeSymbol: {},
+                      Data: {
+                        Title: Int 32
+                      }
+                    },
+                    IsRequired: false,
+                    IsDeprecated: false,
+                    PropertySymbol: {},
+                    Data: {
+                      Title: Length
+                    }
+                  }
+                ],
+                TypeSymbol: {},
+                Data: {
+                  Title: String
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: false,
+              PropertySymbol: {},
+              Data: {
+                Title: Postal Code,
+                Description: The postal code of the address.,
+                Example: 12345
+              }
+            },
+            {
+              MemberType: {
+                Properties: [
+                  {
+                    MemberType: {
+                      Properties: null,
+                      TypeSymbol: {},
+                      Data: {
+                        Title: Int 32
+                      }
+                    },
+                    IsRequired: false,
+                    IsDeprecated: false,
+                    PropertySymbol: {},
+                    Data: {
+                      Title: Length
+                    }
+                  }
+                ],
+                TypeSymbol: {},
+                Data: {
+                  Title: String
+                }
+              },
+              IsRequired: false,
+              IsDeprecated: true,
+              PropertySymbol: {},
+              Data: {
+                Title: Zip Code,
+                Deprecated: 
+              }
+            }
+          ],
+          TypeSymbol: {},
+          Data: {
+            Title: Address
+          }
+        },
+        IsRequired: false,
+        IsDeprecated: false,
+        PropertySymbol: {},
+        Data: {
+          Title: Company Address,
+          Description: The address of the company.
+        }
+      }
+    ],
+    TypeSymbol: {},
+    Data: {
+      Title: Company
+    }
+  },
+  Filename: test.schema.json,
+  Id: https://sharpschema/test/company,
+  CommonNamespace: AllFeatures
+}

@@ -1,7 +1,4 @@
-﻿// Copyright (c) Charles Willis. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-using System;
+﻿using System;
 
 #nullable enable
 
@@ -31,4 +28,14 @@ internal class SchemaMetaAttribute : SchemaAttribute
     /// Gets or sets the comment for the schema.
     /// </summary>
     public string? Comment { get; set; }
+
+    /// <summary>
+    /// Gets or sets an example for the schema.
+    /// </summary>
+    public string? Example { get; set; }
+
+    /// <summary>
+    /// Gets or sets the deprecation message for the schema.
+    /// </summary>
+    public string? Deprecated { get; set; }
 }

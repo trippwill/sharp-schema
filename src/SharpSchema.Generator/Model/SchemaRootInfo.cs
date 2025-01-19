@@ -31,7 +31,7 @@ public record SchemaRootInfo(
     {
         private readonly Compilation _compilation = compilation;
         private readonly CancellationToken _cancellationToken = cancellationToken;
-        private readonly SchemaMember.Object.SymbolVisitor _symbolVisitor = new(new());
+        private readonly SchemaMember.Object.SymbolVisitor _symbolVisitor = new(compilation, new());
 
         /// <summary>
         /// Visits a class declaration syntax node.

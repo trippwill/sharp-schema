@@ -1,5 +1,4 @@
 ﻿using SharpSchema.Annotations;
-using System.Text.Json.Serialization;
 
 namespace AllFeatures;
 
@@ -20,7 +19,7 @@ public class Company
     ///     <description>The name of the company.</description>
     ///     <example>Acme Corp</example>
     /// </jsonschema>
-    public required string Name { get; set; }
+    public required string Name { get; set; } = "Contoso";
 
     /// <summary>
     /// The list of departments in the company.
@@ -89,7 +88,7 @@ public class Team
     ///     <description>The name of the team.</description>
     ///     <example>Development Team</example>
     /// </jsonschema>
-    public required string Name { get; set; }
+    public required string Name { get; set; } = "New Team";
 
     /// <summary>
     /// The list of projects the team is working on.
@@ -161,7 +160,7 @@ public class Task
     ///     <description>The estimated hours to complete the task.</description>
     ///     <example>40</example>
     /// </jsonschema>
-    public int EstimatedHours { get; set; }
+    public int EstimatedHours { get; set; } = 40;
 }
 
 /// <summary>

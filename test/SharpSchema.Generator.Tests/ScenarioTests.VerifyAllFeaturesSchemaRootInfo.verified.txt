@@ -1,33 +1,49 @@
 ﻿{
   RootType: {
+    TypeArgumentMembers: null,
     Properties: [
       {
         MemberType: {
+          TypeArgumentMembers: null,
           Properties: [
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: null,
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: Int32
+                },
                 Data: {
                   Title: Int 32
                 }
               },
               IsRequired: false,
               IsDeprecated: false,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: Length
+              },
               Data: {
                 Title: Length
               }
             }
           ],
-          TypeSymbol: {},
+          TypeSymbol: {
+            SymbolKind: NamedType,
+            Name: String
+          },
           Data: {
             Title: String
           }
         },
         IsRequired: true,
         IsDeprecated: false,
-        PropertySymbol: {},
+        DefaultValueSyntax: "Contoso",
+        PropertySymbol: {
+          SymbolKind: Property,
+          Name: Name
+        },
         Data: {
           Title: Company Name,
           Description: The name of the company.,
@@ -36,46 +52,584 @@
       },
       {
         MemberType: {
+          TypeArgumentMembers: [
+            {
+              TypeArgumentMembers: null,
+              Properties: [
+                {
+                  MemberType: {
+                    TypeArgumentMembers: null,
+                    Properties: [
+                      {
+                        MemberType: {
+                          TypeArgumentMembers: null,
+                          Properties: null,
+                          TypeSymbol: {
+                            SymbolKind: NamedType,
+                            Name: Int32
+                          },
+                          Data: {
+                            Title: Int 32
+                          }
+                        },
+                        IsRequired: false,
+                        IsDeprecated: false,
+                        PropertySymbol: {
+                          SymbolKind: Property,
+                          Name: Length
+                        },
+                        Data: {
+                          Title: Length
+                        }
+                      }
+                    ],
+                    TypeSymbol: {
+                      SymbolKind: NamedType,
+                      Name: String
+                    },
+                    Data: {
+                      Title: String
+                    }
+                  },
+                  IsRequired: false,
+                  IsDeprecated: false,
+                  PropertySymbol: {
+                    SymbolKind: Property,
+                    Name: Name
+                  },
+                  Data: {
+                    Title: Department Name,
+                    Description: The name of the department.,
+                    Example: Human Resources
+                  }
+                },
+                {
+                  MemberType: {
+                    TypeArgumentMembers: [
+                      {
+                        TypeArgumentMembers: null,
+                        Properties: [
+                          {
+                            MemberType: {
+                              TypeArgumentMembers: null,
+                              Properties: [
+                                {
+                                  MemberType: {
+                                    TypeArgumentMembers: null,
+                                    Properties: null,
+                                    TypeSymbol: {
+                                      SymbolKind: NamedType,
+                                      Name: Int32
+                                    },
+                                    Data: {
+                                      Title: Int 32
+                                    }
+                                  },
+                                  IsRequired: false,
+                                  IsDeprecated: false,
+                                  PropertySymbol: {
+                                    SymbolKind: Property,
+                                    Name: Length
+                                  },
+                                  Data: {
+                                    Title: Length
+                                  }
+                                }
+                              ],
+                              TypeSymbol: {
+                                SymbolKind: NamedType,
+                                Name: String
+                              },
+                              Data: {
+                                Title: String
+                              }
+                            },
+                            IsRequired: true,
+                            IsDeprecated: false,
+                            DefaultValueSyntax: "New Team",
+                            PropertySymbol: {
+                              SymbolKind: Property,
+                              Name: Name
+                            },
+                            Data: {
+                              Title: Team Name,
+                              Description: The name of the team.,
+                              Example: Development Team
+                            }
+                          },
+                          {
+                            MemberType: {
+                              TypeArgumentMembers: [
+                                {
+                                  TypeArgumentMembers: null,
+                                  Properties: [
+                                    {
+                                      MemberType: {
+                                        TypeArgumentMembers: null,
+                                        Properties: [
+                                          {
+                                            MemberType: {
+                                              TypeArgumentMembers: null,
+                                              Properties: null,
+                                              TypeSymbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Int32
+                                              },
+                                              Data: {
+                                                Title: Int 32
+                                              }
+                                            },
+                                            IsRequired: false,
+                                            IsDeprecated: false,
+                                            PropertySymbol: {
+                                              SymbolKind: Property,
+                                              Name: Length
+                                            },
+                                            Data: {
+                                              Title: Length
+                                            }
+                                          }
+                                        ],
+                                        TypeSymbol: {
+                                          SymbolKind: NamedType,
+                                          Name: String
+                                        },
+                                        Data: {
+                                          Title: String
+                                        }
+                                      },
+                                      IsRequired: false,
+                                      IsDeprecated: false,
+                                      PropertySymbol: {
+                                        SymbolKind: Property,
+                                        Name: Name
+                                      },
+                                      Data: {
+                                        Title: Project Name,
+                                        Description: The name of the project.,
+                                        Example: Project X
+                                      }
+                                    },
+                                    {
+                                      MemberType: {
+                                        TypeArgumentMembers: null,
+                                        Properties: [
+                                          {
+                                            MemberType: {
+                                              TypeArgumentMembers: null,
+                                              Properties: null,
+                                              TypeSymbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Byte
+                                              },
+                                              Data: {
+                                                Title: Byte
+                                              }
+                                            },
+                                            IsRequired: false,
+                                            IsDeprecated: false,
+                                            PropertySymbol: {
+                                              SymbolKind: Property,
+                                              Name: Scale
+                                            },
+                                            Data: {
+                                              Title: Scale
+                                            }
+                                          }
+                                        ],
+                                        TypeSymbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Decimal
+                                        },
+                                        Data: {
+                                          Title: Decimal
+                                        }
+                                      },
+                                      IsRequired: false,
+                                      IsDeprecated: false,
+                                      PropertySymbol: {
+                                        SymbolKind: Property,
+                                        Name: Budget
+                                      },
+                                      Data: {
+                                        Title: Project Budget,
+                                        Description: The budget of the project.,
+                                        Example: 100000
+                                      }
+                                    },
+                                    {
+                                      MemberType: {
+                                        TypeArgumentMembers: [
+                                          {
+                                            TypeArgumentMembers: null,
+                                            Properties: [
+                                              {
+                                                MemberType: {
+                                                  TypeArgumentMembers: null,
+                                                  Properties: [
+                                                    {
+                                                      MemberType: {
+                                                        TypeArgumentMembers: null,
+                                                        Properties: null,
+                                                        TypeSymbol: {
+                                                          SymbolKind: NamedType,
+                                                          Name: Int32
+                                                        },
+                                                        Data: {
+                                                          Title: Int 32
+                                                        }
+                                                      },
+                                                      IsRequired: false,
+                                                      IsDeprecated: false,
+                                                      PropertySymbol: {
+                                                        SymbolKind: Property,
+                                                        Name: Length
+                                                      },
+                                                      Data: {
+                                                        Title: Length
+                                                      }
+                                                    }
+                                                  ],
+                                                  TypeSymbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: String
+                                                  },
+                                                  Data: {
+                                                    Title: String
+                                                  }
+                                                },
+                                                IsRequired: false,
+                                                IsDeprecated: false,
+                                                PropertySymbol: {
+                                                  SymbolKind: Property,
+                                                  Name: Name
+                                                },
+                                                Data: {
+                                                  Title: Task Name,
+                                                  Description: The name of the task.,
+                                                  Example: Design Database
+                                                }
+                                              },
+                                              {
+                                                MemberType: {
+                                                  TypeArgumentMembers: null,
+                                                  Properties: null,
+                                                  TypeSymbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: Int32
+                                                  },
+                                                  Data: {
+                                                    Title: Int 32
+                                                  }
+                                                },
+                                                IsRequired: false,
+                                                IsDeprecated: false,
+                                                DefaultValueSyntax: 40,
+                                                PropertySymbol: {
+                                                  SymbolKind: Property,
+                                                  Name: EstimatedHours
+                                                },
+                                                Data: {
+                                                  Title: Estimated Hours,
+                                                  Description: The estimated hours to complete the task.,
+                                                  Example: 40
+                                                }
+                                              }
+                                            ],
+                                            TypeSymbol: {
+                                              SymbolKind: NamedType,
+                                              Name: Task
+                                            },
+                                            Data: {
+                                              Title: Task
+                                            }
+                                          }
+                                        ],
+                                        Properties: [
+                                          {
+                                            MemberType: {
+                                              TypeArgumentMembers: null,
+                                              Properties: null,
+                                              TypeSymbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Int32
+                                              },
+                                              Data: {
+                                                Title: Int 32
+                                              }
+                                            },
+                                            IsRequired: false,
+                                            IsDeprecated: false,
+                                            PropertySymbol: {
+                                              SymbolKind: Property,
+                                              Name: Capacity
+                                            },
+                                            Data: {
+                                              Title: Capacity
+                                            }
+                                          },
+                                          {
+                                            MemberType: {
+                                              TypeArgumentMembers: null,
+                                              Properties: null,
+                                              TypeSymbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Int32
+                                              },
+                                              Data: {
+                                                Title: Int 32
+                                              }
+                                            },
+                                            IsRequired: false,
+                                            IsDeprecated: false,
+                                            PropertySymbol: {
+                                              SymbolKind: Property,
+                                              Name: Count
+                                            },
+                                            Data: {
+                                              Title: Count
+                                            }
+                                          }
+                                        ],
+                                        TypeSymbol: {
+                                          SymbolKind: NamedType,
+                                          Name: List
+                                        },
+                                        Data: {
+                                          Title: List
+                                        }
+                                      },
+                                      IsRequired: true,
+                                      IsDeprecated: false,
+                                      PropertySymbol: {
+                                        SymbolKind: Property,
+                                        Name: Tasks
+                                      },
+                                      Data: {
+                                        Title: Tasks,
+                                        Description: A list of tasks in the project.
+                                      }
+                                    }
+                                  ],
+                                  TypeSymbol: {
+                                    SymbolKind: NamedType,
+                                    Name: Project
+                                  },
+                                  Data: {
+                                    Title: Project
+                                  }
+                                }
+                              ],
+                              Properties: [
+                                {
+                                  MemberType: {
+                                    TypeArgumentMembers: null,
+                                    Properties: null,
+                                    TypeSymbol: {
+                                      SymbolKind: NamedType,
+                                      Name: Int32
+                                    },
+                                    Data: {
+                                      Title: Int 32
+                                    }
+                                  },
+                                  IsRequired: false,
+                                  IsDeprecated: false,
+                                  PropertySymbol: {
+                                    SymbolKind: Property,
+                                    Name: Capacity
+                                  },
+                                  Data: {
+                                    Title: Capacity
+                                  }
+                                },
+                                {
+                                  MemberType: {
+                                    TypeArgumentMembers: null,
+                                    Properties: null,
+                                    TypeSymbol: {
+                                      SymbolKind: NamedType,
+                                      Name: Int32
+                                    },
+                                    Data: {
+                                      Title: Int 32
+                                    }
+                                  },
+                                  IsRequired: false,
+                                  IsDeprecated: false,
+                                  PropertySymbol: {
+                                    SymbolKind: Property,
+                                    Name: Count
+                                  },
+                                  Data: {
+                                    Title: Count
+                                  }
+                                }
+                              ],
+                              TypeSymbol: {
+                                SymbolKind: NamedType,
+                                Name: List
+                              },
+                              Data: {
+                                Title: List
+                              }
+                            },
+                            IsRequired: false,
+                            IsDeprecated: false,
+                            PropertySymbol: {
+                              SymbolKind: Property,
+                              Name: Projects
+                            },
+                            Data: {
+                              Title: Projects,
+                              Description: A list of projects the team is working on.
+                            }
+                          }
+                        ],
+                        TypeSymbol: {
+                          SymbolKind: NamedType,
+                          Name: Team
+                        },
+                        Data: {
+                          Title: Team
+                        }
+                      }
+                    ],
+                    Properties: [
+                      {
+                        MemberType: {
+                          TypeArgumentMembers: null,
+                          Properties: null,
+                          TypeSymbol: {
+                            SymbolKind: NamedType,
+                            Name: Int32
+                          },
+                          Data: {
+                            Title: Int 32
+                          }
+                        },
+                        IsRequired: false,
+                        IsDeprecated: false,
+                        PropertySymbol: {
+                          SymbolKind: Property,
+                          Name: Capacity
+                        },
+                        Data: {
+                          Title: Capacity
+                        }
+                      },
+                      {
+                        MemberType: {
+                          TypeArgumentMembers: null,
+                          Properties: null,
+                          TypeSymbol: {
+                            SymbolKind: NamedType,
+                            Name: Int32
+                          },
+                          Data: {
+                            Title: Int 32
+                          }
+                        },
+                        IsRequired: false,
+                        IsDeprecated: false,
+                        PropertySymbol: {
+                          SymbolKind: Property,
+                          Name: Count
+                        },
+                        Data: {
+                          Title: Count
+                        }
+                      }
+                    ],
+                    TypeSymbol: {
+                      SymbolKind: NamedType,
+                      Name: List
+                    },
+                    Data: {
+                      Title: List
+                    }
+                  },
+                  IsRequired: true,
+                  IsDeprecated: false,
+                  PropertySymbol: {
+                    SymbolKind: Property,
+                    Name: Teams
+                  },
+                  Data: {
+                    Title: Teams,
+                    Description: A list of teams in the department.
+                  }
+                }
+              ],
+              TypeSymbol: {
+                SymbolKind: NamedType,
+                Name: Department
+              },
+              Data: {
+                Title: Department
+              }
+            }
+          ],
           Properties: [
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: null,
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: Int32
+                },
                 Data: {
                   Title: Int 32
                 }
               },
               IsRequired: false,
               IsDeprecated: false,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: Capacity
+              },
               Data: {
                 Title: Capacity
               }
             },
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: null,
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: Int32
+                },
                 Data: {
                   Title: Int 32
                 }
               },
               IsRequired: false,
               IsDeprecated: false,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: Count
+              },
               Data: {
                 Title: Count
               }
             }
           ],
-          TypeSymbol: {},
+          TypeSymbol: {
+            SymbolKind: NamedType,
+            Name: List
+          },
           Data: {
             Title: List
           }
         },
         IsRequired: false,
         IsDeprecated: false,
-        PropertySymbol: {},
+        PropertySymbol: {
+          SymbolKind: Property,
+          Name: Departments
+        },
         Data: {
           Title: Departments,
           Description: A list of departments in the company.
@@ -83,93 +637,487 @@
       },
       {
         MemberType: {
+          TypeArgumentMembers: [
+            {
+              TypeArgumentMembers: null,
+              Properties: [
+                {
+                  MemberType: {
+                    TypeArgumentMembers: null,
+                    Properties: null,
+                    TypeSymbol: {
+                      SymbolKind: NamedType,
+                      Name: Int32
+                    },
+                    Data: {
+                      Title: Int 32
+                    }
+                  },
+                  IsRequired: false,
+                  IsDeprecated: false,
+                  PropertySymbol: {
+                    SymbolKind: Property,
+                    Name: Length
+                  },
+                  Data: {
+                    Title: Length
+                  }
+                }
+              ],
+              TypeSymbol: {
+                SymbolKind: NamedType,
+                Name: String
+              },
+              Data: {
+                Title: String
+              }
+            },
+            {
+              TypeArgumentMembers: null,
+              Properties: [
+                {
+                  MemberType: {
+                    TypeArgumentMembers: null,
+                    Properties: [
+                      {
+                        MemberType: {
+                          TypeArgumentMembers: null,
+                          Properties: null,
+                          TypeSymbol: {
+                            SymbolKind: NamedType,
+                            Name: Int32
+                          },
+                          Data: {
+                            Title: Int 32
+                          }
+                        },
+                        IsRequired: false,
+                        IsDeprecated: false,
+                        PropertySymbol: {
+                          SymbolKind: Property,
+                          Name: Length
+                        },
+                        Data: {
+                          Title: Length
+                        }
+                      }
+                    ],
+                    TypeSymbol: {
+                      SymbolKind: NamedType,
+                      Name: String
+                    },
+                    Data: {
+                      Title: String
+                    }
+                  },
+                  IsRequired: true,
+                  IsDeprecated: false,
+                  PropertySymbol: {
+                    SymbolKind: Property,
+                    Name: Name
+                  },
+                  Data: {
+                    Title: Employee Name,
+                    Description: The name of the employee.,
+                    Example: John Doe
+                  }
+                },
+                {
+                  MemberType: {
+                    TypeArgumentMembers: null,
+                    Properties: [
+                      {
+                        MemberType: {
+                          TypeArgumentMembers: null,
+                          Properties: null,
+                          TypeSymbol: {
+                            SymbolKind: NamedType,
+                            Name: Int32
+                          },
+                          Data: {
+                            Title: Int 32
+                          }
+                        },
+                        IsRequired: false,
+                        IsDeprecated: false,
+                        PropertySymbol: {
+                          SymbolKind: Property,
+                          Name: Length
+                        },
+                        Data: {
+                          Title: Length
+                        }
+                      }
+                    ],
+                    TypeSymbol: {
+                      SymbolKind: NamedType,
+                      Name: String
+                    },
+                    Data: {
+                      Title: String
+                    }
+                  },
+                  IsRequired: false,
+                  IsDeprecated: false,
+                  PropertySymbol: {
+                    SymbolKind: Property,
+                    Name: Position
+                  },
+                  Data: {
+                    Title: Position,
+                    Description: The position of the employee.,
+                    Example: Software Engineer
+                  }
+                },
+                {
+                  MemberType: {
+                    TypeArgumentMembers: null,
+                    Properties: [
+                      {
+                        MemberType: {
+                          TypeArgumentMembers: null,
+                          Properties: [
+                            {
+                              MemberType: {
+                                TypeArgumentMembers: null,
+                                Properties: null,
+                                TypeSymbol: {
+                                  SymbolKind: NamedType,
+                                  Name: Int32
+                                },
+                                Data: {
+                                  Title: Int 32
+                                }
+                              },
+                              IsRequired: false,
+                              IsDeprecated: false,
+                              PropertySymbol: {
+                                SymbolKind: Property,
+                                Name: Length
+                              },
+                              Data: {
+                                Title: Length
+                              }
+                            }
+                          ],
+                          TypeSymbol: {
+                            SymbolKind: NamedType,
+                            Name: String
+                          },
+                          Data: {
+                            Title: String
+                          }
+                        },
+                        IsRequired: false,
+                        IsDeprecated: false,
+                        PropertySymbol: {
+                          SymbolKind: Property,
+                          Name: Street
+                        },
+                        Data: {
+                          Title: Street,
+                          Description: The street of the address.,
+                          Example: 123 Main St
+                        }
+                      },
+                      {
+                        MemberType: {
+                          TypeArgumentMembers: null,
+                          Properties: [
+                            {
+                              MemberType: {
+                                TypeArgumentMembers: null,
+                                Properties: null,
+                                TypeSymbol: {
+                                  SymbolKind: NamedType,
+                                  Name: Int32
+                                },
+                                Data: {
+                                  Title: Int 32
+                                }
+                              },
+                              IsRequired: false,
+                              IsDeprecated: false,
+                              PropertySymbol: {
+                                SymbolKind: Property,
+                                Name: Length
+                              },
+                              Data: {
+                                Title: Length
+                              }
+                            }
+                          ],
+                          TypeSymbol: {
+                            SymbolKind: NamedType,
+                            Name: String
+                          },
+                          Data: {
+                            Title: String
+                          }
+                        },
+                        IsRequired: false,
+                        IsDeprecated: false,
+                        PropertySymbol: {
+                          SymbolKind: Property,
+                          Name: City
+                        },
+                        Data: {
+                          Title: City,
+                          Description: The city of the address.,
+                          Example: Metropolis
+                        }
+                      },
+                      {
+                        MemberType: {
+                          TypeArgumentMembers: null,
+                          Properties: [
+                            {
+                              MemberType: {
+                                TypeArgumentMembers: null,
+                                Properties: null,
+                                TypeSymbol: {
+                                  SymbolKind: NamedType,
+                                  Name: Int32
+                                },
+                                Data: {
+                                  Title: Int 32
+                                }
+                              },
+                              IsRequired: false,
+                              IsDeprecated: false,
+                              PropertySymbol: {
+                                SymbolKind: Property,
+                                Name: Length
+                              },
+                              Data: {
+                                Title: Length
+                              }
+                            }
+                          ],
+                          TypeSymbol: {
+                            SymbolKind: NamedType,
+                            Name: String
+                          },
+                          Data: {
+                            Title: String
+                          }
+                        },
+                        IsRequired: false,
+                        IsDeprecated: false,
+                        PropertySymbol: {
+                          SymbolKind: Property,
+                          Name: PostalCode
+                        },
+                        Data: {
+                          Title: Postal Code,
+                          Description: The postal code of the address.,
+                          Example: 12345
+                        }
+                      },
+                      {
+                        MemberType: {
+                          TypeArgumentMembers: null,
+                          Properties: [
+                            {
+                              MemberType: {
+                                TypeArgumentMembers: null,
+                                Properties: null,
+                                TypeSymbol: {
+                                  SymbolKind: NamedType,
+                                  Name: Int32
+                                },
+                                Data: {
+                                  Title: Int 32
+                                }
+                              },
+                              IsRequired: false,
+                              IsDeprecated: false,
+                              PropertySymbol: {
+                                SymbolKind: Property,
+                                Name: Length
+                              },
+                              Data: {
+                                Title: Length
+                              }
+                            }
+                          ],
+                          TypeSymbol: {
+                            SymbolKind: NamedType,
+                            Name: String
+                          },
+                          Data: {
+                            Title: String
+                          }
+                        },
+                        IsRequired: false,
+                        IsDeprecated: true,
+                        PropertySymbol: {
+                          SymbolKind: Property,
+                          Name: ZipCode
+                        },
+                        Data: {
+                          Title: Zip Code,
+                          Deprecated: 
+                        }
+                      }
+                    ],
+                    TypeSymbol: {
+                      SymbolKind: NamedType,
+                      Name: Address
+                    },
+                    Data: {
+                      Title: Address
+                    }
+                  },
+                  IsRequired: false,
+                  IsDeprecated: false,
+                  PropertySymbol: {
+                    SymbolKind: Property,
+                    Name: EmployeeAddress
+                  },
+                  Data: {
+                    Title: Employee Address,
+                    Description: The address of the employee.
+                  }
+                }
+              ],
+              TypeSymbol: {
+                SymbolKind: NamedType,
+                Name: Employee
+              },
+              Data: {
+                Title: Employee
+              }
+            }
+          ],
           Properties: [
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: null,
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: Int32
+                },
                 Data: {
                   Title: Int 32
                 }
               },
               IsRequired: false,
               IsDeprecated: false,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: Count
+              },
               Data: {
                 Title: Count
               }
             },
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: [
                   {
                     MemberType: {
+                      TypeArgumentMembers: null,
                       Properties: null,
-                      TypeSymbol: {},
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: Int32
+                      },
                       Data: {
                         Title: Int 32
                       }
                     },
                     IsRequired: false,
                     IsDeprecated: false,
-                    PropertySymbol: {},
+                    PropertySymbol: {
+                      SymbolKind: Property,
+                      Name: Count
+                    },
                     Data: {
                       Title: Count
                     }
                   }
                 ],
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: KeyCollection
+                },
                 Data: {
                   Title: Key Collection
                 }
               },
               IsRequired: false,
               IsDeprecated: false,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: Keys
+              },
               Data: {
                 Title: Keys
               }
             },
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: [
                   {
                     MemberType: {
+                      TypeArgumentMembers: null,
                       Properties: null,
-                      TypeSymbol: {},
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: Int32
+                      },
                       Data: {
                         Title: Int 32
                       }
                     },
                     IsRequired: false,
                     IsDeprecated: false,
-                    PropertySymbol: {},
+                    PropertySymbol: {
+                      SymbolKind: Property,
+                      Name: Count
+                    },
                     Data: {
                       Title: Count
                     }
                   }
                 ],
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: ValueCollection
+                },
                 Data: {
                   Title: Value Collection
                 }
               },
               IsRequired: false,
               IsDeprecated: false,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: Values
+              },
               Data: {
                 Title: Values
               }
             }
           ],
-          TypeSymbol: {},
+          TypeSymbol: {
+            SymbolKind: NamedType,
+            Name: Dictionary
+          },
           Data: {
             Title: Dictionary
           }
         },
         IsRequired: false,
         IsDeprecated: false,
-        PropertySymbol: {},
+        PropertySymbol: {
+          SymbolKind: Property,
+          Name: Employees
+        },
         Data: {
           Title: Employees,
           Description: A dictionary of employees by their ID.
@@ -177,34 +1125,49 @@
       },
       {
         MemberType: {
+          TypeArgumentMembers: null,
           Properties: [
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: [
                   {
                     MemberType: {
+                      TypeArgumentMembers: null,
                       Properties: null,
-                      TypeSymbol: {},
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: Int32
+                      },
                       Data: {
                         Title: Int 32
                       }
                     },
                     IsRequired: false,
                     IsDeprecated: false,
-                    PropertySymbol: {},
+                    PropertySymbol: {
+                      SymbolKind: Property,
+                      Name: Length
+                    },
                     Data: {
                       Title: Length
                     }
                   }
                 ],
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                },
                 Data: {
                   Title: String
                 }
               },
               IsRequired: false,
               IsDeprecated: false,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: Street
+              },
               Data: {
                 Title: Street,
                 Description: The street of the address.,
@@ -213,31 +1176,45 @@
             },
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: [
                   {
                     MemberType: {
+                      TypeArgumentMembers: null,
                       Properties: null,
-                      TypeSymbol: {},
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: Int32
+                      },
                       Data: {
                         Title: Int 32
                       }
                     },
                     IsRequired: false,
                     IsDeprecated: false,
-                    PropertySymbol: {},
+                    PropertySymbol: {
+                      SymbolKind: Property,
+                      Name: Length
+                    },
                     Data: {
                       Title: Length
                     }
                   }
                 ],
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                },
                 Data: {
                   Title: String
                 }
               },
               IsRequired: false,
               IsDeprecated: false,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: City
+              },
               Data: {
                 Title: City,
                 Description: The city of the address.,
@@ -246,31 +1223,45 @@
             },
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: [
                   {
                     MemberType: {
+                      TypeArgumentMembers: null,
                       Properties: null,
-                      TypeSymbol: {},
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: Int32
+                      },
                       Data: {
                         Title: Int 32
                       }
                     },
                     IsRequired: false,
                     IsDeprecated: false,
-                    PropertySymbol: {},
+                    PropertySymbol: {
+                      SymbolKind: Property,
+                      Name: Length
+                    },
                     Data: {
                       Title: Length
                     }
                   }
                 ],
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                },
                 Data: {
                   Title: String
                 }
               },
               IsRequired: false,
               IsDeprecated: false,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: PostalCode
+              },
               Data: {
                 Title: Postal Code,
                 Description: The postal code of the address.,
@@ -279,52 +1270,75 @@
             },
             {
               MemberType: {
+                TypeArgumentMembers: null,
                 Properties: [
                   {
                     MemberType: {
+                      TypeArgumentMembers: null,
                       Properties: null,
-                      TypeSymbol: {},
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: Int32
+                      },
                       Data: {
                         Title: Int 32
                       }
                     },
                     IsRequired: false,
                     IsDeprecated: false,
-                    PropertySymbol: {},
+                    PropertySymbol: {
+                      SymbolKind: Property,
+                      Name: Length
+                    },
                     Data: {
                       Title: Length
                     }
                   }
                 ],
-                TypeSymbol: {},
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                },
                 Data: {
                   Title: String
                 }
               },
               IsRequired: false,
               IsDeprecated: true,
-              PropertySymbol: {},
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: ZipCode
+              },
               Data: {
                 Title: Zip Code,
                 Deprecated: 
               }
             }
           ],
-          TypeSymbol: {},
+          TypeSymbol: {
+            SymbolKind: NamedType,
+            Name: Address
+          },
           Data: {
             Title: Address
           }
         },
         IsRequired: false,
         IsDeprecated: false,
-        PropertySymbol: {},
+        PropertySymbol: {
+          SymbolKind: Property,
+          Name: CompanyAddress
+        },
         Data: {
           Title: Company Address,
           Description: The address of the company.
         }
       }
     ],
-    TypeSymbol: {},
+    TypeSymbol: {
+      SymbolKind: NamedType,
+      Name: Company
+    },
     Data: {
       Title: Company
     }

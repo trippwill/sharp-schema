@@ -29,7 +29,7 @@ public class SchemaRootInfoGenerator
         var bag = new ConcurrentBag<SchemaRootInfo>();
         var tasks = workspace.CurrentSolution.Projects.Select(async project =>
         {
-            await foreach (SchemaRootInfo rootInfo in this.FindSchemaRootTypesAsync(project, cancellationToken))
+            await foreach (SchemaRootInfo rootInfo in this.FindSchemaRootTypesAsync(project, cancellationToken).WithCancellation(cancellationToken))
             {
                 bag.Add(rootInfo);
             }
@@ -37,7 +37,7 @@ public class SchemaRootInfoGenerator
 
         await Task.WhenAll(tasks);
 
-        return bag;
+        return bag.ToArray();
     }
 
     /// <summary>
@@ -55,13 +55,12 @@ public class SchemaRootInfoGenerator
         Compilation? compilation = await project.GetCompilationAsync(cancellationToken);
         if (compilation is null) yield break;
 
-
         SchemaRootInfo.SyntaxVisitor rootInfoVisitor = new(compilation, cancellationToken);
         CompilationUnitVisitor compilationUnitVisitor = new(rootInfoVisitor, cancellationToken);
         foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
         {
             SyntaxNode root = await syntaxTree.GetRootAsync(cancellationToken);
-            foreach (SchemaRootInfo rootInfo in compilationUnitVisitor.Visit(root) ?? Array.Empty<SchemaRootInfo>())
+            foreach (SchemaRootInfo rootInfo in compilationUnitVisitor.Visit(root) ?? [])
             {
                 yield return rootInfo;
             }
@@ -78,100 +77,50 @@ public class SchemaRootInfoGenerator
         {
             foreach (MemberDeclarationSyntax member in node.Members)
             {
-                switch (member)
+                foreach (SchemaRootInfo rootInfo in this.HandleMemberDeclaration(member) ?? [])
                 {
-                    case ClassDeclarationSyntax classDeclaration:
-                        {
-                            if (classDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
-                            {
-                                yield return info;
-                            }
-                            break;
-                        }
-                    case StructDeclarationSyntax structDeclaration:
-                        {
-                            if (structDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
-                            {
-                                yield return info;
-                            }
-                            break;
-                        }
-                    case NamespaceDeclarationSyntax namespaceDeclaration:
-                        foreach (SchemaRootInfo rootInfo in this.VisitNamespaceDeclaration(namespaceDeclaration) ?? [])
-                        {
-                            _cancellationToken.ThrowIfCancellationRequested();
-                            yield return rootInfo;
-                        }
-                        break;
-                    case FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclaration:
-                        foreach (SchemaRootInfo rootInfo in this.VisitFileScopedNamespaceDeclaration(fileScopedNamespaceDeclaration) ?? [])
-                        {
-                            _cancellationToken.ThrowIfCancellationRequested();
-                            yield return rootInfo;
-                        }
-                        break;
+                    _cancellationToken.ThrowIfCancellationRequested();
+                    yield return rootInfo;
                 }
             }
         }
 
-        public override IEnumerable<SchemaRootInfo>? VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
+        private IEnumerable<SchemaRootInfo> HandleMemberDeclaration(MemberDeclarationSyntax member)
         {
-            foreach (MemberDeclarationSyntax member in node.Members)
+            switch (member)
             {
-                switch (member)
-                {
-                    case ClassDeclarationSyntax classDeclaration:
-                        {
-                            if (classDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
-                            {
-                                yield return info;
-                            }
-                            break;
-                        }
-                    case StructDeclarationSyntax structDeclaration:
-                        {
-                            if (structDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
-                            {
-                                yield return info;
-                            }
-                            break;
-                        }
-                    case NamespaceDeclarationSyntax namespaceDeclaration:
-                        foreach (SchemaRootInfo rootInfo in this.VisitNamespaceDeclaration(namespaceDeclaration) ?? [])
+                case ClassDeclarationSyntax classDeclaration:
+                    {
+                        if (classDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
+                            yield return info;
+                        break;
+                    }
+                case StructDeclarationSyntax structDeclaration:
+                    {
+                        if (structDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
+                            yield return info;
+                        break;
+                    }
+                case NamespaceDeclarationSyntax namespaceDeclaration:
+                    foreach (MemberDeclarationSyntax nestedMember in namespaceDeclaration.Members)
+                    {
+                        foreach (SchemaRootInfo rootInfo in this.HandleMemberDeclaration(nestedMember) ?? Array.Empty<SchemaRootInfo>())
                         {
                             _cancellationToken.ThrowIfCancellationRequested();
                             yield return rootInfo;
                         }
-                        break;
-                }
-            }
-        }
-
-        public override IEnumerable<SchemaRootInfo>? VisitFileScopedNamespaceDeclaration(FileScopedNamespaceDeclarationSyntax node)
-        {
-            foreach (MemberDeclarationSyntax member in node.Members)
-            {
-                switch (member)
-                {
-                    case ClassDeclarationSyntax classDeclaration:
+                    }
+                    break;
+                case FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclaration:
+                    foreach (MemberDeclarationSyntax nestedMember in fileScopedNamespaceDeclaration.Members)
+                    {
+                        foreach (SchemaRootInfo rootInfo in this.HandleMemberDeclaration(nestedMember) ?? Array.Empty<SchemaRootInfo>())
                         {
-                            if (classDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
-                            {
-                                yield return info;
-                            }
-                            break;
+                            _cancellationToken.ThrowIfCancellationRequested();
+                            yield return rootInfo;
                         }
-                    case StructDeclarationSyntax structDeclaration:
-                        {
-                            if (structDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
-                            {
-                                yield return info;
-                            }
-                            break;
-                        }
-                    case NamespaceDeclarationSyntax namespaceDeclaration:
-                        throw new Exception("File scoped namespace declaration cannot contain nested namespaces.");
-                }
+                    }
+                    break;
             }
         }
     }

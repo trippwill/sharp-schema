@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
-using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpSchema.Annotations;
 
 namespace SharpSchema.Generator.Model;
@@ -19,6 +19,7 @@ public abstract record SchemaMember(SchemaMemberData? Data, string? Override)
         public record DataObject(
             INamedTypeSymbol TypeSymbol,
             SchemaMemberData Data,
+            ImmutableArray<Object> TypeArgumentMembers,
             ImmutableArray<Property> Properties)
             : Object(TypeSymbol, Data, Override: null);
 
@@ -26,11 +27,14 @@ public abstract record SchemaMember(SchemaMemberData? Data, string? Override)
         {
             private readonly Property.SymbolVisitor _propertyVisitor;
 
-            public SymbolVisitor(SchemaMemberData.SymbolVisitor dataVisitor)
+            public SymbolVisitor(Compilation compilation, SchemaMemberData.SymbolVisitor dataVisitor)
             {
                 _propertyVisitor = new(this);
+                this.Compilation = compilation;
                 this.DataVisitor = dataVisitor;
             }
+
+            internal Compilation Compilation { get; }
 
             internal SchemaMemberData.SymbolVisitor DataVisitor { get; }
 
@@ -53,6 +57,12 @@ public abstract record SchemaMember(SchemaMemberData? Data, string? Override)
                 if (symbol.IsIgnoredForGeneration())
                     return null;
 
+                ImmutableArray<Object> typeArgumentMembers = ImmutableArray<Object>.Empty;
+                if (symbol.IsGenericType)
+                {
+                    typeArgumentMembers = [.. symbol.TypeArguments.SelectNotNull(t => t.Accept(this))];
+                }
+
                 SchemaMemberData data = DataVisitor.VisitNamedType(symbol);
 
                 ImmutableArray<Property> properties = symbol.GetMembers()
@@ -60,7 +70,7 @@ public abstract record SchemaMember(SchemaMemberData? Data, string? Override)
                     .SelectNotNull(p => p.Accept(_propertyVisitor))
                     .ToImmutableArray();
 
-                return new DataObject(symbol, data, properties);
+                return new DataObject(symbol, data, typeArgumentMembers, properties);
             }
         }
     }
@@ -76,7 +86,8 @@ public abstract record SchemaMember(SchemaMemberData? Data, string? Override)
             SchemaMemberData Data,
             SchemaMember.Object MemberType,
             bool IsRequired,
-            bool IsDeprecated)
+            bool IsDeprecated,
+            string? DefaultValueSyntax) // Added DefaultValue property
             : Property(PropertySymbol, Data, Override: null);
 
         internal class SymbolVisitor(Object.SymbolVisitor objectVisitor) : SymbolVisitor<Property>
@@ -109,10 +120,27 @@ public abstract record SchemaMember(SchemaMemberData? Data, string? Override)
                 }
 
                 bool isDeprecated = data.Deprecated is not null;
+                string? defaultValue = GetDefaultValue(symbol, CancellationToken.None);
 
                 return symbol.Type.Accept(_objectVisitor) is Object objectMember
-                    ? new DataProperty(symbol, data, objectMember, isRequired, isDeprecated)
+                    ? new DataProperty(symbol, data, objectMember, isRequired, isDeprecated, defaultValue)
                     : null;
+            }
+
+            private static string? GetDefaultValue(IPropertySymbol propertySymbol, CancellationToken ct)
+            {
+                if (propertySymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(ct) is SyntaxNode syntaxNode)
+                {
+                    if (syntaxNode is PropertyDeclarationSyntax propertyDeclarationSyntax)
+                    {
+                        if (propertyDeclarationSyntax.Initializer is EqualsValueClauseSyntax evcs)
+                        {
+                            return evcs.Value.ToString();
+                        }
+                    }
+                }
+
+                return null;
             }
         }
     }

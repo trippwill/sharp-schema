@@ -1,0 +1,13 @@
+<Project>
+  <UsingTask TaskName="SharpSchema.Build.GenerateSchemaTask" AssemblyFile="$(MSBuildThisFileDirectory)SharpSchema.Build.dll" />
+
+  <Target Name="GenerateSchema" AfterTargets="Build">
+    <GenerateSchemaTask
+      Compile="@(Compile)"
+      ReferencePath="@(ReferencePath)"
+      ProjectReference="@(ProjectReference)"
+      SchemaOutputDirectory="$(SharpSchema_OutputDirectory)">
+      <Output TaskParameter="SchemaOutputFileName" PropertyName="SharpSchema_OutputFileName" />
+    </GenerateSchemaTask>
+  </Target>
+</Project>

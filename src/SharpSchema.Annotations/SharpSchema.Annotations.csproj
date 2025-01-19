@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <PackageId>SharpSchema.Annotations</PackageId>
-    <Product>SharpSchema</Product>
     <Description>Annotations library for the SharpSchema project.</Description>
     <DefineConstants>SHARPSCHEMA_ASSEMBLY</DefineConstants>
   </PropertyGroup>

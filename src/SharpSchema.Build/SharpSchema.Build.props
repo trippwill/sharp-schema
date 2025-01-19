@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <SharpSchema_OutputDirectory>$(OutputPath)</SharpSchema_OutputDirectory>
+  </PropertyGroup>
+</Project>

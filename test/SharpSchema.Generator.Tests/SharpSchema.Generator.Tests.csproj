@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.msbuild" />
+    <PackageReference Include="JunitXml.TestLogger" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
     <PackageReference Include="Microsoft.Build" />
     <PackageReference Include="Microsoft.Build.Locator" />

@@ -6,28 +6,6 @@ using SharpSchema.Generator.Model;
 
 namespace SharpSchema.Generator;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
-[Flags]
-public enum AllowedTypeDeclarations
-{
-    Class = 1,
-    Struct = 2,
-    Record = 4,
-    Any = Class | Struct | Record,
-    Default = Any,
-}
-
-[Flags]
-public enum AllowedAccessibilities
-{
-    Public = 1,
-    Internal = 2,
-    Private = 4,
-    Any = Public | Internal | Private,
-    Default = Public,
-}
-
 /// <summary>
 /// Generates schema root information.
 /// </summary>
@@ -35,21 +13,37 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
 {
     private readonly Options _options = options ?? Options.Default;
 
+    /// <summary>
+    /// Options for type declarations.
+    /// </summary>
     public record TypeOptions(
         AllowedTypeDeclarations AllowedTypeDeclarations = AllowedTypeDeclarations.Any,
         AllowedAccessibilities AllowedAccessibilities = AllowedAccessibilities.Default);
 
+    /// <summary>
+    /// Options for member declarations.
+    /// </summary>
     public record MemberOptions(
         AllowedAccessibilities AllowedAccessibilities = AllowedAccessibilities.Default);
 
+    /// <summary>
+    /// Options for the schema root info generator.
+    /// </summary>
     public record Options(
         TypeOptions TypeOptions,
         MemberOptions MemberOptions)
     {
+        /// <summary>
+        /// Gets the default options.
+        /// </summary>
         public static Options Default { get; } = new(
             new TypeOptions(),
             new MemberOptions());
 
+        /// <summary>
+        /// Returns a string representation of the options.
+        /// </summary>
+        /// <returns>A string representation of the options.</returns>
         public override string ToString() => $"{TypeOptions.AllowedAccessibilities}[{TypeOptions.AllowedTypeDeclarations}]_{MemberOptions.AllowedAccessibilities}";
     }
 
@@ -139,6 +133,10 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
     {
         private readonly SchemaMember.Object.SyntaxVisitor _objectVisitor = new(options, compilation);
 
+        /// <summary>
+        /// Visits a class declaration syntax node.
+        /// </summary>
+        /// <param name="node">The class declaration syntax node.</param>
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Class))
@@ -147,6 +145,10 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
             this.ProcessTypeDeclaration(node);
         }
 
+        /// <summary>
+        /// Visits a struct declaration syntax node.
+        /// </summary>
+        /// <param name="node">The struct declaration syntax node.</param>
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
             if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Struct))
@@ -155,6 +157,10 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
             this.ProcessTypeDeclaration(node);
         }
 
+        /// <summary>
+        /// Visits a record declaration syntax node.
+        /// </summary>
+        /// <param name="node">The record declaration syntax node.</param>
         public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
         {
             if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Record))
@@ -172,6 +178,10 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
             this.ProcessTypeDeclaration(node);
         }
 
+        /// <summary>
+        /// Processes a type declaration syntax node.
+        /// </summary>
+        /// <param name="node">The type declaration syntax node.</param>
         private void ProcessTypeDeclaration(TypeDeclarationSyntax node)
         {
             AttributeSyntax? schemaRootAttribute = node.AttributeLists
@@ -187,6 +197,12 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
             schemaRootInfos.Add(GetSchemaRootInfo(rootType, schemaRootAttribute));
         }
 
+        /// <summary>
+        /// Gets the schema root information from the specified root type and attribute syntax.
+        /// </summary>
+        /// <param name="rootType">The root type.</param>
+        /// <param name="attributeSyntax">The attribute syntax.</param>
+        /// <returns>The schema root information.</returns>
         private static SchemaRootInfo GetSchemaRootInfo(SchemaMember.Object rootType, AttributeSyntax attributeSyntax)
         {
             string? filename = null;

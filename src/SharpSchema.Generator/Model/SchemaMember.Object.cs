@@ -84,15 +84,37 @@ public abstract partial record SchemaMember
 
             /// <inheritdoc />
             public override Object? VisitClassDeclaration(ClassDeclarationSyntax node)
-                => this.VisitTypeDeclaration(node);
+            {
+                if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Class))
+                    return null;
+
+                return this.VisitTypeDeclaration(node);
+            }
 
             /// <inheritdoc />
             public override Object? VisitStructDeclaration(StructDeclarationSyntax node)
-                => this.VisitTypeDeclaration(node);
+            {
+                if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Struct))
+                    return null;
+
+                return this.VisitTypeDeclaration(node);
+            }
 
             /// <inheritdoc />
             public override Object? VisitRecordDeclaration(RecordDeclarationSyntax node)
-                => this.VisitTypeDeclaration(node);
+            {
+                if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Record))
+                    return null;
+
+                bool isStruct = node.ClassOrStructKeyword.Text == "struct";
+                if (isStruct && !options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Struct))
+                    return null;
+
+                if (!isStruct && !options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Class))
+                    return null;
+
+                return this.VisitTypeDeclaration(node);
+            }
 
             /// <inheritdoc />
             public override Object? VisitIdentifierName(IdentifierNameSyntax node)

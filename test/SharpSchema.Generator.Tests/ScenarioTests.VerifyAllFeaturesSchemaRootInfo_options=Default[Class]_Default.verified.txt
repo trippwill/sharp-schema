@@ -561,7 +561,7 @@
       Title: Company
     }
   },
-  Filename: test.schema.json,
-  Id: https://sharpschema/test/company,
-  CommonNamespace: AllFeatures
+  Filename: "test.schema.json",
+  Id: "https://sharpschema/test/company",
+  CommonNamespace: "AllFeatures"
 }

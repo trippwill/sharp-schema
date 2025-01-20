@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SharpSchema.Annotations;
 using SharpSchema.Generator.Model;
 
 namespace SharpSchema.Generator;
@@ -121,8 +120,7 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
         SchemaRootInfoSyntaxWalker rootSyntaxWalker = new(
             _options,
             compilation,
-            schemaRootInfos,
-            cancellationToken);
+            schemaRootInfos);
 
         SyntaxNode root = await syntaxTree.GetRootAsync(cancellationToken);
         rootSyntaxWalker.Visit(root);
@@ -136,8 +134,7 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
     internal class SchemaRootInfoSyntaxWalker(
         Options options,
         Compilation compilation,
-        List<SchemaRootInfo> schemaRootInfos,
-        CancellationToken ct)
+        List<SchemaRootInfo> schemaRootInfos)
         : CSharpSyntaxWalker
     {
         private readonly SchemaMember.Object.SyntaxVisitor _objectVisitor = new(options, compilation);
@@ -177,27 +174,46 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
 
         private void ProcessTypeDeclaration(TypeDeclarationSyntax node)
         {
-            SemanticModel semanticModel = compilation.GetSemanticModel(node.SyntaxTree);
-            if (semanticModel.GetDeclaredSymbol(node, ct) is not INamedTypeSymbol symbol)
-                return;
+            AttributeSyntax? schemaRootAttribute = node.AttributeLists
+                .SelectMany(list => list.Attributes)
+                .FirstOrDefault(attribute => attribute.Name.ToString() == "SchemaRoot");
 
-            if (!symbol.ShouldProcessAccessibility(options))
-                return;
-
-            if (symbol.GetAttributeData<SchemaRootAttribute>() is not AttributeData attributeData)
+            if (schemaRootAttribute is null)
                 return;
 
             if (node.Accept(_objectVisitor) is not SchemaMember.Object rootType)
                 return;
 
-            schemaRootInfos.Add(GetSchemaRootInfo(rootType, attributeData));
+            schemaRootInfos.Add(GetSchemaRootInfo(rootType, schemaRootAttribute));
         }
 
-        private static SchemaRootInfo GetSchemaRootInfo(SchemaMember.Object rootType, AttributeData attributeData)
+        private static SchemaRootInfo GetSchemaRootInfo(SchemaMember.Object rootType, AttributeSyntax attributeSyntax)
         {
-            string? filename = attributeData.GetNamedArgument<string>(nameof(SchemaRootAttribute.Filename));
-            string? id = attributeData.GetNamedArgument<string>(nameof(SchemaRootAttribute.Id));
-            string? commonNamespace = attributeData.GetNamedArgument<string>(nameof(SchemaRootAttribute.CommonNamespace));
+            string? filename = null;
+            string? id = null;
+            string? commonNamespace = null;
+
+            foreach (AttributeArgumentSyntax argument in attributeSyntax.ArgumentList?.Arguments ?? [])
+            {
+                if (argument.NameEquals?.Name.ToString() is not string argumentName)
+                    continue;
+
+                string argumentValue = argument.Expression.ToString();
+
+                switch (argumentName)
+                {
+                    case "Filename":
+                        filename = argumentValue;
+                        break;
+                    case "Id":
+                        id = argumentValue;
+                        break;
+                    case "CommonNamespace":
+                        commonNamespace = argumentValue;
+                        break;
+                }
+            }
+
             return new(rootType, filename, id, commonNamespace);
         }
     }

@@ -47,6 +47,8 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
         public override string ToString() => $"{TypeOptions.AllowedAccessibilities}[{TypeOptions.AllowedTypeDeclarations}]_{MemberOptions.AllowedAccessibilities}";
     }
 
+    private SchemaMember.Object.SyntaxVisitor? _objectVisitor;
+
     /// <summary>
     /// Finds schema root types in the given workspace.
     /// </summary>
@@ -85,6 +87,8 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
         if (await project.GetCompilationAsync(cancellationToken) is not Compilation compilation)
             return [];
 
+        _objectVisitor ??= new(_options, compilation);
+
         List<SchemaRootInfo> schemaRootInfos = [];
         foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
         {
@@ -110,10 +114,12 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
         Throw.IfNullArgument(syntaxTree, nameof(syntaxTree));
         Throw.IfNullArgument(compilation, nameof(compilation));
 
+        _objectVisitor ??= new(_options, compilation);
+
         List<SchemaRootInfo> schemaRootInfos = [];
         SchemaRootInfoSyntaxWalker rootSyntaxWalker = new(
             _options,
-            compilation,
+            _objectVisitor,
             schemaRootInfos);
 
         SyntaxNode root = await syntaxTree.GetRootAsync(cancellationToken);
@@ -127,11 +133,11 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
     /// </summary>
     internal class SchemaRootInfoSyntaxWalker(
         Options options,
-        Compilation compilation,
+        SchemaMember.Object.SyntaxVisitor objectVisitor,
         List<SchemaRootInfo> schemaRootInfos)
         : CSharpSyntaxWalker
     {
-        private readonly SchemaMember.Object.SyntaxVisitor _objectVisitor = new(options, compilation);
+        private readonly SchemaMember.Object.SyntaxVisitor _objectVisitor = objectVisitor;
 
         /// <summary>
         /// Visits a class declaration syntax node.
@@ -139,7 +145,7 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
         /// <param name="node">The class declaration syntax node.</param>
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Class))
+            if (!options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Class))
                 return;
 
             this.ProcessTypeDeclaration(node);
@@ -151,7 +157,7 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
         /// <param name="node">The struct declaration syntax node.</param>
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Struct))
+            if (!options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Struct))
                 return;
 
             this.ProcessTypeDeclaration(node);
@@ -163,16 +169,16 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
         /// <param name="node">The record declaration syntax node.</param>
         public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
         {
-            if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Record))
+            if (!options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Record))
                 return;
 
             bool isStruct = node.ClassOrStructKeyword.IsKind(SyntaxKind.StructKeyword);
             bool isClass = node.ClassOrStructKeyword.IsKind(SyntaxKind.ClassKeyword) || node.ClassOrStructKeyword.IsKind(SyntaxKind.None);
 
-            if (isStruct && !options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Struct))
+            if (isStruct && !options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Struct))
                 return;
 
-            if (isClass && !options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Class))
+            if (isClass && !options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Class))
                 return;
 
             this.ProcessTypeDeclaration(node);

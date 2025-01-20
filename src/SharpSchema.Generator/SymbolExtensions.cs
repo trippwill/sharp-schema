@@ -12,9 +12,9 @@ internal static class SymbolExtensions
     {
         return symbol.DeclaredAccessibility switch
         {
-            Accessibility.Public => options.TypeOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Public),
-            Accessibility.Internal => options.TypeOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Internal),
-            Accessibility.Private => options.TypeOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Private),
+            Accessibility.Public => options.TypeOptions.AllowedAccessibilities.CheckFlag(AllowedAccessibilities.Public),
+            Accessibility.Internal => options.TypeOptions.AllowedAccessibilities.CheckFlag(AllowedAccessibilities.Internal),
+            Accessibility.Private => options.TypeOptions.AllowedAccessibilities.CheckFlag(AllowedAccessibilities.Private),
             _ => false,
         };
     }
@@ -23,9 +23,9 @@ internal static class SymbolExtensions
     {
         return symbol.DeclaredAccessibility switch
         {
-            Accessibility.Public => options.MemberOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Public),
-            Accessibility.Internal => options.MemberOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Internal),
-            Accessibility.Private => options.MemberOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Private),
+            Accessibility.Public => options.MemberOptions.AllowedAccessibilities.CheckFlag(AllowedAccessibilities.Public),
+            Accessibility.Internal => options.MemberOptions.AllowedAccessibilities.CheckFlag(AllowedAccessibilities.Internal),
+            Accessibility.Private => options.MemberOptions.AllowedAccessibilities.CheckFlag(AllowedAccessibilities.Private),
             _ => false,
         };
     }

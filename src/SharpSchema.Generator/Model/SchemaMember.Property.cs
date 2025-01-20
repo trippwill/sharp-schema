@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Concurrent;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpSchema.Annotations;
@@ -41,10 +42,23 @@ public abstract partial record SchemaMember
         /// <summary>
         /// A syntax visitor for properties.
         /// </summary>
-        /// <param name="objectSyntaxVisitor">The object syntax visitor.</param>
-        internal class SyntaxVisitor(Object.SyntaxVisitor objectSyntaxVisitor)
+        internal class SyntaxVisitor
             : CSharpSyntaxVisitor<Property>
         {
+            private static ConcurrentDictionary<Object.SyntaxVisitor, SyntaxVisitor> _instanceCache = new();
+
+            private readonly Object.SyntaxVisitor _objectSyntaxVisitor;
+
+            private SyntaxVisitor(Object.SyntaxVisitor objectSyntaxVisitor)
+            {
+                _objectSyntaxVisitor = objectSyntaxVisitor;
+            }
+
+            public static SyntaxVisitor GetInstance(Object.SyntaxVisitor objectSyntaxVisitor)
+            {
+                return _instanceCache.GetOrAdd(objectSyntaxVisitor, _ => new SyntaxVisitor(_));
+            }
+
             /// <summary>
             /// Visits a property declaration syntax node.
             /// </summary>
@@ -52,25 +66,30 @@ public abstract partial record SchemaMember
             /// <returns>The property.</returns>
             public override Property? VisitPropertyDeclaration(PropertyDeclarationSyntax node)
             {
-                SemanticModel semanticModel = objectSyntaxVisitor.Compilation.GetSemanticModel(node.SyntaxTree);
-                if (semanticModel.GetDeclaredSymbol(node) is not IPropertySymbol symbol)
-                    return null;
+                return CreateProperty(node);
 
-                if (!symbol.ShouldProcessAccessibility(objectSyntaxVisitor.Options))
-                    return null;
+                Property? CreateProperty(PropertyDeclarationSyntax node)
+                {
+                    SemanticModel semanticModel = _objectSyntaxVisitor.Compilation.GetSemanticModel(node.SyntaxTree);
+                    if (semanticModel.GetDeclaredSymbol(node) is not IPropertySymbol symbol)
+                        return null;
 
-                if (symbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? @override))
-                    return new OverrideProperty(symbol, @override);
+                    if (!symbol.ShouldProcessAccessibility(_objectSyntaxVisitor.Options))
+                        return null;
 
-                if (!symbol.IsValidForGeneration() || symbol.IsIgnoredForGeneration())
-                    return null;
+                    if (symbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? @override))
+                        return new OverrideProperty(symbol, @override);
 
-                var data = Data.SymbolVisitor.Instance.VisitProperty(symbol);
+                    if (!symbol.IsValidForGeneration() || symbol.IsIgnoredForGeneration())
+                        return null;
 
-                if (node.Type.Accept(objectSyntaxVisitor) is not Object memberType)
-                    return null;
+                    var data = Data.SymbolVisitor.Instance.VisitProperty(symbol);
 
-                return new DataProperty(symbol, data, memberType, node.Initializer);
+                    if (node.Type.Accept(_objectSyntaxVisitor) is not Object memberType)
+                        return null;
+
+                    return new DataProperty(symbol, data, memberType, node.Initializer);
+                }
             }
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using SharpSchema.Generator.Model;
 using SharpSchema.Generator.Tests.Utilities;
+using SharpSchema.Generator.Tests.VerifyConverters;
 
 namespace SharpSchema.Generator.Tests;
 
@@ -24,28 +25,43 @@ public class ScenarioTests
         VerifySettings.AddExtraSettings(settings =>
         {
             settings.Converters.Add(new ISymbolJsonConverter());
+            settings.Converters.Add(new EqualsValueClauseSyntaxConverter());
         });
     }
 
     public VerifySettings VerifySettings { get; }
 
-    [Fact]
-    public async Task VerifyAllFeaturesSchemaRootInfo()
+    [Theory]
+    [MemberData(nameof(VerifyAllFeaturesSchemaRootInfoOptions))]
+    public async Task VerifyAllFeaturesSchemaRootInfo(SchemaRootInfoGenerator.Options options)
     {
         using var workspace = MSBuildWorkspace.Create();
         string projectPath = PathHelper.GetProjectPath("test/generator-scenarios/AllFeatures/AllFeatures.csproj");
         Project project = await workspace.OpenProjectAsync(projectPath);
 
-        var generator = new SchemaRootInfoGenerator();
-        List<SchemaRootInfo> schemaRootInfos = new();
-
-        await foreach (SchemaRootInfo value in generator.FindSchemaRootTypesAsync(project, CancellationToken.None))
-        {
-            schemaRootInfos.Add(value);
-        }
+        var generator = new SchemaRootInfoGenerator(options);
+        IReadOnlyCollection<SchemaRootInfo> schemaRootInfos = await generator.FindRootsAsync(
+            project,
+            CancellationToken.None);
 
         SchemaRootInfo schemaRootInfo = Assert.Single(schemaRootInfos);
-        await Verify(schemaRootInfo, this.VerifySettings);
+        await Verify(schemaRootInfo, this.VerifySettings).UseParameters(options);
     }
+
+    public static TheoryData<SchemaRootInfoGenerator.Options> VerifyAllFeaturesSchemaRootInfoOptions()
+    {
+        return new()
+        {
+            { SchemaRootInfoGenerator.Options.Default },
+
+            { new SchemaRootInfoGenerator.Options(
+                new SchemaRootInfoGenerator.TypeOptions(
+                    AllowedTypeDeclarations.Class,
+                    AllowedAccessibilities.Public),
+                new SchemaRootInfoGenerator.MemberOptions(
+                    AllowedAccessibilities.Public)) },
+        };
+    }
+
 }
 

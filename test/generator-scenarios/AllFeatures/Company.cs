@@ -125,7 +125,7 @@ public class Project
     ///     <description>The budget of the project.</description>
     ///     <example>100000</example>
     /// </jsonschema>
-    public decimal Budget { get; set; }
+    public decimal? Budget { get; set; }
 
     /// <summary>
     /// The list of tasks in the project.

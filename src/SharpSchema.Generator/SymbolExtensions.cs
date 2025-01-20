@@ -1,14 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpSchema.Annotations;
 
 namespace SharpSchema.Generator;
 
 internal static class SymbolExtensions
 {
+    public static bool ShouldProcessAccessibility(this INamedTypeSymbol symbol, SchemaRootInfoGenerator.Options options)
+    {
+        return symbol.DeclaredAccessibility switch
+        {
+            Accessibility.Public => options.TypeOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Public),
+            Accessibility.Internal => options.TypeOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Internal),
+            Accessibility.Private => options.TypeOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Private),
+            _ => false,
+        };
+    }
+
+    public static bool ShouldProcessAccessibility(this IPropertySymbol symbol, SchemaRootInfoGenerator.Options options)
+    {
+        return symbol.DeclaredAccessibility switch
+        {
+            Accessibility.Public => options.MemberOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Public),
+            Accessibility.Internal => options.MemberOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Internal),
+            Accessibility.Private => options.MemberOptions.AllowedAccessibilities.HasFlag(AllowedAccessibilities.Private),
+            _ => false,
+        };
+    }
+
     public static AttributeData? GetAttributeData<T>(this ISymbol symbol) where T : Attribute
     {
         return symbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == typeof(T).Name);
@@ -16,44 +37,23 @@ internal static class SymbolExtensions
 
     public static bool IsValidForGeneration(this IPropertySymbol symbol)
     {
-        if (symbol.DeclaredAccessibility
-            is Accessibility.Public
-            or Accessibility.Protected
-            or Accessibility.ProtectedOrInternal
-            or Accessibility.Internal)
-        {
-            return !symbol.IsStatic
-                && !symbol.IsAbstract
-                && !symbol.IsIndexer
-                && !symbol.IsVirtual
-                && !symbol.IsWriteOnly
-                && !symbol.IsImplicitlyDeclared;
-        }
-
-        return false;
+        return !symbol.IsStatic
+            && !symbol.IsAbstract
+            && !symbol.IsIndexer
+            && !symbol.IsVirtual
+            && !symbol.IsWriteOnly
+            && !symbol.IsImplicitlyDeclared;
     }
 
     public static bool IsValidForGeneration(this INamedTypeSymbol symbol)
     {
-        if (symbol.IsNamespace)
-            return false;
-
-        if (symbol.DeclaredAccessibility
-            is Accessibility.Public
-            or Accessibility.Protected
-            or Accessibility.ProtectedOrInternal
-            or Accessibility.Internal)
-        {
-            return !symbol.IsStatic
-                && !symbol.IsAbstract
-                && !symbol.IsAnonymousType
-                && !symbol.IsComImport
-                && !symbol.IsImplicitClass
-                && !symbol.IsExtern
-                && !symbol.IsImplicitlyDeclared;
-        }
-
-        return false;
+        return !symbol.IsStatic
+            && !symbol.IsAbstract
+            && !symbol.IsAnonymousType
+            && !symbol.IsComImport
+            && !symbol.IsImplicitClass
+            && !symbol.IsExtern
+            && !symbol.IsImplicitlyDeclared;
     }
 
     public static bool IsIgnoredForGeneration(this ISymbol symbol)
@@ -74,14 +74,22 @@ internal static class SymbolExtensions
         return false;
     }
 
-    public static IEnumerable<TResult> SelectNotNull<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult?> selector)
+    public static bool TryGetConstructorArgument<TAttribute, TResult>(this ISymbol symbol, int argumentIndex, [NotNullWhen(true)] out TResult? result)
+        where TAttribute : Attribute
         where TResult : notnull
     {
-        foreach (TSource item in source)
-        {
-            TResult? result = selector(item);
-            if (result is not null)
-                yield return result;
-        }
+        result = default;
+        AttributeData? attributeData = symbol.GetAttributeData<TAttribute>();
+        if (attributeData is null) return false;
+
+        result = attributeData.GetConstructorArgument<TResult>(argumentIndex);
+        return result is not null;
+    }
+
+    public static bool IsNestedInSystemNamespace(this TypeDeclarationSyntax node)
+    {
+        return node.Ancestors()
+            .OfType<NamespaceDeclarationSyntax>()
+            .Any(n => n.Name.ToString().StartsWith("System"));
     }
 }

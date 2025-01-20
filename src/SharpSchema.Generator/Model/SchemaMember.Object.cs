@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -69,6 +70,8 @@ public abstract partial record SchemaMember
             Compilation compilation)
             : CSharpSyntaxVisitor<Object>
         {
+            private readonly ConcurrentDictionary<SyntaxNode, Object> _cache = new();
+
             /// <summary>
             /// Gets the options for the schema root info generator.
             /// </summary>
@@ -80,12 +83,16 @@ public abstract partial record SchemaMember
             public Compilation Compilation => compilation;
 
             /// <inheritdoc />
-            public override Object? DefaultVisit(SyntaxNode node) => base.DefaultVisit(node);
+            public override Object? DefaultVisit(SyntaxNode node)
+            {
+                // TODO: Log warning
+                return null;
+            }
 
             /// <inheritdoc />
             public override Object? VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Class))
+                if (!options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Class))
                     return null;
 
                 return this.VisitTypeDeclaration(node);
@@ -94,7 +101,7 @@ public abstract partial record SchemaMember
             /// <inheritdoc />
             public override Object? VisitStructDeclaration(StructDeclarationSyntax node)
             {
-                if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Struct))
+                if (!options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Struct))
                     return null;
 
                 return this.VisitTypeDeclaration(node);
@@ -103,14 +110,14 @@ public abstract partial record SchemaMember
             /// <inheritdoc />
             public override Object? VisitRecordDeclaration(RecordDeclarationSyntax node)
             {
-                if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Record))
+                if (!options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Record))
                     return null;
 
                 bool isStruct = node.ClassOrStructKeyword.Text == "struct";
-                if (isStruct && !options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Struct))
+                if (isStruct && !options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Struct))
                     return null;
 
-                if (!isStruct && !options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Class))
+                if (!isStruct && !options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Class))
                     return null;
 
                 return this.VisitTypeDeclaration(node);
@@ -119,6 +126,11 @@ public abstract partial record SchemaMember
             /// <inheritdoc />
             public override Object? VisitIdentifierName(IdentifierNameSyntax node)
             {
+                if (_cache.TryGetValue(node, out var cachedObject))
+                {
+                    return cachedObject;
+                }
+
                 SemanticModel semanticModel = compilation.GetSemanticModel(node.SyntaxTree);
                 if (semanticModel.GetTypeInfo(node).Type is not INamedTypeSymbol symbol)
                     return null;
@@ -132,7 +144,10 @@ public abstract partial record SchemaMember
                     if (symbol.DeclaringSyntaxReferences[0].GetSyntax() is not TypeDeclarationSyntax typeDeclaration)
                         return null;
 
-                    return typeDeclaration.Accept(this);
+                    if (typeDeclaration.Accept(this) is Object result)
+                    {
+                        return _cache[node] = result;
+                    }
                 }
 
                 return null;
@@ -141,6 +156,11 @@ public abstract partial record SchemaMember
             /// <inheritdoc />
             public override Object? VisitNullableType(NullableTypeSyntax node)
             {
+                if (_cache.TryGetValue(node, out var cachedObject))
+                {
+                    return cachedObject;
+                }
+
                 SemanticModel semanticModel = compilation.GetSemanticModel(node.SyntaxTree);
                 if (semanticModel.GetTypeInfo(node).Type is not INamedTypeSymbol symbol)
                     return null;
@@ -148,12 +168,19 @@ public abstract partial record SchemaMember
                 if (node.ElementType.Accept(this) is not Object type)
                     return null;
 
-                return new NullableObject(symbol, type);
+                var result = new NullableObject(symbol, type);
+                _cache[node] = result;
+                return result;
             }
 
             /// <inheritdoc />
             public override Object? VisitGenericName(GenericNameSyntax node)
             {
+                if (_cache.TryGetValue(node, out var cachedObject))
+                {
+                    return cachedObject;
+                }
+
                 SemanticModel semanticModel = compilation.GetSemanticModel(node.SyntaxTree);
                 if (semanticModel.GetTypeInfo(node).Type is not INamedTypeSymbol symbol)
                     return null;
@@ -164,17 +191,26 @@ public abstract partial record SchemaMember
                 ImmutableArray<Object> typeArgumentMembers = node.TypeArgumentList
                     .Arguments.SelectNotNull(tps => tps.Accept(this));
 
-                return new SystemObject(symbol, typeArgumentMembers);
+                var result = new SystemObject(symbol, typeArgumentMembers);
+                _cache[node] = result;
+                return result;
             }
 
             /// <inheritdoc />
             public override Object? VisitPredefinedType(PredefinedTypeSyntax node)
             {
+                if (_cache.TryGetValue(node, out var cachedObject))
+                {
+                    return cachedObject;
+                }
+
                 SemanticModel semanticModel = compilation.GetSemanticModel(node.SyntaxTree);
                 if (semanticModel.GetTypeInfo(node).Type is not INamedTypeSymbol symbol)
                     return null;
 
-                return new SystemObject(symbol, []);
+                var result = new SystemObject(symbol, ImmutableArray<Object>.Empty);
+                _cache[node] = result;
+                return result;
             }
 
             /// <summary>
@@ -184,12 +220,21 @@ public abstract partial record SchemaMember
             /// <returns>The schema member object.</returns>
             private Object? VisitTypeDeclaration(TypeDeclarationSyntax node)
             {
+                if (_cache.TryGetValue(node, out var cachedObject))
+                {
+                    return cachedObject;
+                }
+
                 SemanticModel semanticModel = compilation.GetSemanticModel(node.SyntaxTree);
                 if (semanticModel.GetDeclaredSymbol(node) is not INamedTypeSymbol symbol)
                     return null;
 
                 if (symbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? @override))
-                    return new OverrideObject(symbol, @override);
+                {
+                    var result = new OverrideObject(symbol, @override);
+                    _cache[node] = result;
+                    return result;
+                }
 
                 if (!symbol.ShouldProcessAccessibility(options))
                     return null;
@@ -198,14 +243,20 @@ public abstract partial record SchemaMember
                     return null;
 
                 if (node.IsNestedInSystemNamespace())
-                    return new SystemObject(symbol, []);
+                {
+                    var result = new SystemObject(symbol, ImmutableArray<Object>.Empty);
+                    _cache[node] = result;
+                    return result;
+                }
 
-                Property.SyntaxVisitor propertySyntaxVisitor = new(this);
+                Property.SyntaxVisitor propertyVisitor = Property.SyntaxVisitor.GetInstance(this);
                 ImmutableArray<Property> properties = node.Members
-                    .SelectNotNull(mds => mds.Accept(propertySyntaxVisitor));
+                    .SelectNotNull(mds => mds.Accept(propertyVisitor));
 
                 var data = Data.SymbolVisitor.Instance.VisitNamedType(symbol);
-                return new DataObject(symbol, data, [], properties);
+                var dataObject = new DataObject(symbol, data, ImmutableArray<Object>.Empty, properties);
+                _cache[node] = dataObject;
+                return dataObject;
             }
         }
     }

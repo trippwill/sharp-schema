@@ -1,16 +1,16 @@
 using Argon;
 using Microsoft.CodeAnalysis;
 
-namespace SharpSchema.Generator.Tests
+namespace SharpSchema.Generator.Tests.VerifyConverters
 {
-    internal class ISymbolJsonConverter : Argon.JsonConverter<ISymbol>
+    internal class ISymbolJsonConverter : JsonConverter<ISymbol>
     {
-        public override ISymbol ReadJson(JsonReader reader, Type type, ISymbol? existingValue, bool hasExisting, Argon.JsonSerializer serializer)
+        public override ISymbol ReadJson(JsonReader reader, Type type, ISymbol? existingValue, bool hasExisting, JsonSerializer serializer)
         {
             throw new NotImplementedException();
         }
 
-        public override void WriteJson(JsonWriter writer, ISymbol value, Argon.JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, ISymbol value, JsonSerializer serializer)
         {
             writer.WriteStartObject();
             writer.WritePropertyName("SymbolKind");

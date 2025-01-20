@@ -1,0 +1,567 @@
+﻿{
+  RootType: {
+    TypeArgumentMembers: null,
+    Properties: [
+      {
+        MemberType: {
+          TypeArgumentMembers: null,
+          TypeSymbol: {
+            SymbolKind: NamedType,
+            Name: String
+          }
+        },
+        DefaultValueSyntax: {
+          Value: "Contoso"
+        },
+        PropertySymbol: {
+          SymbolKind: Property,
+          Name: Name
+        },
+        MemberData: {
+          Title: Company Name,
+          Description: The name of the company.,
+          Example: Acme Corp
+        }
+      },
+      {
+        MemberType: {
+          TypeArgumentMembers: [
+            {
+              TypeArgumentMembers: null,
+              Properties: [
+                {
+                  MemberType: {
+                    ElementType: {
+                      TypeArgumentMembers: null,
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    TypeSymbol: {
+                      SymbolKind: NamedType,
+                      Name: String
+                    }
+                  },
+                  PropertySymbol: {
+                    SymbolKind: Property,
+                    Name: Name
+                  },
+                  MemberData: {
+                    Title: Department Name,
+                    Description: The name of the department.,
+                    Example: Human Resources
+                  }
+                },
+                {
+                  MemberType: {
+                    TypeArgumentMembers: [
+                      {
+                        TypeArgumentMembers: null,
+                        Properties: [
+                          {
+                            MemberType: {
+                              TypeArgumentMembers: null,
+                              TypeSymbol: {
+                                SymbolKind: NamedType,
+                                Name: String
+                              }
+                            },
+                            DefaultValueSyntax: {
+                              Value: "New Team"
+                            },
+                            PropertySymbol: {
+                              SymbolKind: Property,
+                              Name: Name
+                            },
+                            MemberData: {
+                              Title: Team Name,
+                              Description: The name of the team.,
+                              Example: Development Team
+                            }
+                          },
+                          {
+                            MemberType: {
+                              TypeArgumentMembers: [
+                                {
+                                  TypeArgumentMembers: null,
+                                  Properties: [
+                                    {
+                                      MemberType: {
+                                        ElementType: {
+                                          TypeArgumentMembers: null,
+                                          TypeSymbol: {
+                                            SymbolKind: NamedType,
+                                            Name: String
+                                          }
+                                        },
+                                        TypeSymbol: {
+                                          SymbolKind: NamedType,
+                                          Name: String
+                                        }
+                                      },
+                                      PropertySymbol: {
+                                        SymbolKind: Property,
+                                        Name: Name
+                                      },
+                                      MemberData: {
+                                        Title: Project Name,
+                                        Description: The name of the project.,
+                                        Example: Project X
+                                      }
+                                    },
+                                    {
+                                      MemberType: {
+                                        ElementType: {
+                                          TypeArgumentMembers: null,
+                                          TypeSymbol: {
+                                            SymbolKind: NamedType,
+                                            Name: Decimal
+                                          }
+                                        },
+                                        TypeSymbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Nullable
+                                        }
+                                      },
+                                      PropertySymbol: {
+                                        SymbolKind: Property,
+                                        Name: Budget
+                                      },
+                                      MemberData: {
+                                        Title: Project Budget,
+                                        Description: The budget of the project.,
+                                        Example: 100000
+                                      }
+                                    },
+                                    {
+                                      MemberType: {
+                                        TypeArgumentMembers: [
+                                          {
+                                            TypeArgumentMembers: null,
+                                            Properties: [
+                                              {
+                                                MemberType: {
+                                                  ElementType: {
+                                                    TypeArgumentMembers: null,
+                                                    TypeSymbol: {
+                                                      SymbolKind: NamedType,
+                                                      Name: String
+                                                    }
+                                                  },
+                                                  TypeSymbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: String
+                                                  }
+                                                },
+                                                PropertySymbol: {
+                                                  SymbolKind: Property,
+                                                  Name: Name
+                                                },
+                                                MemberData: {
+                                                  Title: Task Name,
+                                                  Description: The name of the task.,
+                                                  Example: Design Database
+                                                }
+                                              },
+                                              {
+                                                MemberType: {
+                                                  TypeArgumentMembers: null,
+                                                  TypeSymbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: Int32
+                                                  }
+                                                },
+                                                DefaultValueSyntax: {
+                                                  Value: 40
+                                                },
+                                                PropertySymbol: {
+                                                  SymbolKind: Property,
+                                                  Name: EstimatedHours
+                                                },
+                                                MemberData: {
+                                                  Title: Estimated Hours,
+                                                  Description: The estimated hours to complete the task.,
+                                                  Example: 40
+                                                }
+                                              }
+                                            ],
+                                            TypeSymbol: {
+                                              SymbolKind: NamedType,
+                                              Name: Task
+                                            },
+                                            MemberData: {
+                                              Title: Task
+                                            }
+                                          }
+                                        ],
+                                        TypeSymbol: {
+                                          SymbolKind: NamedType,
+                                          Name: List
+                                        }
+                                      },
+                                      PropertySymbol: {
+                                        SymbolKind: Property,
+                                        Name: Tasks
+                                      },
+                                      MemberData: {
+                                        Title: Tasks,
+                                        Description: A list of tasks in the project.
+                                      }
+                                    }
+                                  ],
+                                  TypeSymbol: {
+                                    SymbolKind: NamedType,
+                                    Name: Project
+                                  },
+                                  MemberData: {
+                                    Title: Project
+                                  }
+                                }
+                              ],
+                              TypeSymbol: {
+                                SymbolKind: NamedType,
+                                Name: List
+                              }
+                            },
+                            PropertySymbol: {
+                              SymbolKind: Property,
+                              Name: Projects
+                            },
+                            MemberData: {
+                              Title: Projects,
+                              Description: A list of projects the team is working on.
+                            }
+                          }
+                        ],
+                        TypeSymbol: {
+                          SymbolKind: NamedType,
+                          Name: Team
+                        },
+                        MemberData: {
+                          Title: Team
+                        }
+                      }
+                    ],
+                    TypeSymbol: {
+                      SymbolKind: NamedType,
+                      Name: List
+                    }
+                  },
+                  PropertySymbol: {
+                    SymbolKind: Property,
+                    Name: Teams
+                  },
+                  MemberData: {
+                    Title: Teams,
+                    Description: A list of teams in the department.
+                  }
+                }
+              ],
+              TypeSymbol: {
+                SymbolKind: NamedType,
+                Name: Department
+              },
+              MemberData: {
+                Title: Department
+              }
+            }
+          ],
+          TypeSymbol: {
+            SymbolKind: NamedType,
+            Name: List
+          }
+        },
+        PropertySymbol: {
+          SymbolKind: Property,
+          Name: Departments
+        },
+        MemberData: {
+          Title: Departments,
+          Description: A list of departments in the company.
+        }
+      },
+      {
+        MemberType: {
+          ElementType: {
+            TypeArgumentMembers: [
+              {
+                TypeArgumentMembers: null,
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              {
+                TypeArgumentMembers: null,
+                Properties: [
+                  {
+                    MemberType: {
+                      TypeArgumentMembers: null,
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    PropertySymbol: {
+                      SymbolKind: Property,
+                      Name: Name
+                    },
+                    MemberData: {
+                      Title: Employee Name,
+                      Description: The name of the employee.,
+                      Example: John Doe
+                    }
+                  },
+                  {
+                    MemberType: {
+                      ElementType: {
+                        TypeArgumentMembers: null,
+                        TypeSymbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    PropertySymbol: {
+                      SymbolKind: Property,
+                      Name: Position
+                    },
+                    MemberData: {
+                      Title: Position,
+                      Description: The position of the employee.,
+                      Example: Software Engineer
+                    }
+                  },
+                  {
+                    MemberType: {
+                      TypeArgumentMembers: null,
+                      Properties: [
+                        {
+                          MemberType: {
+                            TypeArgumentMembers: null,
+                            TypeSymbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          PropertySymbol: {
+                            SymbolKind: Property,
+                            Name: Street
+                          },
+                          MemberData: {
+                            Title: Street,
+                            Description: The street of the address.,
+                            Example: 123 Main St
+                          }
+                        },
+                        {
+                          MemberType: {
+                            TypeArgumentMembers: null,
+                            TypeSymbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          PropertySymbol: {
+                            SymbolKind: Property,
+                            Name: City
+                          },
+                          MemberData: {
+                            Title: City,
+                            Description: The city of the address.,
+                            Example: Metropolis
+                          }
+                        },
+                        {
+                          MemberType: {
+                            TypeArgumentMembers: null,
+                            TypeSymbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          PropertySymbol: {
+                            SymbolKind: Property,
+                            Name: PostalCode
+                          },
+                          MemberData: {
+                            Title: Postal Code,
+                            Description: The postal code of the address.,
+                            Example: 12345
+                          }
+                        },
+                        {
+                          MemberType: {
+                            TypeArgumentMembers: null,
+                            TypeSymbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          PropertySymbol: {
+                            SymbolKind: Property,
+                            Name: ZipCode
+                          },
+                          MemberData: {
+                            Title: Zip Code,
+                            Deprecated: 
+                          }
+                        }
+                      ],
+                      TypeSymbol: {
+                        SymbolKind: NamedType,
+                        Name: Address
+                      },
+                      MemberData: {
+                        Title: Address
+                      }
+                    },
+                    PropertySymbol: {
+                      SymbolKind: Property,
+                      Name: EmployeeAddress
+                    },
+                    MemberData: {
+                      Title: Employee Address,
+                      Description: The address of the employee.
+                    }
+                  }
+                ],
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: Employee
+                },
+                MemberData: {
+                  Title: Employee
+                }
+              }
+            ],
+            TypeSymbol: {
+              SymbolKind: NamedType,
+              Name: Dictionary
+            }
+          },
+          TypeSymbol: {
+            SymbolKind: NamedType,
+            Name: Dictionary
+          }
+        },
+        PropertySymbol: {
+          SymbolKind: Property,
+          Name: Employees
+        },
+        MemberData: {
+          Title: Employees,
+          Description: A dictionary of employees by their ID.
+        }
+      },
+      {
+        MemberType: {
+          TypeArgumentMembers: null,
+          Properties: [
+            {
+              MemberType: {
+                TypeArgumentMembers: null,
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: Street
+              },
+              MemberData: {
+                Title: Street,
+                Description: The street of the address.,
+                Example: 123 Main St
+              }
+            },
+            {
+              MemberType: {
+                TypeArgumentMembers: null,
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: City
+              },
+              MemberData: {
+                Title: City,
+                Description: The city of the address.,
+                Example: Metropolis
+              }
+            },
+            {
+              MemberType: {
+                TypeArgumentMembers: null,
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: PostalCode
+              },
+              MemberData: {
+                Title: Postal Code,
+                Description: The postal code of the address.,
+                Example: 12345
+              }
+            },
+            {
+              MemberType: {
+                TypeArgumentMembers: null,
+                TypeSymbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              PropertySymbol: {
+                SymbolKind: Property,
+                Name: ZipCode
+              },
+              MemberData: {
+                Title: Zip Code,
+                Deprecated: 
+              }
+            }
+          ],
+          TypeSymbol: {
+            SymbolKind: NamedType,
+            Name: Address
+          },
+          MemberData: {
+            Title: Address
+          }
+        },
+        PropertySymbol: {
+          SymbolKind: Property,
+          Name: CompanyAddress
+        },
+        MemberData: {
+          Title: Company Address,
+          Description: The address of the company.
+        }
+      }
+    ],
+    TypeSymbol: {
+      SymbolKind: NamedType,
+      Name: Company
+    },
+    MemberData: {
+      Title: Company
+    }
+  },
+  Filename: test.schema.json,
+  Id: https://sharpschema/test/company,
+  CommonNamespace: AllFeatures
+}

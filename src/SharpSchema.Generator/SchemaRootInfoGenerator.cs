@@ -1,43 +1,80 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SharpSchema.Annotations;
 using SharpSchema.Generator.Model;
 
 namespace SharpSchema.Generator;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+[Flags]
+public enum AllowedTypeDeclarations
+{
+    Class = 1,
+    Struct = 2,
+    Record = 4,
+    Any = Class | Struct | Record,
+    Default = Any,
+}
+
+[Flags]
+public enum AllowedAccessibilities
+{
+    Public = 1,
+    Internal = 2,
+    Private = 4,
+    Any = Public | Internal | Private,
+    Default = Public,
+}
+
 /// <summary>
 /// Generates schema root information.
 /// </summary>
-public class SchemaRootInfoGenerator
+public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = null)
 {
+    private readonly Options _options = options ?? Options.Default;
+
+    public record TypeOptions(
+        AllowedTypeDeclarations AllowedTypeDeclarations = AllowedTypeDeclarations.Any,
+        AllowedAccessibilities AllowedAccessibilities = AllowedAccessibilities.Default);
+
+    public record MemberOptions(
+        AllowedAccessibilities AllowedAccessibilities = AllowedAccessibilities.Default);
+
+    public record Options(
+        TypeOptions TypeOptions,
+        MemberOptions MemberOptions)
+    {
+        public static Options Default { get; } = new(
+            new TypeOptions(),
+            new MemberOptions());
+
+        public override string ToString() => $"{TypeOptions.AllowedAccessibilities}[{TypeOptions.AllowedTypeDeclarations}]_{MemberOptions.AllowedAccessibilities}";
+    }
+
     /// <summary>
     /// Finds schema root types in the given workspace.
     /// </summary>
     /// <param name="workspace">The workspace to search for schema root types.</param>
     /// <param name="cancellationToken">The cancellation token to observe.</param>
-    /// <returns>An async enumerable of <see cref="SchemaRootInfo"/>.</returns>
+    /// <returns>A collection of <see cref="SchemaRootInfo"/>.</returns>
     [ExcludeFromCodeCoverage]
-    public async Task<IReadOnlyCollection<SchemaRootInfo>> FindSchemaRootTypesAsync(
+    public async Task<IReadOnlyCollection<SchemaRootInfo>> FindRootsAsync(
         Workspace workspace,
         CancellationToken cancellationToken)
     {
         Throw.IfNullArgument(workspace, nameof(workspace));
 
-        var bag = new ConcurrentBag<SchemaRootInfo>();
-        var tasks = workspace.CurrentSolution.Projects.Select(async project =>
+        List<SchemaRootInfo> schemaRootInfos = [];
+        foreach (Project project in workspace.CurrentSolution.Projects)
         {
-            await foreach (SchemaRootInfo rootInfo in this.FindSchemaRootTypesAsync(project, cancellationToken).WithCancellation(cancellationToken))
-            {
-                bag.Add(rootInfo);
-            }
-        });
+            IReadOnlyCollection<SchemaRootInfo> projectRootInfos = await this.FindRootsAsync(project, cancellationToken);
+            schemaRootInfos.AddRange(projectRootInfos);
+        }
 
-        await Task.WhenAll(tasks);
-
-        return bag.ToArray();
+        return schemaRootInfos;
     }
 
     /// <summary>
@@ -45,83 +82,123 @@ public class SchemaRootInfoGenerator
     /// </summary>
     /// <param name="project">The project to search for schema root types.</param>
     /// <param name="cancellationToken">The cancellation token to observe.</param>
-    /// <returns>An async enumerable of <see cref="SchemaRootInfo"/>.</returns>
-    public async IAsyncEnumerable<SchemaRootInfo> FindSchemaRootTypesAsync(
+    /// <returns>A collection of <see cref="SchemaRootInfo"/>.</returns>
+    public async Task<IReadOnlyCollection<SchemaRootInfo>> FindRootsAsync(
         Project project,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
         Throw.IfNullArgument(project, nameof(project));
 
-        Compilation? compilation = await project.GetCompilationAsync(cancellationToken);
-        if (compilation is null) yield break;
+        if (await project.GetCompilationAsync(cancellationToken) is not Compilation compilation)
+            return [];
 
-        SchemaRootInfo.SyntaxVisitor rootInfoVisitor = new(compilation, cancellationToken);
-        CompilationUnitVisitor compilationUnitVisitor = new(rootInfoVisitor, cancellationToken);
+        List<SchemaRootInfo> schemaRootInfos = [];
         foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
         {
-            SyntaxNode root = await syntaxTree.GetRootAsync(cancellationToken);
-            foreach (SchemaRootInfo rootInfo in compilationUnitVisitor.Visit(root) ?? [])
-            {
-                yield return rootInfo;
-            }
+            IReadOnlyCollection<SchemaRootInfo> syntaxTreeRootInfos = await this.FindRootsAsync(syntaxTree, compilation, cancellationToken);
+            schemaRootInfos.AddRange(syntaxTreeRootInfos);
         }
+
+        return schemaRootInfos;
     }
 
-    private class CompilationUnitVisitor(SchemaRootInfo.SyntaxVisitor rootInfoVisitor, CancellationToken cancellationToken)
-        : CSharpSyntaxVisitor<IEnumerable<SchemaRootInfo>>
+    /// <summary>
+    /// Finds schema root types in the given syntax tree.
+    /// </summary>
+    /// <param name="syntaxTree">The syntax tree to search for schema root types.</param>
+    /// <param name="compilation">The compilation containing the syntax tree.</param>
+    /// <param name="cancellationToken">The cancellation token to observe.</param>
+    /// <returns>A collection of <see cref="SchemaRootInfo"/>.</returns>
+    public async Task<IReadOnlyCollection<SchemaRootInfo>> FindRootsAsync(
+        SyntaxTree syntaxTree,
+        Compilation compilation,
+        CancellationToken cancellationToken)
     {
-        private readonly SchemaRootInfo.SyntaxVisitor _rootInfoVisitor = rootInfoVisitor;
-        private readonly CancellationToken _cancellationToken = cancellationToken;
+        Throw.IfNullArgument(syntaxTree, nameof(syntaxTree));
+        Throw.IfNullArgument(compilation, nameof(compilation));
 
-        public override IEnumerable<SchemaRootInfo>? VisitCompilationUnit(CompilationUnitSyntax node)
+        List<SchemaRootInfo> schemaRootInfos = [];
+        SchemaRootInfoSyntaxWalker rootSyntaxWalker = new(
+            _options,
+            compilation,
+            schemaRootInfos,
+            cancellationToken);
+
+        SyntaxNode root = await syntaxTree.GetRootAsync(cancellationToken);
+        rootSyntaxWalker.Visit(root);
+
+        return schemaRootInfos;
+    }
+
+    /// <summary>
+    /// Filters the SyntaxTree based on the options.
+    /// </summary>
+    internal class SchemaRootInfoSyntaxWalker(
+        Options options,
+        Compilation compilation,
+        List<SchemaRootInfo> schemaRootInfos,
+        CancellationToken ct)
+        : CSharpSyntaxWalker
+    {
+        private readonly SchemaMember.Object.SyntaxVisitor _objectVisitor = new(options, compilation);
+
+        public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            foreach (MemberDeclarationSyntax member in node.Members)
-            {
-                foreach (SchemaRootInfo rootInfo in this.HandleMemberDeclaration(member) ?? [])
-                {
-                    _cancellationToken.ThrowIfCancellationRequested();
-                    yield return rootInfo;
-                }
-            }
+            if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Class))
+                return;
+
+            this.ProcessTypeDeclaration(node);
         }
 
-        private IEnumerable<SchemaRootInfo> HandleMemberDeclaration(MemberDeclarationSyntax member)
+        public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            switch (member)
-            {
-                case ClassDeclarationSyntax classDeclaration:
-                    {
-                        if (classDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
-                            yield return info;
-                        break;
-                    }
-                case StructDeclarationSyntax structDeclaration:
-                    {
-                        if (structDeclaration.Accept(_rootInfoVisitor) is SchemaRootInfo info)
-                            yield return info;
-                        break;
-                    }
-                case NamespaceDeclarationSyntax namespaceDeclaration:
-                    foreach (MemberDeclarationSyntax nestedMember in namespaceDeclaration.Members)
-                    {
-                        foreach (SchemaRootInfo rootInfo in this.HandleMemberDeclaration(nestedMember) ?? Array.Empty<SchemaRootInfo>())
-                        {
-                            _cancellationToken.ThrowIfCancellationRequested();
-                            yield return rootInfo;
-                        }
-                    }
-                    break;
-                case FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclaration:
-                    foreach (MemberDeclarationSyntax nestedMember in fileScopedNamespaceDeclaration.Members)
-                    {
-                        foreach (SchemaRootInfo rootInfo in this.HandleMemberDeclaration(nestedMember) ?? Array.Empty<SchemaRootInfo>())
-                        {
-                            _cancellationToken.ThrowIfCancellationRequested();
-                            yield return rootInfo;
-                        }
-                    }
-                    break;
-            }
+            if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Struct))
+                return;
+
+            this.ProcessTypeDeclaration(node);
+        }
+
+        public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
+        {
+            if (!options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Record))
+                return;
+
+            bool isStruct = node.ClassOrStructKeyword.IsKind(SyntaxKind.StructKeyword);
+            bool isClass = node.ClassOrStructKeyword.IsKind(SyntaxKind.ClassKeyword) || node.ClassOrStructKeyword.IsKind(SyntaxKind.None);
+
+            if (isStruct && !options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Struct))
+                return;
+
+            if (isClass && !options.TypeOptions.AllowedTypeDeclarations.HasFlag(AllowedTypeDeclarations.Class))
+                return;
+
+            this.ProcessTypeDeclaration(node);
+        }
+
+        private void ProcessTypeDeclaration(TypeDeclarationSyntax node)
+        {
+            SemanticModel semanticModel = compilation.GetSemanticModel(node.SyntaxTree);
+            if (semanticModel.GetDeclaredSymbol(node, ct) is not INamedTypeSymbol symbol)
+                return;
+
+            if (!symbol.ShouldProcessAccessibility(options))
+                return;
+
+            if (symbol.GetAttributeData<SchemaRootAttribute>() is not AttributeData attributeData)
+                return;
+
+            if (node.Accept(_objectVisitor) is not SchemaMember.Object rootType)
+                return;
+
+            schemaRootInfos.Add(GetSchemaRootInfo(rootType, attributeData));
+        }
+
+        private static SchemaRootInfo GetSchemaRootInfo(SchemaMember.Object rootType, AttributeData attributeData)
+        {
+            string? filename = attributeData.GetNamedArgument<string>(nameof(SchemaRootAttribute.Filename));
+            string? id = attributeData.GetNamedArgument<string>(nameof(SchemaRootAttribute.Id));
+            string? commonNamespace = attributeData.GetNamedArgument<string>(nameof(SchemaRootAttribute.CommonNamespace));
+            return new(rootType, filename, id, commonNamespace);
         }
     }
 }

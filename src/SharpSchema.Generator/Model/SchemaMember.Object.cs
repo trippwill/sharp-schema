@@ -101,6 +101,9 @@ public abstract partial record SchemaMember
                 if (semanticModel.GetTypeInfo(node).Type is not INamedTypeSymbol symbol)
                     return null;
 
+                if (!symbol.ShouldProcessAccessibility(options))
+                    return null;
+
                 // if the identifier is a type identifier find the type declaration
                 if (symbol.DeclaringSyntaxReferences.Length > 0)
                 {
@@ -133,6 +136,9 @@ public abstract partial record SchemaMember
                 if (semanticModel.GetTypeInfo(node).Type is not INamedTypeSymbol symbol)
                     return null;
 
+                if (!symbol.ShouldProcessAccessibility(options))
+                    return null;
+
                 ImmutableArray<Object> typeArgumentMembers = node.TypeArgumentList
                     .Arguments.SelectNotNull(tps => tps.Accept(this));
 
@@ -162,6 +168,9 @@ public abstract partial record SchemaMember
 
                 if (symbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? @override))
                     return new OverrideObject(symbol, @override);
+
+                if (!symbol.ShouldProcessAccessibility(options))
+                    return null;
 
                 if (!symbol.IsValidForGeneration() || symbol.IsIgnoredForGeneration())
                     return null;

@@ -32,10 +32,10 @@ internal class SchemaMetaAttribute : SchemaAttribute
     /// <summary>
     /// Gets or sets an example for the schema.
     /// </summary>
-    public string? Example { get; set; }
+    public string[]? Examples { get; set; }
 
     /// <summary>
-    /// Gets or sets the deprecation message for the schema.
+    /// Gets or sets the deprecation status for the schema.
     /// </summary>
-    public string? Deprecated { get; set; }
+    public bool Deprecated { get; set; }
 }

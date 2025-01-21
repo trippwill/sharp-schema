@@ -2,7 +2,7 @@
 
 public static class PathHelper
 {
-    public static string GetProjectPath(string relativePath)
+    public static string GetRepoPath(string relativePath)
     {
         string basePath = AppContext.BaseDirectory;
         string repoRoot = FindRepoRoot(basePath);

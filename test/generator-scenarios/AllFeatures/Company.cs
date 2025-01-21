@@ -220,6 +220,7 @@ public struct Address
     ///     <title>City</title>
     ///     <description>The city of the address.</description>
     ///     <example>Metropolis</example>
+    ///     <example>Central City</example>
     /// </jsonschema>
     public string City { get; set; }
 
@@ -230,6 +231,7 @@ public struct Address
     ///     <title>Postal Code</title>
     ///     <description>The postal code of the address.</description>
     ///     <example>12345</example>
+    ///     <example>67890</example>
     /// </jsonschema>
     public string PostalCode { get; set; }
 

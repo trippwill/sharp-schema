@@ -1,10 +1,8 @@
 ﻿{
   RootType: {
-    TypeArgumentMembers: null,
     Properties: [
       {
         MemberType: {
-          TypeArgumentMembers: null,
           TypeSymbol: {
             SymbolKind: NamedType,
             Name: String
@@ -20,19 +18,21 @@
         MemberData: {
           Title: Company Name,
           Description: The name of the company.,
-          Example: Acme Corp
+          Examples: [
+            Acme Corp
+          ],
+          Deprecated: false
         }
       },
       {
         MemberType: {
+          Arity: 1,
           TypeArgumentMembers: [
             {
-              TypeArgumentMembers: null,
               Properties: [
                 {
                   MemberType: {
                     ElementType: {
-                      TypeArgumentMembers: null,
                       TypeSymbol: {
                         SymbolKind: NamedType,
                         Name: String
@@ -50,18 +50,20 @@
                   MemberData: {
                     Title: Department Name,
                     Description: The name of the department.,
-                    Example: Human Resources
+                    Examples: [
+                      Human Resources
+                    ],
+                    Deprecated: false
                   }
                 },
                 {
                   MemberType: {
+                    Arity: 1,
                     TypeArgumentMembers: [
                       {
-                        TypeArgumentMembers: null,
                         Properties: [
                           {
                             MemberType: {
-                              TypeArgumentMembers: null,
                               TypeSymbol: {
                                 SymbolKind: NamedType,
                                 Name: String
@@ -77,19 +79,21 @@
                             MemberData: {
                               Title: Team Name,
                               Description: The name of the team.,
-                              Example: Development Team
+                              Examples: [
+                                Development Team
+                              ],
+                              Deprecated: false
                             }
                           },
                           {
                             MemberType: {
+                              Arity: 1,
                               TypeArgumentMembers: [
                                 {
-                                  TypeArgumentMembers: null,
                                   Properties: [
                                     {
                                       MemberType: {
                                         ElementType: {
-                                          TypeArgumentMembers: null,
                                           TypeSymbol: {
                                             SymbolKind: NamedType,
                                             Name: String
@@ -107,13 +111,15 @@
                                       MemberData: {
                                         Title: Project Name,
                                         Description: The name of the project.,
-                                        Example: Project X
+                                        Examples: [
+                                          Project X
+                                        ],
+                                        Deprecated: false
                                       }
                                     },
                                     {
                                       MemberType: {
                                         ElementType: {
-                                          TypeArgumentMembers: null,
                                           TypeSymbol: {
                                             SymbolKind: NamedType,
                                             Name: Decimal
@@ -131,19 +137,21 @@
                                       MemberData: {
                                         Title: Project Budget,
                                         Description: The budget of the project.,
-                                        Example: 100000
+                                        Examples: [
+                                          100000
+                                        ],
+                                        Deprecated: false
                                       }
                                     },
                                     {
                                       MemberType: {
+                                        Arity: 1,
                                         TypeArgumentMembers: [
                                           {
-                                            TypeArgumentMembers: null,
                                             Properties: [
                                               {
                                                 MemberType: {
                                                   ElementType: {
-                                                    TypeArgumentMembers: null,
                                                     TypeSymbol: {
                                                       SymbolKind: NamedType,
                                                       Name: String
@@ -161,12 +169,14 @@
                                                 MemberData: {
                                                   Title: Task Name,
                                                   Description: The name of the task.,
-                                                  Example: Design Database
+                                                  Examples: [
+                                                    Design Database
+                                                  ],
+                                                  Deprecated: false
                                                 }
                                               },
                                               {
                                                 MemberType: {
-                                                  TypeArgumentMembers: null,
                                                   TypeSymbol: {
                                                     SymbolKind: NamedType,
                                                     Name: Int32
@@ -182,7 +192,10 @@
                                                 MemberData: {
                                                   Title: Estimated Hours,
                                                   Description: The estimated hours to complete the task.,
-                                                  Example: 40
+                                                  Examples: [
+                                                    40
+                                                  ],
+                                                  Deprecated: false
                                                 }
                                               }
                                             ],
@@ -191,7 +204,8 @@
                                               Name: Task
                                             },
                                             MemberData: {
-                                              Title: Task
+                                              Title: Task,
+                                              Deprecated: false
                                             }
                                           }
                                         ],
@@ -206,7 +220,8 @@
                                       },
                                       MemberData: {
                                         Title: Tasks,
-                                        Description: A list of tasks in the project.
+                                        Description: A list of tasks in the project.,
+                                        Deprecated: false
                                       }
                                     }
                                   ],
@@ -215,7 +230,8 @@
                                     Name: Project
                                   },
                                   MemberData: {
-                                    Title: Project
+                                    Title: Project,
+                                    Deprecated: false
                                   }
                                 }
                               ],
@@ -230,7 +246,8 @@
                             },
                             MemberData: {
                               Title: Projects,
-                              Description: A list of projects the team is working on.
+                              Description: A list of projects the team is working on.,
+                              Deprecated: false
                             }
                           }
                         ],
@@ -239,7 +256,8 @@
                           Name: Team
                         },
                         MemberData: {
-                          Title: Team
+                          Title: Team,
+                          Deprecated: false
                         }
                       }
                     ],
@@ -254,7 +272,8 @@
                   },
                   MemberData: {
                     Title: Teams,
-                    Description: A list of teams in the department.
+                    Description: A list of teams in the department.,
+                    Deprecated: false
                   }
                 }
               ],
@@ -263,7 +282,8 @@
                 Name: Department
               },
               MemberData: {
-                Title: Department
+                Title: Department,
+                Deprecated: false
               }
             }
           ],
@@ -278,26 +298,25 @@
         },
         MemberData: {
           Title: Departments,
-          Description: A list of departments in the company.
+          Description: A list of departments in the company.,
+          Deprecated: false
         }
       },
       {
         MemberType: {
           ElementType: {
+            Arity: 2,
             TypeArgumentMembers: [
               {
-                TypeArgumentMembers: null,
                 TypeSymbol: {
                   SymbolKind: NamedType,
                   Name: String
                 }
               },
               {
-                TypeArgumentMembers: null,
                 Properties: [
                   {
                     MemberType: {
-                      TypeArgumentMembers: null,
                       TypeSymbol: {
                         SymbolKind: NamedType,
                         Name: String
@@ -310,13 +329,15 @@
                     MemberData: {
                       Title: Employee Name,
                       Description: The name of the employee.,
-                      Example: John Doe
+                      Examples: [
+                        John Doe
+                      ],
+                      Deprecated: false
                     }
                   },
                   {
                     MemberType: {
                       ElementType: {
-                        TypeArgumentMembers: null,
                         TypeSymbol: {
                           SymbolKind: NamedType,
                           Name: String
@@ -334,16 +355,17 @@
                     MemberData: {
                       Title: Position,
                       Description: The position of the employee.,
-                      Example: Software Engineer
+                      Examples: [
+                        Software Engineer
+                      ],
+                      Deprecated: false
                     }
                   },
                   {
                     MemberType: {
-                      TypeArgumentMembers: null,
                       Properties: [
                         {
                           MemberType: {
-                            TypeArgumentMembers: null,
                             TypeSymbol: {
                               SymbolKind: NamedType,
                               Name: String
@@ -356,12 +378,14 @@
                           MemberData: {
                             Title: Street,
                             Description: The street of the address.,
-                            Example: 123 Main St
+                            Examples: [
+                              123 Main St
+                            ],
+                            Deprecated: false
                           }
                         },
                         {
                           MemberType: {
-                            TypeArgumentMembers: null,
                             TypeSymbol: {
                               SymbolKind: NamedType,
                               Name: String
@@ -374,12 +398,15 @@
                           MemberData: {
                             Title: City,
                             Description: The city of the address.,
-                            Example: Metropolis
+                            Examples: [
+                              Metropolis,
+                              Central City
+                            ],
+                            Deprecated: false
                           }
                         },
                         {
                           MemberType: {
-                            TypeArgumentMembers: null,
                             TypeSymbol: {
                               SymbolKind: NamedType,
                               Name: String
@@ -392,12 +419,15 @@
                           MemberData: {
                             Title: Postal Code,
                             Description: The postal code of the address.,
-                            Example: 12345
+                            Examples: [
+                              12345,
+                              67890
+                            ],
+                            Deprecated: false
                           }
                         },
                         {
                           MemberType: {
-                            TypeArgumentMembers: null,
                             TypeSymbol: {
                               SymbolKind: NamedType,
                               Name: String
@@ -409,7 +439,7 @@
                           },
                           MemberData: {
                             Title: Zip Code,
-                            Deprecated: 
+                            Deprecated: true
                           }
                         }
                       ],
@@ -418,7 +448,8 @@
                         Name: Address
                       },
                       MemberData: {
-                        Title: Address
+                        Title: Address,
+                        Deprecated: false
                       }
                     },
                     PropertySymbol: {
@@ -427,7 +458,8 @@
                     },
                     MemberData: {
                       Title: Employee Address,
-                      Description: The address of the employee.
+                      Description: The address of the employee.,
+                      Deprecated: false
                     }
                   }
                 ],
@@ -436,7 +468,8 @@
                   Name: Employee
                 },
                 MemberData: {
-                  Title: Employee
+                  Title: Employee,
+                  Deprecated: false
                 }
               }
             ],
@@ -456,16 +489,15 @@
         },
         MemberData: {
           Title: Employees,
-          Description: A dictionary of employees by their ID.
+          Description: A dictionary of employees by their ID.,
+          Deprecated: false
         }
       },
       {
         MemberType: {
-          TypeArgumentMembers: null,
           Properties: [
             {
               MemberType: {
-                TypeArgumentMembers: null,
                 TypeSymbol: {
                   SymbolKind: NamedType,
                   Name: String
@@ -478,12 +510,14 @@
               MemberData: {
                 Title: Street,
                 Description: The street of the address.,
-                Example: 123 Main St
+                Examples: [
+                  123 Main St
+                ],
+                Deprecated: false
               }
             },
             {
               MemberType: {
-                TypeArgumentMembers: null,
                 TypeSymbol: {
                   SymbolKind: NamedType,
                   Name: String
@@ -496,12 +530,15 @@
               MemberData: {
                 Title: City,
                 Description: The city of the address.,
-                Example: Metropolis
+                Examples: [
+                  Metropolis,
+                  Central City
+                ],
+                Deprecated: false
               }
             },
             {
               MemberType: {
-                TypeArgumentMembers: null,
                 TypeSymbol: {
                   SymbolKind: NamedType,
                   Name: String
@@ -514,12 +551,15 @@
               MemberData: {
                 Title: Postal Code,
                 Description: The postal code of the address.,
-                Example: 12345
+                Examples: [
+                  12345,
+                  67890
+                ],
+                Deprecated: false
               }
             },
             {
               MemberType: {
-                TypeArgumentMembers: null,
                 TypeSymbol: {
                   SymbolKind: NamedType,
                   Name: String
@@ -531,7 +571,7 @@
               },
               MemberData: {
                 Title: Zip Code,
-                Deprecated: 
+                Deprecated: true
               }
             }
           ],
@@ -540,7 +580,8 @@
             Name: Address
           },
           MemberData: {
-            Title: Address
+            Title: Address,
+            Deprecated: false
           }
         },
         PropertySymbol: {
@@ -549,7 +590,8 @@
         },
         MemberData: {
           Title: Company Address,
-          Description: The address of the company.
+          Description: The address of the company.,
+          Deprecated: false
         }
       }
     ],
@@ -558,10 +600,11 @@
       Name: Company
     },
     MemberData: {
-      Title: Company
+      Title: Company,
+      Deprecated: false
     }
   },
-  Filename: "test.schema.json",
-  Id: "https://sharpschema/test/company",
-  CommonNamespace: "AllFeatures"
+  Filename: test.schema.json,
+  Id: https://sharpschema/test/company,
+  CommonNamespace: AllFeatures
 }

@@ -7,7 +7,7 @@
 /// <param name="Filename">The filename associated with the schema.</param>
 /// <param name="Id">The identifier of the schema.</param>
 /// <param name="CommonNamespace">The common namespace of the schema.</param>
-public record SchemaRootInfo(
+public record SchemaTree(
         SchemaMember.Object RootType,
         string? Filename,
         string? Id,

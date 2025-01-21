@@ -8,14 +8,14 @@ namespace SharpSchema.Generator.Model;
 public abstract partial record SchemaMember
 {
     /// <summary>
-    /// Data for a schema member, including title, description, example, comment, and deprecated status.
+    /// Data for a schema member, including title, description, examples, comment, and deprecated status.
     /// </summary>
     /// <param name="Title">The title of the schema member.</param>
     /// <param name="Description">The description of the schema member.</param>
-    /// <param name="Example">An example for the schema member.</param>
+    /// <param name="Examples">Examples for the schema member.</param>
     /// <param name="Comment">Additional comments for the schema member.</param>
     /// <param name="Deprecated">Indicates if the schema member is deprecated.</param>
-    public record Data(string Title, string? Description, string? Example, string? Comment, string? Deprecated)
+    public record Data(string Title, string? Description, List<string>? Examples, string? Comment, bool Deprecated)
     {
         /// <summary>
         /// A visitor that extracts member data from symbols.
@@ -62,21 +62,21 @@ public abstract partial record SchemaMember
             {
                 string title = symbol.Name.Titleize();
                 string? description = null;
+                List<string>? examples = null;
                 string? comment = null;
-                string? example = null;
-                string? deprecated = null;
+                bool deprecated = false;
 
                 string? xmlComment = symbol.GetDocumentationCommentXml();
                 if (!string.IsNullOrEmpty(xmlComment))
                 {
-                    XDocument xmlDoc = XDocument.Parse(xmlComment);
+                    var xmlDoc = XDocument.Parse(xmlComment);
                     if (xmlDoc.Descendants(JsonSchemaTag).FirstOrDefault() is XElement element)
                     {
                         title = element.Element(TitleElement)?.Value ?? title;
                         description = element.Element(DescriptionElement)?.Value;
                         comment = element.Element(CommentElement)?.Value;
-                        example = element.Element(ExampleElement)?.Value;
-                        deprecated = element.Element(DeprecatedElement)?.Value;
+                        examples = [.. element.Elements(ExampleElement).Select(e => e.Value)];
+                        deprecated = element.Element(DeprecatedElement) is not null;
                     }
                 }
 
@@ -85,12 +85,13 @@ public abstract partial record SchemaMember
                     title = data.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Title)) ?? title;
                     description = data.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Description)) ?? description;
                     comment = data.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Comment)) ?? comment;
-                    example = data.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Example)) ?? example;
-                    deprecated = data.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Deprecated)) ?? deprecated;
+                    examples = data.GetNamedArgument<List<string>>(nameof(SchemaMetaAttribute.Examples)) ?? examples;
+                    deprecated = data.GetNamedArgument<bool>(nameof(SchemaMetaAttribute.Deprecated));
                 }
 
-                return new Data(title, description, example, comment, deprecated);
+                return new Data(title, description, examples, comment, deprecated);
             }
         }
     }
 }
+

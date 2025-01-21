@@ -30,9 +30,19 @@ public abstract partial record SchemaMember
         /// Represents a system object.
         /// </summary>
         /// <param name="TypeSymbol">The type symbol of the system object.</param>
-        /// <param name="TypeArgumentMembers">The type argument members of the system object.</param>
         public record SystemObject(
+            INamedTypeSymbol TypeSymbol)
+            : Object(TypeSymbol, MemberData: null, Override: null);
+
+        /// <summary>
+        /// Represents a generic object in the schema.
+        /// </summary>
+        /// <param name="TypeSymbol">The type symbol of the generic object.</param>
+        /// <param name="Arity">The arity of the generic object.</param>
+        /// <param name="TypeArgumentMembers">The type argument members of the generic object.</param>
+        public record GenericObject(
             INamedTypeSymbol TypeSymbol,
+            int Arity,
             ImmutableArray<Object> TypeArgumentMembers)
             : Object(TypeSymbol, MemberData: null, Override: null);
 
@@ -51,12 +61,10 @@ public abstract partial record SchemaMember
         /// </summary>
         /// <param name="TypeSymbol">The type symbol of the data object.</param>
         /// <param name="MemberData">The member data of the data object.</param>
-        /// <param name="TypeArgumentMembers">The type argument members of the data object.</param>
         /// <param name="Properties">The properties of the data object.</param>
         public record DataObject(
             INamedTypeSymbol TypeSymbol,
             Data MemberData,
-            ImmutableArray<Object> TypeArgumentMembers,
             ImmutableArray<Property> Properties)
             : Object(TypeSymbol, MemberData, Override: null);
 
@@ -66,7 +74,7 @@ public abstract partial record SchemaMember
         /// <param name="options">The options for the schema root info generator.</param>
         /// <param name="compilation">The compilation context.</param>
         internal class SyntaxVisitor(
-            SchemaRootInfoGenerator.Options options,
+            SchemaTreeGenerator.Options options,
             Compilation compilation)
             : CSharpSyntaxVisitor<Object>
         {
@@ -75,7 +83,7 @@ public abstract partial record SchemaMember
             /// <summary>
             /// Gets the options for the schema root info generator.
             /// </summary>
-            public SchemaRootInfoGenerator.Options Options => options;
+            public SchemaTreeGenerator.Options Options => options;
 
             /// <summary>
             /// Gets the compilation context.
@@ -176,10 +184,11 @@ public abstract partial record SchemaMember
             /// <inheritdoc />
             public override Object? VisitGenericName(GenericNameSyntax node)
             {
+                if (node.IsUnboundGenericName)
+                    return null;
+
                 if (_cache.TryGetValue(node, out var cachedObject))
-                {
                     return cachedObject;
-                }
 
                 SemanticModel semanticModel = compilation.GetSemanticModel(node.SyntaxTree);
                 if (semanticModel.GetTypeInfo(node).Type is not INamedTypeSymbol symbol)
@@ -188,12 +197,15 @@ public abstract partial record SchemaMember
                 if (!symbol.ShouldProcessAccessibility(options))
                     return null;
 
-                ImmutableArray<Object> typeArgumentMembers = node.TypeArgumentList
-                    .Arguments.SelectNotNull(tps => tps.Accept(this));
+                if (symbol.TypeArguments.Length > 0)
+                {
+                    ImmutableArray<Object> typeArgumentMembers = node.TypeArgumentList
+                        .Arguments.SelectNotNull(tps => tps.Accept(this));
 
-                var result = new SystemObject(symbol, typeArgumentMembers);
-                _cache[node] = result;
-                return result;
+                    return _cache[node] = new GenericObject(symbol, symbol.Arity, typeArgumentMembers);
+                }
+
+                return null;
             }
 
             /// <inheritdoc />
@@ -208,7 +220,7 @@ public abstract partial record SchemaMember
                 if (semanticModel.GetTypeInfo(node).Type is not INamedTypeSymbol symbol)
                     return null;
 
-                var result = new SystemObject(symbol, ImmutableArray<Object>.Empty);
+                var result = new SystemObject(symbol);
                 _cache[node] = result;
                 return result;
             }
@@ -244,7 +256,7 @@ public abstract partial record SchemaMember
 
                 if (node.IsNestedInSystemNamespace())
                 {
-                    var result = new SystemObject(symbol, ImmutableArray<Object>.Empty);
+                    var result = new SystemObject(symbol);
                     _cache[node] = result;
                     return result;
                 }
@@ -254,7 +266,7 @@ public abstract partial record SchemaMember
                     .SelectNotNull(mds => mds.Accept(propertyVisitor));
 
                 var data = Data.SymbolVisitor.Instance.VisitNamedType(symbol);
-                var dataObject = new DataObject(symbol, data, ImmutableArray<Object>.Empty, properties);
+                var dataObject = new DataObject(symbol, data, properties);
                 _cache[node] = dataObject;
                 return dataObject;
             }

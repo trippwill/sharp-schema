@@ -9,7 +9,7 @@ namespace SharpSchema.Generator;
 /// <summary>
 /// Generates schema root information.
 /// </summary>
-public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = null)
+public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
 {
     private readonly Options _options = options ?? Options.Default;
 
@@ -54,18 +54,18 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
     /// </summary>
     /// <param name="workspace">The workspace to search for schema root types.</param>
     /// <param name="cancellationToken">The cancellation token to observe.</param>
-    /// <returns>A collection of <see cref="SchemaRootInfo"/>.</returns>
+    /// <returns>A collection of <see cref="SchemaTree"/>.</returns>
     [ExcludeFromCodeCoverage]
-    public async Task<IReadOnlyCollection<SchemaRootInfo>> FindRootsAsync(
+    public async Task<IReadOnlyCollection<SchemaTree>> FindRootsAsync(
         Workspace workspace,
         CancellationToken cancellationToken)
     {
         Throw.IfNullArgument(workspace, nameof(workspace));
 
-        List<SchemaRootInfo> schemaRootInfos = [];
+        List<SchemaTree> schemaRootInfos = [];
         foreach (Project project in workspace.CurrentSolution.Projects)
         {
-            IReadOnlyCollection<SchemaRootInfo> projectRootInfos = await this.FindRootsAsync(project, cancellationToken);
+            IReadOnlyCollection<SchemaTree> projectRootInfos = await this.FindRootsAsync(project, cancellationToken);
             schemaRootInfos.AddRange(projectRootInfos);
         }
 
@@ -77,8 +77,8 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
     /// </summary>
     /// <param name="project">The project to search for schema root types.</param>
     /// <param name="cancellationToken">The cancellation token to observe.</param>
-    /// <returns>A collection of <see cref="SchemaRootInfo"/>.</returns>
-    public async Task<IReadOnlyCollection<SchemaRootInfo>> FindRootsAsync(
+    /// <returns>A collection of <see cref="SchemaTree"/>.</returns>
+    public async Task<IReadOnlyCollection<SchemaTree>> FindRootsAsync(
         Project project,
         CancellationToken cancellationToken)
     {
@@ -89,10 +89,10 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
 
         _objectVisitor ??= new(_options, compilation);
 
-        List<SchemaRootInfo> schemaRootInfos = [];
+        List<SchemaTree> schemaRootInfos = [];
         foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
         {
-            IReadOnlyCollection<SchemaRootInfo> syntaxTreeRootInfos = await this.FindRootsAsync(syntaxTree, compilation, cancellationToken);
+            IReadOnlyCollection<SchemaTree> syntaxTreeRootInfos = await this.FindRootsAsync(syntaxTree, compilation, cancellationToken);
             schemaRootInfos.AddRange(syntaxTreeRootInfos);
         }
 
@@ -105,8 +105,8 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
     /// <param name="syntaxTree">The syntax tree to search for schema root types.</param>
     /// <param name="compilation">The compilation containing the syntax tree.</param>
     /// <param name="cancellationToken">The cancellation token to observe.</param>
-    /// <returns>A collection of <see cref="SchemaRootInfo"/>.</returns>
-    public async Task<IReadOnlyCollection<SchemaRootInfo>> FindRootsAsync(
+    /// <returns>A collection of <see cref="SchemaTree"/>.</returns>
+    public async Task<IReadOnlyCollection<SchemaTree>> FindRootsAsync(
         SyntaxTree syntaxTree,
         Compilation compilation,
         CancellationToken cancellationToken)
@@ -116,7 +116,7 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
 
         _objectVisitor ??= new(_options, compilation);
 
-        List<SchemaRootInfo> schemaRootInfos = [];
+        List<SchemaTree> schemaRootInfos = [];
         SchemaRootInfoSyntaxWalker rootSyntaxWalker = new(
             _options,
             _objectVisitor,
@@ -134,7 +134,7 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
     internal class SchemaRootInfoSyntaxWalker(
         Options options,
         SchemaMember.Object.SyntaxVisitor objectVisitor,
-        List<SchemaRootInfo> schemaRootInfos)
+        List<SchemaTree> schemaRootInfos)
         : CSharpSyntaxWalker
     {
         private readonly SchemaMember.Object.SyntaxVisitor _objectVisitor = objectVisitor;
@@ -209,7 +209,7 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
         /// <param name="rootType">The root type.</param>
         /// <param name="attributeSyntax">The attribute syntax.</param>
         /// <returns>The schema root information.</returns>
-        private static SchemaRootInfo GetSchemaRootInfo(SchemaMember.Object rootType, AttributeSyntax attributeSyntax)
+        private static SchemaTree GetSchemaRootInfo(SchemaMember.Object rootType, AttributeSyntax attributeSyntax)
         {
             string? filename = null;
             string? id = null;
@@ -220,7 +220,7 @@ public class SchemaRootInfoGenerator(SchemaRootInfoGenerator.Options? options = 
                 if (argument.NameEquals?.Name.ToString() is not string argumentName)
                     continue;
 
-                string argumentValue = argument.Expression.ToString();
+                string argumentValue = argument.Expression.ToString().Trim('"');
 
                 switch (argumentName)
                 {

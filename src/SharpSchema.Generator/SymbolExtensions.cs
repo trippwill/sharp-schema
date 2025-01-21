@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using Json.Schema;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpSchema.Annotations;
@@ -8,7 +9,7 @@ namespace SharpSchema.Generator;
 
 internal static class SymbolExtensions
 {
-    public static bool ShouldProcessAccessibility(this INamedTypeSymbol symbol, SchemaRootInfoGenerator.Options options)
+    public static bool ShouldProcessAccessibility(this INamedTypeSymbol symbol, SchemaTreeGenerator.Options options)
     {
         return symbol.DeclaredAccessibility switch
         {
@@ -19,7 +20,7 @@ internal static class SymbolExtensions
         };
     }
 
-    public static bool ShouldProcessAccessibility(this IPropertySymbol symbol, SchemaRootInfoGenerator.Options options)
+    public static bool ShouldProcessAccessibility(this IPropertySymbol symbol, SchemaTreeGenerator.Options options)
     {
         return symbol.DeclaredAccessibility switch
         {
@@ -86,10 +87,27 @@ internal static class SymbolExtensions
         return result is not null;
     }
 
-    public static bool IsNestedInSystemNamespace(this TypeDeclarationSyntax node)
+    public static SchemaValueType GetSchemaValueType(this INamedTypeSymbol symbol)
     {
-        return node.Ancestors()
-            .OfType<NamespaceDeclarationSyntax>()
-            .Any(n => n.Name.ToString().StartsWith("System"));
+        return symbol.Name switch
+        {
+            "Boolean" => SchemaValueType.Boolean,
+            "Byte" => SchemaValueType.Integer,
+            "Char" => SchemaValueType.String,
+            "DateTime" => SchemaValueType.String,
+            "Decimal" => SchemaValueType.Number,
+            "Double" => SchemaValueType.Number,
+            "Int16" => SchemaValueType.Integer,
+            "Int32" => SchemaValueType.Integer,
+            "Int64" => SchemaValueType.Integer,
+            "Object" => SchemaValueType.Object,
+            "SByte" => SchemaValueType.Integer,
+            "Single" => SchemaValueType.Number,
+            "String" => SchemaValueType.String,
+            "UInt16" => SchemaValueType.Integer,
+            "UInt32" => SchemaValueType.Integer,
+            "UInt64" => SchemaValueType.Integer,
+            _ => SchemaValueType.Object
+        };
     }
 }

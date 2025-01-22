@@ -75,6 +75,20 @@ internal static class SymbolExtensions
         return false;
     }
 
+    public static TypeDeclarationSyntax? FindTypeDeclaration(this ISymbol symbol)
+    {
+        return symbol.DeclaringSyntaxReferences
+            .Select(r => r.GetSyntax())
+            .OfType<TypeDeclarationSyntax>()
+            .FirstOrDefault();
+    }
+
+    public static INamedTypeSymbol? ImplementsGenericInterface(this ITypeSymbol symbol, INamedTypeSymbol interfaceSymbol)
+    {
+        return symbol.AllInterfaces
+            .FirstOrDefault(i => i.OriginalDefinition.Equals(interfaceSymbol, SymbolEqualityComparer.Default));
+    }
+
     public static bool TryGetConstructorArgument<TAttribute, TResult>(this ISymbol symbol, int argumentIndex, [NotNullWhen(true)] out TResult? result)
         where TAttribute : Attribute
         where TResult : notnull

@@ -6,38 +6,37 @@ using SharpSchema.Annotations;
 
 namespace SharpSchema.Generator.Model;
 
-public abstract partial record SchemaMember
+public abstract partial record SchemaNode
 {
     /// <summary>
     /// Represents a property in the schema member.
     /// </summary>
     /// <param name="PropertySymbol">The property symbol.</param>
-    /// <param name="MemberData">The member data.</param>
-    /// <param name="Override">The override string.</param>
-    public abstract record Property(IPropertySymbol PropertySymbol, Data? MemberData, string? Override)
-        : SchemaMember(MemberData, Override)
+    /// <param name="Metadata">The member data.</param>
+    public abstract record Property(IPropertySymbol PropertySymbol, Metadata? Metadata = null)
+        : SchemaNode(PropertySymbol, Metadata)
     {
         /// <summary>
         /// Represents an override property.
         /// </summary>
         /// <param name="PropertySymbol">The property symbol.</param>
-        /// <param name="Override">The override string.</param>
-        public record OverrideProperty(IPropertySymbol PropertySymbol, string Override)
-            : Property(PropertySymbol, MemberData: null, Override);
+        /// <param name="SchemaString">The override string.</param>
+        public record Override(IPropertySymbol PropertySymbol, string SchemaString)
+            : Property(PropertySymbol);
 
         /// <summary>
         /// Represents a data property.
         /// </summary>
         /// <param name="PropertySymbol">The property symbol.</param>
-        /// <param name="MemberData">The member data.</param>
+        /// <param name="Metadata">The member data.</param>
         /// <param name="MemberType">The member type.</param>
         /// <param name="DefaultValueSyntax">The default value syntax.</param>
-        public record DataProperty(
+        public record Custom(
             IPropertySymbol PropertySymbol,
-            Data MemberData,
+            Metadata Metadata,
             Object MemberType,
             EqualsValueClauseSyntax? DefaultValueSyntax)
-            : Property(PropertySymbol, MemberData, Override: null);
+            : Property(PropertySymbol, Metadata);
 
         /// <summary>
         /// A syntax visitor for properties.
@@ -45,7 +44,7 @@ public abstract partial record SchemaMember
         internal class SyntaxVisitor
             : CSharpSyntaxVisitor<Property>
         {
-            private static ConcurrentDictionary<Object.SyntaxVisitor, SyntaxVisitor> _instanceCache = new();
+            private static readonly ConcurrentDictionary<Object.SyntaxVisitor, SyntaxVisitor> _instanceCache = new();
 
             private readonly Object.SyntaxVisitor _objectSyntaxVisitor;
 
@@ -78,17 +77,17 @@ public abstract partial record SchemaMember
                         return null;
 
                     if (symbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? @override))
-                        return new OverrideProperty(symbol, @override);
+                        return new Override(symbol, @override);
 
                     if (!symbol.IsValidForGeneration() || symbol.IsIgnoredForGeneration())
                         return null;
 
-                    var data = Data.SymbolVisitor.Instance.VisitProperty(symbol);
+                    Metadata data = Metadata.SymbolVisitor.Instance.VisitProperty(symbol);
 
                     if (node.Type.Accept(_objectSyntaxVisitor) is not Object memberType)
                         return null;
 
-                    return new DataProperty(symbol, data, memberType, node.Initializer);
+                    return new Custom(symbol, data, memberType, node.Initializer);
                 }
             }
         }

@@ -8,7 +8,7 @@
 /// <param name="Id">The identifier of the schema.</param>
 /// <param name="CommonNamespace">The common namespace of the schema.</param>
 public record SchemaTree(
-        SchemaMember.Object RootType,
+        SchemaNode.Object RootType,
         string? Filename,
         string? Id,
         string? CommonNamespace);

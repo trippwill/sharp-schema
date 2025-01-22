@@ -1,30 +1,20 @@
-﻿using System.Runtime.CompilerServices;
-using Json.Schema;
-using Microsoft.Build.Locator;
+﻿using Json.Schema;
 using Microsoft.CodeAnalysis;
 using SharpSchema.Generator.Model;
-using SharpSchema.Generator.Tests.Utilities;
 using SharpSchema.Generator.Tests.VerifyConverters;
 using Xunit.Abstractions;
 
 namespace SharpSchema.Generator.Tests;
 
-internal class ModuleInitializer
-{
-    [ModuleInitializer]
-    public static void Initializer()
-    {
-        MSBuildLocator.RegisterDefaults();
-    }
-}
-
-public class AllFeaturesProjectTests
+public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
 {
     private readonly ITestOutputHelper _outputHelper;
+    private readonly AllFeaturesProjectFixture _fixture;
 
-    public AllFeaturesProjectTests(ITestOutputHelper outputHelper)
+    public AllFeaturesProjectTests(ITestOutputHelper outputHelper, AllFeaturesProjectFixture fixture)
     {
         _outputHelper = outputHelper;
+        _fixture = fixture;
 
         VerifySettings = new VerifySettings();
         VerifySettings.AddExtraSettings(settings =>
@@ -38,8 +28,9 @@ public class AllFeaturesProjectTests
 
     [Theory]
     [MemberData(nameof(VerifyAllFeaturesSchemaRootInfoOptions))]
-    public async Task AllFeaturesProject_SchemaTree(SchemaTreeGenerator.Options options)
+    public async Task AllFeaturesProject_SchemaTree(OptionsProxy optionsProxy)
     {
+        SchemaTreeGenerator.Options options = optionsProxy.Options;
         SchemaTree schemaTree = await GetSchemaTreeAsync(options);
         await Verify(schemaTree, this.VerifySettings).UseParameters(options);
     }
@@ -58,32 +49,65 @@ public class AllFeaturesProjectTests
         await Verify(json);
     }
 
-    private static async Task<SchemaTree> GetSchemaTreeAsync(SchemaTreeGenerator.Options? options = null)
+    private async Task<SchemaTree> GetSchemaTreeAsync(SchemaTreeGenerator.Options? options = null)
     {
-        Project project = await WorkspaceHelper.LoadProjectAsync(
-             PathHelper.GetRepoPath("test/generator-scenarios/AllFeatures/AllFeatures.csproj"));
-
         var generator = new SchemaTreeGenerator(options);
-        IReadOnlyCollection<SchemaTree> schemaRootInfos = await generator.FindRootsAsync(
-            project,
-            CancellationToken.None);
+        IReadOnlyCollection<SchemaTree> schemaRootInfos = await generator
+            .FindRootsAsync(
+                _fixture.Project!,
+                CancellationToken.None);
 
-        return Assert.Single(schemaRootInfos);
+        return schemaRootInfos.Single();
     }
 
-    public static TheoryData<SchemaTreeGenerator.Options> VerifyAllFeaturesSchemaRootInfoOptions()
+    public class OptionsProxy : IXunitSerializable
+    {
+        public SchemaTreeGenerator.Options Options { get; private set; }
+
+        public OptionsProxy()
+        {
+            Options = SchemaTreeGenerator.Options.Default;
+        }
+
+        public OptionsProxy(SchemaTreeGenerator.Options options)
+        {
+            Options = options;
+        }
+
+        public void Deserialize(IXunitSerializationInfo info)
+        {
+            Options = new(
+                new SchemaTreeGenerator.TypeOptions(
+                    info.GetValue<AllowedTypeDeclarations>(nameof(Options.TypeOptions.AllowedTypeDeclarations)),
+                    info.GetValue<AllowedAccessibilities>(nameof(Options.TypeOptions.AllowedAccessibilities))),
+                new SchemaTreeGenerator.MemberOptions(
+                    info.GetValue<AllowedAccessibilities>(nameof(Options.MemberOptions.AllowedAccessibilities))));
+        }
+
+        public void Serialize(IXunitSerializationInfo info)
+        {
+            info.AddValue(nameof(Options.TypeOptions.AllowedTypeDeclarations), Options.TypeOptions.AllowedTypeDeclarations);
+            info.AddValue(nameof(Options.TypeOptions.AllowedAccessibilities), Options.TypeOptions.AllowedAccessibilities);
+            info.AddValue(nameof(Options.MemberOptions.AllowedAccessibilities), Options.MemberOptions.AllowedAccessibilities);
+        }
+
+        public override string ToString() => Options.ToString();
+    }
+
+    public static TheoryData<OptionsProxy> VerifyAllFeaturesSchemaRootInfoOptions()
     {
         return new()
         {
-            { SchemaTreeGenerator.Options.Default },
+            { new() },
 
-            //{ new SchemaRootInfoGenerator.Options(
-            //    new SchemaRootInfoGenerator.TypeOptions(
-            //        AllowedTypeDeclarations.Class,
-            //        AllowedAccessibilities.Public),
-            //    new SchemaRootInfoGenerator.MemberOptions(
-            //        AllowedAccessibilities.Public)) },
+            { new(new SchemaTreeGenerator.Options(
+                new SchemaTreeGenerator.TypeOptions(
+                    AllowedTypeDeclarations.Class,
+                    AllowedAccessibilities.Public),
+                new SchemaTreeGenerator.MemberOptions(
+                    AllowedAccessibilities.Public))) },
         };
     }
+
 
 }

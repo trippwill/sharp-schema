@@ -47,7 +47,7 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
         public override string ToString() => $"{TypeOptions.AllowedAccessibilities}[{TypeOptions.AllowedTypeDeclarations}]_{MemberOptions.AllowedAccessibilities}";
     }
 
-    private SchemaMember.Object.SyntaxVisitor? _objectVisitor;
+    private SchemaNode.Object.SyntaxVisitor? _objectVisitor;
 
     /// <summary>
     /// Finds schema root types in the given workspace.
@@ -133,11 +133,11 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
     /// </summary>
     internal class SchemaRootInfoSyntaxWalker(
         Options options,
-        SchemaMember.Object.SyntaxVisitor objectVisitor,
+        SchemaNode.Object.SyntaxVisitor objectVisitor,
         List<SchemaTree> schemaRootInfos)
         : CSharpSyntaxWalker
     {
-        private readonly SchemaMember.Object.SyntaxVisitor _objectVisitor = objectVisitor;
+        private readonly SchemaNode.Object.SyntaxVisitor _objectVisitor = objectVisitor;
 
         /// <summary>
         /// Visits a class declaration syntax node.
@@ -197,7 +197,7 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
             if (schemaRootAttribute is null)
                 return;
 
-            if (node.Accept(_objectVisitor) is not SchemaMember.Object rootType)
+            if (node.Accept(_objectVisitor) is not SchemaNode.Object rootType)
                 return;
 
             schemaRootInfos.Add(GetSchemaRootInfo(rootType, schemaRootAttribute));
@@ -209,7 +209,7 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
         /// <param name="rootType">The root type.</param>
         /// <param name="attributeSyntax">The attribute syntax.</param>
         /// <returns>The schema root information.</returns>
-        private static SchemaTree GetSchemaRootInfo(SchemaMember.Object rootType, AttributeSyntax attributeSyntax)
+        private static SchemaTree GetSchemaRootInfo(SchemaNode.Object rootType, AttributeSyntax attributeSyntax)
         {
             string? filename = null;
             string? id = null;

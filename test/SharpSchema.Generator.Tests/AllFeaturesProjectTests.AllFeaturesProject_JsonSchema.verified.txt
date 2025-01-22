@@ -18,8 +18,7 @@
         "title": "Department"
       },
       "title": "Departments",
-      "description": "A list of departments in the company.",
-      "examples": []
+      "description": "A list of departments in the company."
     },
     "Employees": {
       "oneOf": [
@@ -38,14 +37,12 @@
         }
       ],
       "title": "Employees",
-      "description": "A dictionary of employees by their ID.",
-      "examples": []
+      "description": "A dictionary of employees by their ID."
     },
     "CompanyAddress": {
       "$ref": "#/$defs/Address",
       "title": "Company Address",
-      "description": "The address of the company.",
-      "examples": []
+      "description": "The address of the company."
     }
   },
   "$defs": {
@@ -81,8 +78,7 @@
         "ZipCode": {
           "type": "string",
           "title": "Zip Code",
-          "deprecated": true,
-          "examples": []
+          "deprecated": true
         }
       }
     },
@@ -111,8 +107,7 @@
             "title": "Team"
           },
           "title": "Teams",
-          "description": "A list of teams in the department.",
-          "examples": []
+          "description": "A list of teams in the department."
         }
       }
     },
@@ -145,8 +140,7 @@
         "EmployeeAddress": {
           "$ref": "#/$defs/Address",
           "title": "Employee Address",
-          "description": "The address of the employee.",
-          "examples": []
+          "description": "The address of the employee."
         }
       }
     },
@@ -190,8 +184,7 @@
             "title": "Task"
           },
           "title": "Tasks",
-          "description": "A list of tasks in the project.",
-          "examples": []
+          "description": "A list of tasks in the project."
         }
       }
     },
@@ -241,8 +234,7 @@
             "title": "Project"
           },
           "title": "Projects",
-          "description": "A list of projects the team is working on.",
-          "examples": []
+          "description": "A list of projects the team is working on."
         }
       }
     }

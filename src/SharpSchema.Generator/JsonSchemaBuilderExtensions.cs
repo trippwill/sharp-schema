@@ -6,7 +6,7 @@ namespace SharpSchema.Generator;
 
 internal static class JsonSchemaBuilderExtensions
 {
-    public static JsonSchemaBuilder Apply(this JsonSchemaBuilder builder, SchemaMember.Data? data)
+    public static JsonSchemaBuilder Apply(this JsonSchemaBuilder builder, Metadata? data)
     {
         if (data is null)
             return builder;
@@ -19,7 +19,7 @@ internal static class JsonSchemaBuilderExtensions
         if (data.Deprecated)
             builder.Deprecated(true);
 
-        if (data.Examples is List<string> examples)
+        if (data.Examples is List<string> examples && examples.Count > 0)
             builder.Examples([.. examples.Select(e => JsonValue.Create(e))]);
 
         if (data.Comment is string comment)

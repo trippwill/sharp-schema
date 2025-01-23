@@ -24,9 +24,6 @@
       "oneOf": [
         {
           "type": "object",
-          "propertyNames": {
-            "type": "string"
-          },
           "additionalProperties": {
             "$ref": "#/$defs/Employee",
             "title": "Employee"
@@ -43,6 +40,34 @@
       "$ref": "#/$defs/Address",
       "title": "Company Address",
       "description": "The address of the company."
+    },
+    "Assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/$defs/Building",
+            "title": "Building"
+          },
+          {
+            "$ref": "#/$defs/Vehicle",
+            "title": "Vehicle"
+          },
+          {
+            "$ref": "#/$defs/Equipment",
+            "title": "Equipment"
+          }
+        ]
+      },
+      "title": "Assets"
+    },
+    "Extra": {
+      "type": [
+        "array",
+        "boolean",
+        "integer"
+      ]
     }
   },
   "$defs": {
@@ -79,6 +104,23 @@
           "type": "string",
           "title": "Zip Code",
           "deprecated": true
+        }
+      }
+    },
+    "Building": {
+      "type": "object",
+      "properties": {
+        "AssetId": {
+          "type": "string",
+          "title": "Asset Id"
+        },
+        "AssetName": {
+          "type": "string",
+          "title": "Asset Name"
+        },
+        "BuildingAddress": {
+          "$ref": "#/$defs/Address",
+          "title": "Building Address"
         }
       }
     },
@@ -141,6 +183,23 @@
           "$ref": "#/$defs/Address",
           "title": "Employee Address",
           "description": "The address of the employee."
+        }
+      }
+    },
+    "Equipment": {
+      "type": "object",
+      "properties": {
+        "AssetId": {
+          "type": "string",
+          "title": "Asset Id"
+        },
+        "AssetName": {
+          "type": "string",
+          "title": "Asset Name"
+        },
+        "EquipmentType": {
+          "type": "string",
+          "title": "Equipment Type"
         }
       }
     },
@@ -235,6 +294,23 @@
           },
           "title": "Projects",
           "description": "A list of projects the team is working on."
+        }
+      }
+    },
+    "Vehicle": {
+      "type": "object",
+      "properties": {
+        "AssetId": {
+          "type": "string",
+          "title": "Asset Id"
+        },
+        "AssetName": {
+          "type": "string",
+          "title": "Asset Name"
+        },
+        "VehicleType": {
+          "type": "string",
+          "title": "Vehicle Type"
         }
       }
     }

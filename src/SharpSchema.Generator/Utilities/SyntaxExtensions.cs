@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace SharpSchema.Generator;
+namespace SharpSchema.Generator.Utilities;
 
 internal static class SyntaxExtensions
 {

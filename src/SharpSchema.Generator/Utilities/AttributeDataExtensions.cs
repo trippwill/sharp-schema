@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace SharpSchema.Generator;
+namespace SharpSchema.Generator.Utilities;
 
 internal static class AttributeDataExtensions
 {

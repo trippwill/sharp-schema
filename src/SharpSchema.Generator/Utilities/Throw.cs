@@ -1,4 +1,6 @@
-﻿namespace SharpSchema.Generator;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace SharpSchema.Generator.Utilities;
 
 internal static class Throw
 {
@@ -7,6 +9,7 @@ internal static class Throw
         if (value is null) throw new ArgumentNullException(paramName);
     }
 
+    [ExcludeFromCodeCoverage]
     public static T ForNullValue<T>(string message) where T : notnull
     {
         throw new InvalidOperationException(message);

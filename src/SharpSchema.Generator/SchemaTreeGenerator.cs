@@ -1,8 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SharpSchema.Annotations;
 using SharpSchema.Generator.Model;
+using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator;
 
@@ -14,37 +17,24 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
     private readonly Options _options = options ?? Options.Default;
 
     /// <summary>
-    /// Options for type declarations.
-    /// </summary>
-    public record TypeOptions(
-        AllowedTypeDeclarations AllowedTypeDeclarations = AllowedTypeDeclarations.Any,
-        AllowedAccessibilities AllowedAccessibilities = AllowedAccessibilities.Default);
-
-    /// <summary>
-    /// Options for member declarations.
-    /// </summary>
-    public record MemberOptions(
-        AllowedAccessibilities AllowedAccessibilities = AllowedAccessibilities.Default);
-
-    /// <summary>
     /// Options for the schema root info generator.
     /// </summary>
     public record Options(
-        TypeOptions TypeOptions,
-        MemberOptions MemberOptions)
+        AllowedAccessibilities TypeOptions,
+        AllowedAccessibilities MemberOptions)
     {
         /// <summary>
         /// Gets the default options.
         /// </summary>
         public static Options Default { get; } = new(
-            new TypeOptions(),
-            new MemberOptions());
+            AllowedAccessibilities.Default,
+            AllowedAccessibilities.Default);
 
         /// <summary>
         /// Returns a string representation of the options.
         /// </summary>
         /// <returns>A string representation of the options.</returns>
-        public override string ToString() => $"{TypeOptions.AllowedAccessibilities}[{TypeOptions.AllowedTypeDeclarations}]_{MemberOptions.AllowedAccessibilities}";
+        public override string ToString() => $"{TypeOptions}[{MemberOptions}]";
     }
 
     private SchemaNode.Object.SyntaxVisitor? _objectVisitor;
@@ -89,12 +79,18 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
 
         _objectVisitor ??= new(_options, compilation);
 
-        List<SchemaTree> schemaRootInfos = [];
-        foreach (SyntaxTree syntaxTree in compilation.SyntaxTrees)
+        ConcurrentBag<SchemaTree> schemaRootInfos = new();
+        Parallel.ForEach(compilation.SyntaxTrees, async syntaxTree =>
         {
-            IReadOnlyCollection<SchemaTree> syntaxTreeRootInfos = await this.FindRootsAsync(syntaxTree, compilation, cancellationToken);
-            schemaRootInfos.AddRange(syntaxTreeRootInfos);
-        }
+            IReadOnlyCollection<SchemaTree> syntaxTreeRootInfos = await this.FindRootsAsync(
+                syntaxTree,
+                compilation,
+                cancellationToken)
+                .ConfigureAwait(false);
+
+            foreach (SchemaTree schemaRootInfo in syntaxTreeRootInfos)
+                schemaRootInfos.Add(schemaRootInfo);
+        });
 
         return schemaRootInfos;
     }
@@ -117,12 +113,9 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
         _objectVisitor ??= new(_options, compilation);
 
         List<SchemaTree> schemaRootInfos = [];
-        SchemaRootInfoSyntaxWalker rootSyntaxWalker = new(
-            _options,
-            _objectVisitor,
-            schemaRootInfos);
+        SchemaRootInfoSyntaxWalker rootSyntaxWalker = new(_objectVisitor, schemaRootInfos);
 
-        SyntaxNode root = await syntaxTree.GetRootAsync(cancellationToken);
+        SyntaxNode root = await syntaxTree.GetRootAsync(cancellationToken).ConfigureAwait(false);
         rootSyntaxWalker.Visit(root);
 
         return schemaRootInfos;
@@ -132,7 +125,6 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
     /// Filters the SyntaxTree based on the options.
     /// </summary>
     internal class SchemaRootInfoSyntaxWalker(
-        Options options,
         SchemaNode.Object.SyntaxVisitor objectVisitor,
         List<SchemaTree> schemaRootInfos)
         : CSharpSyntaxWalker
@@ -145,9 +137,6 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
         /// <param name="node">The class declaration syntax node.</param>
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            if (!options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Class))
-                return;
-
             this.ProcessTypeDeclaration(node);
         }
 
@@ -157,9 +146,6 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
         /// <param name="node">The struct declaration syntax node.</param>
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            if (!options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Struct))
-                return;
-
             this.ProcessTypeDeclaration(node);
         }
 
@@ -169,18 +155,6 @@ public class SchemaTreeGenerator(SchemaTreeGenerator.Options? options = null)
         /// <param name="node">The record declaration syntax node.</param>
         public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
         {
-            if (!options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Record))
-                return;
-
-            bool isStruct = node.ClassOrStructKeyword.IsKind(SyntaxKind.StructKeyword);
-            bool isClass = node.ClassOrStructKeyword.IsKind(SyntaxKind.ClassKeyword) || node.ClassOrStructKeyword.IsKind(SyntaxKind.None);
-
-            if (isStruct && !options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Struct))
-                return;
-
-            if (isClass && !options.TypeOptions.AllowedTypeDeclarations.CheckFlag(AllowedTypeDeclarations.Class))
-                return;
-
             this.ProcessTypeDeclaration(node);
         }
 

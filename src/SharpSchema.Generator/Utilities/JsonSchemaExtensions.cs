@@ -2,7 +2,7 @@
 using Json.More;
 using Json.Schema;
 
-namespace SharpSchema.Generator;
+namespace SharpSchema.Generator.Utilities;
 
 /// <summary>
 /// Extension methods for <see cref="JsonSchema"/>.

@@ -1,4 +1,6 @@
-﻿namespace SharpSchema.Generator.Model;
+﻿using SharpSchema.Generator.Utilities;
+
+namespace SharpSchema.Generator.Model;
 
 /// <summary>
 /// The root type information for producing a schema.
@@ -11,4 +13,12 @@ public record SchemaTree(
         SchemaNode.Object RootType,
         string? Filename,
         string? Id,
-        string? CommonNamespace);
+        string? CommonNamespace) : SchemaNode.ISchemaNode
+{
+    /// <inheritdoc />
+    public long GetSchemaHash() => SchemaHash.Combine(
+        RootType.GetSchemaHash(),
+        Filename.GetSchemaHash(),
+        Id.GetSchemaHash(),
+        CommonNamespace.GetSchemaHash());
+}

@@ -1,5 +1,6 @@
 ﻿using Json.Schema;
 using SharpSchema.Generator.Model;
+using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator;
 
@@ -13,10 +14,11 @@ public partial class JsonSchemaGenerator
 {
     public JsonSchemaResult Generate(SchemaTree rootInfo)
     {
+        Throw.IfNullArgument(rootInfo, nameof(rootInfo));
         return new RootBuilder(rootInfo).Build();
     }
 
-    public class RootBuilder
+    internal class RootBuilder
     {
         public record struct Context(DefMap Defs, string? CommonNamespace);
 
@@ -27,8 +29,6 @@ public partial class JsonSchemaGenerator
 
         public RootBuilder(SchemaTree rootInfo)
         {
-            Throw.IfNullArgument(rootInfo, nameof(rootInfo));
-
             _rootInfo = rootInfo;
             _ctx = new(
                 new DefMap(StringComparer.Ordinal),

@@ -1,5 +1,6 @@
 ﻿using Json.Schema;
 using SharpSchema.Generator.Model;
+using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator;
 
@@ -10,7 +11,7 @@ using Node = SchemaNode;
 
 public partial class JsonSchemaGenerator
 {
-    public class ObjectWalker
+    internal class ObjectWalker
     {
         private readonly CachingObjectBuilder _objectBuilder;
 

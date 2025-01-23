@@ -2,7 +2,7 @@
 using Json.Schema;
 using SharpSchema.Generator.Model;
 
-namespace SharpSchema.Generator;
+namespace SharpSchema.Generator.Utilities;
 
 internal static class JsonSchemaBuilderExtensions
 {

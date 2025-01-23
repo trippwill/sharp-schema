@@ -1,6 +1,7 @@
 ﻿using Json.Schema;
 using Microsoft.CodeAnalysis;
 using SharpSchema.Generator.Model;
+using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator;
 
@@ -20,11 +21,14 @@ public partial class JsonSchemaGenerator
         {
             builder = obj switch
             {
-                Node.Object.Custom d => ApplyObject(builder, d),
-                Node.Object.Generic g => ApplyObject(builder, g),
-                Node.Object.Nullable n => ApplyObject(builder, n),
                 Node.Object.Override o => ApplyObject(builder, o),
                 Node.Object.System s => ApplyObject(builder, s),
+                Node.Object.Nullable n => ApplyObject(builder, n),
+                Node.Object.Map m => ApplyObject(builder, m),
+                Node.Object.Array arr => ApplyObject(builder, arr),
+                Node.Object.Abstract a => ApplyObject(builder, a),
+                Node.Object.Generic g => ApplyObject(builder, g),
+                Node.Object.Custom d => ApplyObject(builder, d),
                 _ => throw new NotSupportedException()
             };
 
@@ -38,28 +42,31 @@ public partial class JsonSchemaGenerator
                 .Properties([.. obj.Properties.Select(propertyWalker.Visit)]);
         }
 
-        private Builder ApplyObject(Builder builder, Node.Object.Generic obj)
+
+        private Builder ApplyObject(Builder builder, Node.Object.Abstract obj)
         {
-            if (obj.TypeArguments.Length == 1)
-            {
-                // Array
-                return builder
-                    .Type(SchemaValueType.Array)
-                    .Items(ApplyObject(new Builder(), obj.TypeArguments[0]));
-            }
-
-            if (obj.TypeArguments.Length == 2)
-            {
-                // Dictionary
-                return builder
-                    .Type(SchemaValueType.Object)
-                    .PropertyNames(new Builder().Type(SchemaValueType.String))
-                    .AdditionalProperties(ApplyObject(new Builder(), obj.TypeArguments[1]));
-            }
-
             return builder
                 .Type(SchemaValueType.Object)
-                .Comment("Unsupported generic object");
+                .OneOf([.. obj.Implementations.Select(impl => ApplyObject(new Builder(), impl).Build())]);
+        }
+
+        private Builder ApplyObject(Builder builder, Node.Object.Array obj)
+        {
+            return builder
+                .Type(SchemaValueType.Array)
+                .Items(ApplyObject(new Builder(), obj.ElementType));
+        }
+
+        private Builder ApplyObject(Builder builder, Node.Object.Map obj)
+        {
+            return builder
+                .Type(SchemaValueType.Object)
+                .AdditionalProperties(ApplyObject(new Builder(), obj.ValueType));
+        }
+
+        private Builder ApplyObject(Builder builder, Node.Object.Generic obj)
+        {
+            throw new NotImplementedException();
         }
 
         private Builder ApplyObject(Builder builder, Node.Object.Nullable obj)
@@ -77,7 +84,7 @@ public partial class JsonSchemaGenerator
 
         private Builder ApplyObject(Builder builder, Node.Object.System obj)
         {
-            return builder.Type(obj.TypeSymbol.GetSchemaValueType());
+            return builder.Type(obj.Symbol.GetSchemaValueType());
         }
     }
 
@@ -93,7 +100,7 @@ public partial class JsonSchemaGenerator
 
         protected override Builder ApplyObject(Builder builder, Node.Object.Custom obj)
         {
-            string cacheKey = obj.TypeSymbol.MetadataName;
+            string cacheKey = obj.Symbol.MetadataName;
             string refKey = $"#/$defs/{cacheKey}";
             if (_ctx.Defs.TryGetValue(cacheKey, out _))
                 return new Builder().Ref(refKey);

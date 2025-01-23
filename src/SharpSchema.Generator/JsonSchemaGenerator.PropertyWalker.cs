@@ -1,5 +1,6 @@
 ﻿using Json.Schema;
 using SharpSchema.Generator.Model;
+using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator;
 
@@ -11,7 +12,7 @@ using PropertyResult = (string Name, JsonSchema Schema);
 
 public partial class JsonSchemaGenerator
 {
-    public class PropertyWalker
+    internal class PropertyWalker
     {
         private readonly ObjectWalker _objectWalker;
 
@@ -30,7 +31,7 @@ public partial class JsonSchemaGenerator
             };
 
             return (
-                property.PropertySymbol.Name,
+                property.Symbol.Name,
                 builder.Apply(property.Metadata));
         }
 

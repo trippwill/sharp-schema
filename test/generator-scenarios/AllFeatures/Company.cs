@@ -48,6 +48,14 @@ public class Company
     ///     <description>The address of the company.</description>
     /// </jsonschema>
     public Address CompanyAddress { get; set; }
+
+    /// <summary>
+    /// The list of company assets.
+    /// </summary>
+    public required CompanyAsset[] Assets { get; set; }
+
+    [SchemaOverride("""{ "type": ["array", "integer", "boolean" ] }""")]
+    public required object Extra { get; set; }
 }
 
 /// <summary>
@@ -73,6 +81,11 @@ public class Department
     ///     <description>A list of teams in the department.</description>
     /// </jsonschema>
     public required List<Team> Teams { get; set; }
+
+    /// <summary>
+    /// The list of department assets.
+    /// </summary>
+    public CompanyAsset[]? DepartmentAssets { get; set; }
 }
 
 /// <summary>
@@ -99,6 +112,11 @@ public class Team
     /// </jsonschema>
     [SchemaRequired(false)]
     public required List<Project> Projects { get; set; }
+
+    /// <summary>
+    /// The list of team assets.
+    /// </summary>
+    public CompanyAsset[]? TeamAssets { get; set; }
 }
 
 /// <summary>

@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Xml.Linq;
 using Humanizer;
 using Microsoft.CodeAnalysis;
 using SharpSchema.Annotations;
+using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator.Model;
 
@@ -14,7 +16,29 @@ namespace SharpSchema.Generator.Model;
 /// <param name="Comment">Additional comments for the schema member.</param>
 /// <param name="Deprecated">Indicates if the schema member is deprecated.</param>
 public record Metadata(string Title, string? Description, List<string>? Examples, string? Comment, bool Deprecated)
+    : SchemaNode.ISchemaNode
 {
+    /// <inheritdoc />
+    public long GetSchemaHash() => SchemaHash.Combine(
+        Title.GetSchemaHash(),
+        Description.GetSchemaHash(),
+        GetElementsSchemaHash(Examples),
+        Comment.GetSchemaHash(),
+        Deprecated ? 1 : 0);
+
+    private static long GetElementsSchemaHash(List<string>? strings)
+    {
+        if (strings is null) return 0;
+
+        long hash = 0;
+        foreach (var str in strings)
+        {
+            hash = SchemaHash.Combine(hash, str.GetSchemaHash());
+        }
+
+        return hash;
+    }
+
     /// <summary>
     /// A visitor that extracts member metadata from symbols.
     /// </summary>
@@ -50,6 +74,13 @@ public record Metadata(string Title, string? Description, List<string>? Examples
         /// <param name="symbol">The property symbol to visit.</param>
         /// <returns>The extracted <see cref="Metadata"/>.</returns>
         public override Metadata VisitProperty(IPropertySymbol symbol) => CreateMetadata(symbol);
+
+        /// <summary>
+        /// Visits a parameter symbol and extracts <see cref="Metadata"/>.
+        /// </summary>
+        /// <param name="symbol">The parameter symbol to visit.</param>
+        /// <returns>The extracted <see cref="Metadata"/>.</returns>
+        public override Metadata VisitParameter(IParameterSymbol symbol) => CreateMetadata(symbol);
 
         /// <summary>
         /// Creates a <see cref="Metadata"/> instance from the given symbol.

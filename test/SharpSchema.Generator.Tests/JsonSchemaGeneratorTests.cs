@@ -1,5 +1,3 @@
-using SharpSchema.Generator.Model;
-
 namespace SharpSchema.Generator.Tests;
 
 public class JsonSchemaGeneratorTests

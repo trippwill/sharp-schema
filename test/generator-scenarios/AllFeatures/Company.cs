@@ -55,7 +55,7 @@ public class Company
     public required CompanyAsset[] Assets { get; set; }
 
     [SchemaOverride("""{ "type": ["array", "integer", "boolean" ] }""")]
-    public required object Extra { get; set; }
+    internal object? Extra { get; set; }
 }
 
 /// <summary>
@@ -85,7 +85,7 @@ public class Department
     /// <summary>
     /// The list of department assets.
     /// </summary>
-    public CompanyAsset[]? DepartmentAssets { get; set; }
+    internal CompanyAsset[]? DepartmentAssets { get; set; }
 }
 
 /// <summary>

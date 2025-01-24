@@ -45,10 +45,12 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
         await Verify(schemaTree.GetSchemaHash()).UseParameters(options);
     }
 
-    [Fact]
-    public async Task Verify_JsonSchema()
+    [Theory]
+    [MemberData(nameof(VerifyOptions))]
+    public async Task Verify_JsonSchema(AllowedAccessibilities typeOptions, AllowedAccessibilities memberOptions)
     {
-        SchemaTree schemaTree = await GetSchemaTreeAsync();
+        SchemaTreeGenerator.Options options = new(typeOptions, memberOptions);
+        SchemaTree schemaTree = await GetSchemaTreeAsync(options);
 
         var jsonSchemaGenerator = new JsonSchemaGenerator();
         (JsonSchema jsonSchema, string? _) = jsonSchemaGenerator.Generate(schemaTree);
@@ -56,7 +58,24 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
         string json = jsonSchema.SerializeToJson();
         _outputHelper.WriteLine(json);
 
-        await Verify(json);
+        await Verify(json).UseParameters(options);
+    }
+
+    [Fact]
+    public async Task DifferentTrees_HaveDifferentSchemaHashes()
+    {
+        SchemaTree schemaTree1 = await GetSchemaTreeAsync(
+            new(
+                AllowedAccessibilities.Public,
+                AllowedAccessibilities.Public));
+        SchemaTree schemaTree2 = await GetSchemaTreeAsync(
+            new(
+                AllowedAccessibilities.Public | AllowedAccessibilities.Internal,
+                AllowedAccessibilities.Public | AllowedAccessibilities.Internal));
+
+        long hash1 = schemaTree1.GetSchemaHash();
+        long hash2 = schemaTree2.GetSchemaHash();
+        Assert.NotEqual(hash1, hash2);
     }
 
     private async Task<SchemaTree> GetSchemaTreeAsync(SchemaTreeGenerator.Options? options = null)
@@ -75,6 +94,7 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
         return new()
         {
             { AllowedAccessibilities.Default, AllowedAccessibilities.Default},
+            { AllowedAccessibilities.Any, AllowedAccessibilities.Any }
         };
     }
 }

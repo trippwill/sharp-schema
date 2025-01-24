@@ -142,13 +142,16 @@ public readonly struct StructuralArray<T> : IEquatable<StructuralArray<T>>, IEnu
     /// <inheritdoc />
     public long GetSchemaHash()
     {
-        long hash = 1701;
-        foreach (var item in _array)
+        unchecked
         {
-            hash = (hash << 5) - hash + item.GetSchemaHash();
-        }
+            long hash = 1701;
+            foreach (var item in _array)
+            {
+                hash = (hash << 5) - hash + item.GetSchemaHash();
+            }
 
-        return hash;
+            return hash;
+        }
     }
 
     /// <inheritdoc/>

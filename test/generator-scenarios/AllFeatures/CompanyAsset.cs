@@ -15,7 +15,7 @@ public abstract record CompanyAsset(string AssetId, string AssetName)
 {
     public record Building(string AssetId, string AssetName, Address BuildingAddress) : CompanyAsset(AssetId, AssetName);
 
-    public record Vehicle(string AssetId, string AssetName, string VehicleType) : CompanyAsset(AssetId, AssetName);
+    internal record Vehicle(string AssetId, string AssetName, string VehicleType) : CompanyAsset(AssetId, AssetName);
 
     public record Equipment(string AssetId, string AssetName, string EquipmentType) : CompanyAsset(AssetId, AssetName);
 }

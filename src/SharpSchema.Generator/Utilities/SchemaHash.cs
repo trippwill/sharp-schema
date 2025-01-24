@@ -4,10 +4,19 @@ namespace SharpSchema.Generator.Utilities;
 internal static class SchemaHash
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long Combine(long hash1, long hash2) => (hash1 << 32) ^ hash2;
+    public static long Combine(long hash1, long hash2)
+    {
+        unchecked
+        {
+            return (hash1 << 5) + hash1 ^ hash2;
+        }
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long Combine(long hash1, long hash2, long hash3) => Combine(Combine(hash1, hash2), hash3);
+    public static long Combine(long hash1, long hash2, long hash3)
+    {
+        return Combine(Combine(hash1, hash2), hash3);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long Combine(long hash1, long hash2, long hash3, long hash4)

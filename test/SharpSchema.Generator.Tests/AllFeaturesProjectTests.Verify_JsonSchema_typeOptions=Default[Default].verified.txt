@@ -1,0 +1,290 @@
+﻿{
+  "$id": "https://sharpschema/test/company",
+  "title": "Company",
+  "type": "object",
+  "properties": {
+    "Name": {
+      "type": "string",
+      "title": "Company Name",
+      "description": "The name of the company.",
+      "examples": [
+        "Acme Corp"
+      ]
+    },
+    "Departments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Department",
+        "title": "Department"
+      },
+      "title": "Departments",
+      "description": "A list of departments in the company."
+    },
+    "Employees": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Employee",
+            "title": "Employee"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Employees",
+      "description": "A dictionary of employees by their ID."
+    },
+    "CompanyAddress": {
+      "$ref": "#/$defs/Address",
+      "title": "Company Address",
+      "description": "The address of the company."
+    },
+    "Assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/$defs/Building",
+            "title": "Building"
+          },
+          {
+            "$ref": "#/$defs/Equipment",
+            "title": "Equipment"
+          }
+        ]
+      },
+      "title": "Assets"
+    }
+  },
+  "$defs": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "Street": {
+          "type": "string",
+          "title": "Street",
+          "description": "The street of the address.",
+          "examples": [
+            "123 Main St"
+          ]
+        },
+        "City": {
+          "type": "string",
+          "title": "City",
+          "description": "The city of the address.",
+          "examples": [
+            "Metropolis",
+            "Central City"
+          ]
+        },
+        "PostalCode": {
+          "type": "string",
+          "title": "Postal Code",
+          "description": "The postal code of the address.",
+          "examples": [
+            "12345",
+            "67890"
+          ]
+        },
+        "ZipCode": {
+          "type": "string",
+          "title": "Zip Code",
+          "deprecated": true
+        }
+      }
+    },
+    "Building": {
+      "type": "object",
+      "properties": {
+        "AssetId": {
+          "type": "string",
+          "title": "Asset Id"
+        },
+        "AssetName": {
+          "type": "string",
+          "title": "Asset Name"
+        },
+        "BuildingAddress": {
+          "$ref": "#/$defs/Address",
+          "title": "Building Address"
+        }
+      }
+    },
+    "Department": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Department Name",
+          "description": "The name of the department.",
+          "examples": [
+            "Human Resources"
+          ]
+        },
+        "Teams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Team",
+            "title": "Team"
+          },
+          "title": "Teams",
+          "description": "A list of teams in the department."
+        }
+      }
+    },
+    "Employee": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "title": "Employee Name",
+          "description": "The name of the employee.",
+          "examples": [
+            "John Doe"
+          ]
+        },
+        "Position": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Position",
+          "description": "The position of the employee.",
+          "examples": [
+            "Software Engineer"
+          ]
+        },
+        "EmployeeAddress": {
+          "$ref": "#/$defs/Address",
+          "title": "Employee Address",
+          "description": "The address of the employee."
+        }
+      }
+    },
+    "Equipment": {
+      "type": "object",
+      "properties": {
+        "AssetId": {
+          "type": "string",
+          "title": "Asset Id"
+        },
+        "AssetName": {
+          "type": "string",
+          "title": "Asset Name"
+        },
+        "EquipmentType": {
+          "type": "string",
+          "title": "Equipment Type"
+        }
+      }
+    },
+    "Project": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Project Name",
+          "description": "The name of the project.",
+          "examples": [
+            "Project X"
+          ]
+        },
+        "Budget": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Project Budget",
+          "description": "The budget of the project.",
+          "examples": [
+            "100000"
+          ]
+        },
+        "Tasks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Task",
+            "title": "Task"
+          },
+          "title": "Tasks",
+          "description": "A list of tasks in the project."
+        }
+      }
+    },
+    "Task": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Task Name",
+          "description": "The name of the task.",
+          "examples": [
+            "Design Database"
+          ]
+        },
+        "EstimatedHours": {
+          "type": "integer",
+          "title": "Estimated Hours",
+          "description": "The estimated hours to complete the task.",
+          "examples": [
+            "40"
+          ]
+        }
+      }
+    },
+    "Team": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "title": "Team Name",
+          "description": "The name of the team.",
+          "examples": [
+            "Development Team"
+          ]
+        },
+        "Projects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Project",
+            "title": "Project"
+          },
+          "title": "Projects",
+          "description": "A list of projects the team is working on."
+        }
+      }
+    }
+  }
+}

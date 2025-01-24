@@ -2944,6 +2944,70 @@
                     },
                     Symbol: {
                       SymbolKind: Parameter,
+                      Name: VehicleType
+                    },
+                    Metadata: {
+                      Title: Vehicle Type,
+                      Deprecated: false
+                    }
+                  }
+                ],
+                Kind: Custom,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: Vehicle
+                },
+                Metadata: {
+                  Title: Vehicle,
+                  Deprecated: false
+                }
+              },
+              {
+                Properties: [
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: AssetId
+                    },
+                    Metadata: {
+                      Title: Asset Id,
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: AssetName
+                    },
+                    Metadata: {
+                      Title: Asset Name,
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
                       Name: EquipmentType
                     },
                     Metadata: {
@@ -3177,6 +3241,70 @@
                       },
                       Symbol: {
                         SymbolKind: Parameter,
+                        Name: VehicleType
+                      },
+                      Metadata: {
+                        Title: Vehicle Type,
+                        Deprecated: false
+                      }
+                    }
+                  ],
+                  Kind: Custom,
+                  Symbol: {
+                    SymbolKind: NamedType,
+                    Name: Vehicle
+                  },
+                  Metadata: {
+                    Title: Vehicle,
+                    Deprecated: false
+                  }
+                },
+                {
+                  Properties: [
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: AssetId
+                      },
+                      Metadata: {
+                        Title: Asset Id,
+                        Deprecated: false
+                      }
+                    },
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: AssetName
+                      },
+                      Metadata: {
+                        Title: Asset Name,
+                        Deprecated: false
+                      }
+                    },
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
                         Name: EquipmentType
                       },
                       Metadata: {
@@ -3216,6 +3344,13 @@
         Metadata: {
           Title: Assets,
           Deprecated: false
+        }
+      },
+      {
+        SchemaString: { "type": ["array", "integer", "boolean" ] },
+        Symbol: {
+          SymbolKind: Property,
+          Name: Extra
         }
       }
     ],

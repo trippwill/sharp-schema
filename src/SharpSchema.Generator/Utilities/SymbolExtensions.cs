@@ -198,6 +198,7 @@ internal static class SymbolExtensions
     /// </summary>
     /// <param name="symbol">The symbol.</param>
     /// <returns>The schema value type.</returns>
+    [ExcludeFromCodeCoverage]
     public static SchemaValueType GetSchemaValueType(this ISymbol symbol)
     {
         return symbol.Name switch

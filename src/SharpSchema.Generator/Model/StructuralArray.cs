@@ -17,7 +17,7 @@ public static class StructuralArray
     /// <param name="values">The values to include in the array.</param>
     /// <returns>A new <see cref="StructuralArray{T}"/> containing the specified values.</returns>
     public static StructuralArray<T> Create<T>(ReadOnlySpan<T> values)
-        where T : notnull, SchemaNode.ISchemaNode
+        where T : notnull, ISchemaNode
     {
         ImmutableArray<T>.Builder builder = ImmutableArray.CreateBuilder<T>(values.Length);
         foreach (T value in values)
@@ -34,8 +34,8 @@ public static class StructuralArray
 /// </summary>
 /// <typeparam name="T">The type of elements in the array.</typeparam>
 [CollectionBuilder(typeof(StructuralArray), nameof(StructuralArray.Create))]
-public readonly struct StructuralArray<T> : IEquatable<StructuralArray<T>>, IEnumerable<T>, SchemaNode.ISchemaNode
-    where T : notnull, SchemaNode.ISchemaNode
+public readonly struct StructuralArray<T> : IEquatable<StructuralArray<T>>, IEnumerable<T>, ISchemaNode
+    where T : notnull, ISchemaNode
 {
     private readonly ImmutableArray<T> _array;
 

@@ -16,7 +16,7 @@ public static class StructuralArrayExtensions
     /// <returns>An <see cref="IEnumerable{T}"/> whose elements are the result of invoking the transform function on each element of the source array.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the selector function is null.</exception>
     public static IEnumerable<T> Select<T>(this StructuralArray<T> array, Func<T, T> selector)
-        where T : notnull, SchemaNode.ISchemaNode
+        where T : notnull, ISchemaNode
     {
         Throw.IfNullArgument(selector, nameof(selector));
         for (var i = 0; i < array.Count; i++)
@@ -35,7 +35,7 @@ public static class StructuralArrayExtensions
     /// <returns>An <see cref="IEnumerable{TResult}"/> whose elements are the result of invoking the transform function on each element of the source array.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the selector function is null.</exception>
     public static IEnumerable<TResult> Select<TSource, TResult>(this StructuralArray<TSource> array, Func<TSource, TResult> selector)
-        where TSource : notnull, SchemaNode.ISchemaNode
+        where TSource : notnull, ISchemaNode
     {
         Throw.IfNullArgument(selector, nameof(selector));
         for (var i = 0; i < array.Count; i++)

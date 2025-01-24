@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -74,6 +75,7 @@ public abstract partial record SchemaNode
             Metadata?.GetSchemaHash() ?? 0,
             GetSchemaHashCore());
 
+        [ExcludeFromCodeCoverage]
         protected private virtual long GetSchemaHashCore() => 0;
 
         /// <summary>
@@ -81,6 +83,7 @@ public abstract partial record SchemaNode
         /// </summary>
         /// <param name="Symbol">The type symbol of the unsupported object.</param>
         /// <param name="SyntaxSpan">The syntax span of the unsupported object.</param>
+        [ExcludeFromCodeCoverage]
         public record Unsupported(ISymbol Symbol, TextSpan SyntaxSpan)
             : Object(Symbol, ObjectKind.Unsupported)
         {
@@ -212,6 +215,7 @@ public abstract partial record SchemaNode
             public Compilation Compilation => compilation;
 
             /// <inheritdoc />
+            [ExcludeFromCodeCoverage]
             public override Object? DefaultVisit(SyntaxNode node)
             {
                 return new Unsupported(

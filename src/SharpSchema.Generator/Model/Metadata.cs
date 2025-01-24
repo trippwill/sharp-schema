@@ -16,7 +16,7 @@ namespace SharpSchema.Generator.Model;
 /// <param name="Comment">Additional comments for the schema member.</param>
 /// <param name="Deprecated">Indicates if the schema member is deprecated.</param>
 public record Metadata(string Title, string? Description, List<string>? Examples, string? Comment, bool Deprecated)
-    : SchemaNode.ISchemaNode
+    : ISchemaNode
 {
     /// <inheritdoc />
     public long GetSchemaHash() => SchemaHash.Combine(

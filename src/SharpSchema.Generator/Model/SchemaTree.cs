@@ -13,7 +13,7 @@ public record SchemaTree(
         SchemaNode.Object RootType,
         string? Filename,
         string? Id,
-        string? CommonNamespace) : SchemaNode.ISchemaNode
+        string? CommonNamespace) : ISchemaNode
 {
     /// <inheritdoc />
     public long GetSchemaHash() => SchemaHash.Combine(

@@ -7,7 +7,7 @@ namespace SharpSchema.Generator.Model;
 /// </summary>
 /// <param name="Symbol">The symbol associated with the schema node.</param>
 /// <param name="Metadata">The metadata associated with the schema node.</param>
-public abstract partial record SchemaNode(ISymbol Symbol, Metadata? Metadata) : SchemaNode.ISchemaNode
+public abstract partial record SchemaNode(ISymbol Symbol, Metadata? Metadata) : ISchemaNode
 {
     /// <inheritdoc />
     public abstract long GetSchemaHash();

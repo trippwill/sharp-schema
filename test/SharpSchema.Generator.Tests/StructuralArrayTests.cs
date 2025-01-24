@@ -1,10 +1,9 @@
 using System.Collections.Immutable;
 using SharpSchema.Generator.Model;
-using Xunit;
 
 namespace SharpSchema.Generator.Tests
 {
-    internal record struct ItemNode : SchemaNode.ISchemaNode, IComparable<ItemNode>
+    internal record struct ItemNode : ISchemaNode, IComparable<ItemNode>
     {
         public int Value;
 

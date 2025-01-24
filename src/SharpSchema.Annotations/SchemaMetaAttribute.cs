@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 #nullable enable
 
@@ -7,6 +8,7 @@ namespace SharpSchema.Annotations;
 /// <summary>
 /// Represents a schema meta attribute.
 /// </summary>
+[ExcludeFromCodeCoverage]
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Enum)]
 #if SHARPSCHEMA_ASSEMBLY
 public class SchemaMetaAttribute : SchemaAttribute

@@ -2,6 +2,29 @@
 
 namespace AllFeatures;
 
+public abstract record Property<T>(string Name, T Value)
+{
+    public record StringProperty(string Name, string Value) : Property<string>(Name, Value);
+    public record IntProperty(string Name, int Value) : Property<int>(Name, Value);
+    public record BoolProperty(string Name, bool Value) : Property<bool>(Name, Value);
+}
+
+[SchemaRoot(
+    CommonNamespace = "AllFeatures",
+    Filename = "section.schema.json",
+    Id = "https://sharpschema/test/section")]
+public record Section
+{
+    public string Name { get; init; }
+
+    public Property<string>[] Strings { get; init; }
+
+    public Property<int>[] Ints { get; init; }
+
+    public Property<bool>[] Bools { get; init; }
+}
+
+
 /// <summary>
 /// Root object for the schema representing a company.
 /// </summary>

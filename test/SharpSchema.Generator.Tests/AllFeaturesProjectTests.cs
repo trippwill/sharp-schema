@@ -32,7 +32,7 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
     public async Task Verify_SchemaTree(AllowedAccessibilities typeOptions, AllowedAccessibilities memberOptions)
     {
         SchemaTreeGenerator.Options options = new(typeOptions, memberOptions);
-        SchemaTree schemaTree = await GetSchemaTreeAsync(options);
+        SchemaTree schemaTree = await GetSchemaTreeAsync("test.schema.json", options);
         await Verify(schemaTree, this.VerifySettings).UseParameters(options);
     }
 
@@ -41,7 +41,7 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
     public async Task Verify_TreeHasStableSchemaHash(AllowedAccessibilities typeOptions, AllowedAccessibilities memberOptions)
     {
         SchemaTreeGenerator.Options options = new(typeOptions, memberOptions);
-        SchemaTree schemaTree = await GetSchemaTreeAsync(options);
+        SchemaTree schemaTree = await GetSchemaTreeAsync("test.schema.json", options);
         await Verify(schemaTree.GetSchemaHash()).UseParameters(options);
     }
 
@@ -50,7 +50,7 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
     public async Task Verify_JsonSchema(AllowedAccessibilities typeOptions, AllowedAccessibilities memberOptions)
     {
         SchemaTreeGenerator.Options options = new(typeOptions, memberOptions);
-        SchemaTree schemaTree = await GetSchemaTreeAsync(options);
+        SchemaTree schemaTree = await GetSchemaTreeAsync("test.schema.json", options);
 
         var jsonSchemaGenerator = new JsonSchemaGenerator();
         (JsonSchema jsonSchema, string? _) = jsonSchemaGenerator.Generate(schemaTree);
@@ -62,13 +62,31 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
     }
 
     [Fact]
+    //[MemberData(nameof(VerifyOptions))]
+    public async Task Section_Verify_JsonSchema(/*AllowedAccessibilities typeOptions, AllowedAccessibilities memberOptions*/)
+    {
+        // SchemaTreeGenerator.Options options = new(typeOptions, memberOptions);
+        SchemaTree schemaTree = await GetSchemaTreeAsync("section.schema.json" /*, options */);
+
+        var jsonSchemaGenerator = new JsonSchemaGenerator();
+        (JsonSchema jsonSchema, string? _) = jsonSchemaGenerator.Generate(schemaTree);
+
+        string json = jsonSchema.SerializeToJson();
+        _outputHelper.WriteLine(json);
+
+        //await Verify(json).UseParameters(options);
+    }
+
+    [Fact]
     public async Task DifferentTrees_HaveDifferentSchemaHashes()
     {
         SchemaTree schemaTree1 = await GetSchemaTreeAsync(
+            "test.schema.json",
             new(
                 AllowedAccessibilities.Public,
                 AllowedAccessibilities.Public));
         SchemaTree schemaTree2 = await GetSchemaTreeAsync(
+            "test.schema.json",
             new(
                 AllowedAccessibilities.Public | AllowedAccessibilities.Internal,
                 AllowedAccessibilities.Public | AllowedAccessibilities.Internal));
@@ -78,7 +96,7 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
         Assert.NotEqual(hash1, hash2);
     }
 
-    private async Task<SchemaTree> GetSchemaTreeAsync(SchemaTreeGenerator.Options? options = null)
+    private async Task<SchemaTree> GetSchemaTreeAsync(string filename, SchemaTreeGenerator.Options? options = null)
     {
         var generator = new SchemaTreeGenerator(options);
         IReadOnlyCollection<SchemaTree> schemaRootInfos = await generator
@@ -86,7 +104,7 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
                 _fixture.Project!,
                 CancellationToken.None);
 
-        return schemaRootInfos.Single();
+        return schemaRootInfos.Single(r => r.Filename == filename);
     }
 
     public static TheoryData<AllowedAccessibilities, AllowedAccessibilities> VerifyOptions()

@@ -17,7 +17,7 @@ public partial class JsonSchemaGenerator
         public static readonly JsonSchema NullSchema = new Builder()
             .Type(SchemaValueType.Null);
 
-        public Builder ApplyObject(Builder builder, Node.Object obj)
+        public virtual Builder ApplyObject(Builder builder, Node.Object obj)
         {
             builder = obj switch
             {
@@ -42,6 +42,10 @@ public partial class JsonSchemaGenerator
                 .Properties([.. obj.Properties.Select(propertyWalker.Visit)]);
         }
 
+        protected virtual Builder ApplyObject(Builder builder, Node.Object.Generic obj)
+        {
+            return ApplyObject(builder, obj.BaseType);
+        }
 
         private Builder ApplyObject(Builder builder, Node.Object.Abstract obj)
         {
@@ -62,11 +66,6 @@ public partial class JsonSchemaGenerator
             return builder
                 .Type(SchemaValueType.Object)
                 .AdditionalProperties(ApplyObject(new Builder(), obj.ValueType));
-        }
-
-        private Builder ApplyObject(Builder builder, Node.Object.Generic obj)
-        {
-            throw new NotImplementedException();
         }
 
         private Builder ApplyObject(Builder builder, Node.Object.Nullable obj)
@@ -100,12 +99,25 @@ public partial class JsonSchemaGenerator
 
         protected override Builder ApplyObject(Builder builder, Node.Object.Custom obj)
         {
-            string cacheKey = obj.Symbol.MetadataName;
+            string cacheKey = obj.Symbol.GetDocumentationCommentId() ?? obj.Symbol.MetadataName;
             string refKey = $"#/$defs/{cacheKey}";
             if (_ctx.Defs.TryGetValue(cacheKey, out _))
                 return new Builder().Ref(refKey);
 
             builder = base.ApplyObject(builder, obj);
+
+            _ctx.Defs[cacheKey] = builder.Build();
+            return new Builder().Ref(refKey);
+        }
+
+        protected override Builder ApplyObject(Builder builder, Node.Object.Generic obj)
+        {
+            string cacheKey = obj.BaseType.Symbol.GetDocumentationCommentId() ?? obj.BaseType.Symbol.MetadataName;
+            string refKey = $"#/$defs/{cacheKey}";
+            if (_ctx.Defs.TryGetValue(cacheKey, out _))
+                return new Builder().Ref(refKey);
+
+            builder = base.ApplyObject(builder, obj.BaseType);
 
             _ctx.Defs[cacheKey] = builder.Build();
             return new Builder().Ref(refKey);

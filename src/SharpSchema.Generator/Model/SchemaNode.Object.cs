@@ -349,6 +349,17 @@ public abstract partial record SchemaNode
                     ImmutableArray<Object> typeArgumentMembers = node.TypeArgumentList
                         .Arguments.SelectNotNull(tps => tps.Accept(this));
 
+                    //Property.SyntaxVisitor propertyVisitor = Property.SyntaxVisitor.GetInstance(this);
+
+                    //ImmutableArray<Property> boundMembers = boundSymbol.GetMembers()
+                    //    .OfType<IPropertySymbol>()
+                    //    .Select(p => p.FindTypeDeclaration())
+                    //    .OfType<TypeDeclarationSyntax>()
+                    //    .SelectNotNull(td => td.Accept(propertyVisitor));
+
+                    //Metadata data = Metadata.SymbolVisitor.Instance.VisitNamedType(boundSymbol);
+                    //Custom custom = new Custom(boundSymbol, data, boundMembers);
+
                     return _cache[boundSymbol] = new Generic(baseType, typeArgumentMembers);
                 }
 

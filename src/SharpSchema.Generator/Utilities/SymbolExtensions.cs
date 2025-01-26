@@ -154,16 +154,26 @@ internal static class SymbolExtensions
     /// <returns>True if the type symbol implements the abstract class; otherwise, false.</returns>
     public static bool ImplementsAbstractClass(this ITypeSymbol typeSymbol, INamedTypeSymbol abstractClassSymbol)
     {
-        INamedTypeSymbol? baseType = typeSymbol.BaseType;
-        while (baseType is not null)
+        if (typeSymbol is null || abstractClassSymbol is null)
+            return false;
+
+        return CheckBaseType(typeSymbol.BaseType, abstractClassSymbol);
+
+        static bool CheckBaseType(INamedTypeSymbol? baseType, INamedTypeSymbol abstractClassSymbol)
         {
-            if (SymbolEqualityComparer.Default.Equals(baseType, abstractClassSymbol))
+            if (baseType is null || baseType.SpecialType == SpecialType.System_Object || baseType.SpecialType == SpecialType.System_Void)
+                return false;
+
+            if (SymbolEqualityComparer.Default.Equals(baseType, abstractClassSymbol) ||
+                SymbolEqualityComparer.Default.Equals(baseType.OriginalDefinition, abstractClassSymbol))
                 return true;
 
-            baseType = baseType.BaseType;
-        }
+            if (CheckBaseType(baseType.BaseType, abstractClassSymbol))
+                return true;
 
-        return false;
+            return !SymbolEqualityComparer.Default.Equals(baseType, baseType.OriginalDefinition)
+                && CheckBaseType(baseType.OriginalDefinition, abstractClassSymbol);
+        }
     }
 
     /// <summary>

@@ -11,6 +11,8 @@ internal static class JsonSchemaBuilderExtensions
         if (data is null)
             return builder;
 
+        using var scope = TraceScope.Enter($"{data}");
+
         builder.Title(data.Title);
 
         if (data.Description is string description)

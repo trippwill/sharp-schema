@@ -4,6 +4,7 @@ using Json.Schema;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpSchema.Annotations;
+using SharpSchema.Generator.Model;
 
 namespace SharpSchema.Generator.Utilities;
 
@@ -16,15 +17,15 @@ internal static class SymbolExtensions
     /// Determines if the symbol should be processed based on its accessibility and the provided options.
     /// </summary>
     /// <param name="symbol">The named type symbol.</param>
-    /// <param name="options">The schema tree generator options.</param>
+    /// <param name="allowedAccessibilities">The allowed accessibilities.</param>
     /// <returns>True if the symbol should process accessibility; otherwise, false.</returns>
-    public static bool ShouldProcessAccessibility(this INamedTypeSymbol symbol, SchemaTreeGenerator.Options options)
+    public static bool ShouldProcessAccessibility(this INamedTypeSymbol symbol, AllowedAccessibilities allowedAccessibilities)
     {
         return symbol.DeclaredAccessibility switch
         {
-            Accessibility.Public => options.TypeOptions.CheckFlag(AllowedAccessibilities.Public),
-            Accessibility.Internal => options.TypeOptions.CheckFlag(AllowedAccessibilities.Internal),
-            Accessibility.Private => options.TypeOptions.CheckFlag(AllowedAccessibilities.Private),
+            Accessibility.Public => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Public),
+            Accessibility.Internal => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Internal),
+            Accessibility.Private => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Private),
             _ => false,
         };
     }
@@ -33,15 +34,15 @@ internal static class SymbolExtensions
     /// Determines if the property symbol should be processed based on its accessibility and the provided options.
     /// </summary>
     /// <param name="symbol">The property symbol.</param>
-    /// <param name="options">The schema tree generator options.</param>
+    /// <param name="allowedAccessibilities">The allowed accessibilities.</param>
     /// <returns>True if the property symbol should process accessibility; otherwise, false.</returns>
-    public static bool ShouldProcessAccessibility(this IPropertySymbol symbol, SchemaTreeGenerator.Options options)
+    public static bool ShouldProcessAccessibility(this IPropertySymbol symbol, AllowedAccessibilities allowedAccessibilities)
     {
         return symbol.DeclaredAccessibility switch
         {
-            Accessibility.Public => options.MemberOptions.CheckFlag(AllowedAccessibilities.Public),
-            Accessibility.Internal => options.MemberOptions.CheckFlag(AllowedAccessibilities.Internal),
-            Accessibility.Private => options.MemberOptions.CheckFlag(AllowedAccessibilities.Private),
+            Accessibility.Public => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Public),
+            Accessibility.Internal => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Internal),
+            Accessibility.Private => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Private),
             _ => false,
         };
     }
@@ -202,6 +203,40 @@ internal static class SymbolExtensions
         symbol.ContainingNamespace.Name.GetSchemaHash(),
         symbol.ContainingAssembly.Name.GetSchemaHash(),
         (long)symbol.Kind);
+
+    public static string GetDefCacheKey(this ISymbol symbol) => symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+
+    public static bool IsJsonValueType(this ITypeSymbol symbol, [NotNullWhen(true)] out JsonSchemaBuilder? schema)
+    {
+        if (symbol.SpecialType == SpecialType.None)
+        {
+            schema = null;
+            return false;
+        }
+
+        schema = symbol.SpecialType switch
+        {
+            SpecialType.System_Boolean => CommonSchemas.Boolean,
+            SpecialType.System_Byte => CommonSchemas.System_Byte,
+            SpecialType.System_Char => CommonSchemas.System_Char,
+            SpecialType.System_DateTime => CommonSchemas.System_DateTime,
+            SpecialType.System_Decimal => CommonSchemas.System_Decimal,
+            SpecialType.System_Double => CommonSchemas.System_Double,
+            SpecialType.System_Int16 => CommonSchemas.System_Int16,
+            SpecialType.System_Int32 => CommonSchemas.System_Int32,
+            SpecialType.System_Int64 => CommonSchemas.System_Int64,
+            SpecialType.System_Object => CommonSchemas.UnsupportedObject,
+            SpecialType.System_SByte => CommonSchemas.System_SByte,
+            SpecialType.System_Single => CommonSchemas.System_Single,
+            SpecialType.System_String => CommonSchemas.String,
+            SpecialType.System_UInt16 => CommonSchemas.System_UInt16,
+            SpecialType.System_UInt32 => CommonSchemas.System_UInt32,
+            SpecialType.System_UInt64 => CommonSchemas.System_UInt64,
+            _ => null
+        };
+
+        return schema is not null;
+    }
 
     /// <summary>
     /// Gets the schema value type for the symbol.

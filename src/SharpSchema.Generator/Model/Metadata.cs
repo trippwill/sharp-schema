@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Xml.Linq;
 using Humanizer;
 using Microsoft.CodeAnalysis;
@@ -20,18 +19,18 @@ public record Metadata(string Title, string? Description, List<string>? Examples
 {
     /// <inheritdoc />
     public long GetSchemaHash() => SchemaHash.Combine(
-        Title.GetSchemaHash(),
-        Description.GetSchemaHash(),
-        GetElementsSchemaHash(Examples),
-        Comment.GetSchemaHash(),
-        Deprecated ? 1 : 0);
+        this.Title.GetSchemaHash(),
+        this.Description.GetSchemaHash(),
+        GetElementsSchemaHash(this.Examples),
+        this.Comment.GetSchemaHash(),
+        this.Deprecated ? 1 : 0);
 
     private static long GetElementsSchemaHash(List<string>? strings)
     {
         if (strings is null) return 0;
 
         long hash = 0;
-        foreach (var str in strings)
+        foreach (string str in strings)
         {
             hash = SchemaHash.Combine(hash, str.GetSchemaHash());
         }
@@ -52,14 +51,9 @@ public record Metadata(string Title, string? Description, List<string>? Examples
         private const string DeprecatedElement = "deprecated";
 
         /// <summary>
-        /// Gets the singleton instance of the <see cref="SymbolVisitor"/> class.
-        /// </summary>
-        public static SymbolVisitor Instance { get; } = new();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="SymbolVisitor"/> class.
         /// </summary>
-        private SymbolVisitor() { }
+        internal SymbolVisitor() { }
 
         /// <summary>
         /// Visits a named type symbol and extracts <see cref="Metadata"/>.
@@ -89,6 +83,8 @@ public record Metadata(string Title, string? Description, List<string>? Examples
         /// <returns>The created <see cref="Metadata"/> instance.</returns>
         private static Metadata CreateMetadata(ISymbol symbol)
         {
+            using var trace = TraceScope.Enter(symbol.Name);
+
             string title = symbol.Name.Titleize();
             string? description = null;
             List<string>? examples = null;

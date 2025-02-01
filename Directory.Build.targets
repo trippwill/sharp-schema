@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
+  <ItemGroup>
+      <PackageReference Update="Microsoft.Build" ExcludeAssets="runtime" />
+      <PackageReference Update="Microsoft.Build.Utilities.Core" ExcludeAssets="runtime" />
+  </ItemGroup>
   <Target Name="PrepareReleaseNotes" BeforeTargets="GenerateNuspec" DependsOnTargets="GetBuildVersion">
     <PropertyGroup>
       <PackageReleaseNotes Condition="'$(PackageProjectUrl)'!=''">$(PackageProjectUrl)/releases/tag/v$(Version)</PackageReleaseNotes>

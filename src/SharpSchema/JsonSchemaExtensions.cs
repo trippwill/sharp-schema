@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charles Willis. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Json.More;
 using Json.Schema;
@@ -18,6 +19,7 @@ public static class JsonSchemaExtensions
     /// <param name="schema">The schema to serialize.</param>
     /// <param name="options">The serializer options. If not provided, the formatting is indented by default.</param>
     /// <returns>The array of bytes.</returns>
+    [ExcludeFromCodeCoverage]
     public static byte[] SerializeToUtf8Bytes(this JsonSchema schema, JsonSerializerOptions? options = null)
     {
         options ??= new JsonSerializerOptions

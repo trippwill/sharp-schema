@@ -8,10 +8,10 @@ internal static class JsonSchemaBuilderExtensions
 {
     public static JsonSchemaBuilder Apply(this JsonSchemaBuilder builder, Metadata? data)
     {
+        using var scope = Tracer.Enter($"{data}");
+
         if (data is null)
             return builder;
-
-        using var scope = TraceScope.Enter($"{data}");
 
         builder.Title(data.Title);
 

@@ -1,4 +1,8 @@
-﻿namespace SharpSchema.Generator.Tests;
+﻿using System.Threading.Tasks;
+using VerifyXunit;
+using Xunit;
+
+namespace SharpSchema.Generator.Tests;
 
 public class VerifyChecksTests
 {

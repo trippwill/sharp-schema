@@ -1,4 +1,5 @@
-﻿using Argon;
+﻿using System;
+using Argon;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SharpSchema.Generator.Tests.VerifyConverters;

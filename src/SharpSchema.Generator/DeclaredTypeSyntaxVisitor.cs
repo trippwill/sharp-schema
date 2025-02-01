@@ -6,6 +6,9 @@ using SharpSchema.Generator.Model;
 using Json.Schema;
 using System.Text.Json.Nodes;
 using System.Diagnostics.CodeAnalysis;
+using Humanizer;
+using System.Xml.Linq;
+using SharpSchema.Annotations;
 
 namespace SharpSchema.Generator;
 
@@ -16,50 +19,144 @@ using Metadata = Model.Metadata;
 
 public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 {
-    private const string IEnumerableMetadataName = "System.Collections.Generic.IEnumerable`1";
-    private const string IDictionaryMetadataName = "System.Collections.Generic.IDictionary`2";
-    private const string IReadOnlyDictionaryMetadataName = "System.Collections.Generic.IReadOnlyDictionary`2";
-
-    private readonly SemanticModelCache _semanticModelCache;
-    private readonly Metadata.SymbolVisitor _metadataVisitor;
-    private readonly Compilation _compilation;
-
-    private INamedTypeSymbol? _enumerableOfTSymbol;
-    private INamedTypeSymbol? _dictionaryOfKVSymbol;
-    private INamedTypeSymbol? _readOnlyDictionaryOfKVSymbol;
+    private readonly CachingDeclaredTypeSyntaxVisitor _cachingVisitor;
 
     public DeclaredTypeSyntaxVisitor(Compilation compilation)
     {
-        _semanticModelCache = new(compilation);
-        _metadataVisitor = new();
-        _compilation = compilation;
+        _cachingVisitor = new(compilation);
     }
 
     public override Builder? Visit(SyntaxNode? node)
     {
         Throw.IfNullArgument(node);
-        using var trace = TraceScope.Enter($"{node.Kind()}");
+        using var trace = Tracer.Enter($"[ROOT] {node.Kind()}");
         return base.Visit(node);
     }
 
     public override Builder? VisitClassDeclaration(ClassDeclarationSyntax node)
     {
         Throw.IfNullArgument(node);
-        using var trace = TraceScope.Enter(node.Identifier.Text);
+        using var trace = Tracer.Enter(node.Identifier.Text);
+        return this.VisitTypeDeclaration(node);
+    }
+
+    public override Builder? VisitStructDeclaration(StructDeclarationSyntax node)
+    {
+        Throw.IfNullArgument(node);
+        using var trace = Tracer.Enter(node.Identifier.Text);
+        return this.VisitTypeDeclaration(node);
+    }
+
+    public override Builder? VisitRecordDeclaration(RecordDeclarationSyntax node)
+    {
+        Throw.IfNullArgument(node);
+        using var trace = Tracer.Enter(node.Identifier.Text);
+        return this.VisitTypeDeclaration(node);
+    }
+
+    private Builder? VisitTypeDeclaration(TypeDeclarationSyntax node)
+    {
+        Builder builder = CreateTypeSchema(node, _cachingVisitor);
+
+        if (_cachingVisitor.GetCachedSchemas() is IReadOnlyDictionary<string, JsonSchema> defs)
+        {
+            builder.Defs(defs);
+        }
+
+        return builder;
+    }
+
+    internal static Builder CreateTypeSchema(TypeDeclarationSyntax node, CSharpSyntaxVisitor<Builder?> typeVisitor)
+    {
+        Throw.IfNullArgument(node);
+
+        Builder builder = CommonSchemas.Object;
+
+        var properties = new Dictionary<string, JsonSchema>();
+
+        foreach (MemberDeclarationSyntax member in node.Members)
+        {
+            if (member is PropertyDeclarationSyntax property && typeVisitor.Visit(property) is Builder propertyBuilder)
+            {
+                properties[property.Identifier.Text.Camelize()] = propertyBuilder;
+            }
+        }
+
+        // Collect primary-constructor parameters
+        if (node.ParameterList is not null)
+        {
+            foreach (ParameterSyntax parameter in node.ParameterList.Parameters)
+            {
+                if (typeVisitor.Visit(parameter) is Builder paramBuilder)
+                {
+                    properties[parameter.Identifier.Text.Camelize()] = paramBuilder;
+                }
+            }
+        }
+
+        // Apply collected properties
+        return builder.Properties(properties);
+    }
+}
+
+internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
+{
+    private const string IEnumerableMetadataName = "System.Collections.Generic.IEnumerable`1";
+    private const string IDictionaryMetadataName = "System.Collections.Generic.IDictionary`2";
+    private const string IReadOnlyDictionaryMetadataName = "System.Collections.Generic.IReadOnlyDictionary`2";
+
+    private readonly Compilation _compilation;
+    private readonly SemanticModelCache _semanticModelCache;
+    private readonly Metadata.SymbolVisitor _metadataVisitor;
+    private readonly Dictionary<string, Builder> _cachedTypeSchemas;
+
+    private INamedTypeSymbol? _enumerableOfTSymbol;
+    private INamedTypeSymbol? _dictionaryOfKVSymbol;
+    private INamedTypeSymbol? _readOnlyDictionaryOfKVSymbol;
+
+    public CachingDeclaredTypeSyntaxVisitor(Compilation compilation)
+    {
+        _compilation = compilation;
+        _semanticModelCache = new(compilation);
+        _metadataVisitor = new();
+        _cachedTypeSchemas = [];
+    }
+
+    public IReadOnlyDictionary<string, JsonSchema>? GetCachedSchemas()
+    {
+        if (_cachedTypeSchemas.Count == 0)
+            return null;
+
+        return _cachedTypeSchemas.ToDictionary(
+            p => string.Format(CommonSchemas.DefUriFormat, p.Key),
+            p => p.Value.Build());
+    }
+
+    public override Builder? Visit(SyntaxNode? node)
+    {
+        Throw.IfNullArgument(node);
+        using var trace = Tracer.Enter($"[LEAF] {node.Kind()}");
+        return base.Visit(node);
+    }
+
+    public override Builder? VisitClassDeclaration(ClassDeclarationSyntax node)
+    {
+        Throw.IfNullArgument(node);
+        using var trace = Tracer.Enter(node.Identifier.Text);
         return VisitTypeDeclaration(node);
     }
 
     public override Builder? VisitStructDeclaration(StructDeclarationSyntax node)
     {
         Throw.IfNullArgument(node);
-        using var trace = TraceScope.Enter(node.Identifier.Text);
+        using var trace = Tracer.Enter(node.Identifier.Text);
         return VisitTypeDeclaration(node);
     }
 
     public override Builder? VisitRecordDeclaration(RecordDeclarationSyntax node)
     {
         Throw.IfNullArgument(node);
-        using var trace = TraceScope.Enter(node.Identifier.Text);
+        using var trace = Tracer.Enter(node.Identifier.Text);
         return VisitTypeDeclaration(node);
     }
 
@@ -71,18 +168,15 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         if (semanticModel.GetDeclaredSymbol(node) is not IPropertySymbol propertySymbol)
             return CommonSchemas.UnsupportedObject;
 
-        Metadata metadata = Throw.ForUnexpectedNull(_metadataVisitor.Visit(propertySymbol));
-
-        JsonNode? defaultValue = null;
-        if (node.Initializer?.Value is ExpressionSyntax initializer)
+        if (propertySymbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? schemaString))
         {
-            if (semanticModel.GetConstantValue(initializer) is { HasValue: true } constantValue)
-            {
-                defaultValue = JsonValue.Create(constantValue.Value);
-            }
+            return new Builder()
+                .Apply(JsonSchema.FromText(schemaString));
         }
 
-        return GetPropertySchema(node.Type, metadata, defaultValue);
+        Metadata metadata = Throw.ForUnexpectedNull(_metadataVisitor.Visit(propertySymbol));
+
+        return GetPropertySchema(node.Type, metadata, node.Initializer?.Value);
     }
 
     public override Builder? VisitParameter(ParameterSyntax node)
@@ -90,8 +184,14 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         Throw.IfNullArgument(node);
 
         SemanticModel semanticModel = _semanticModelCache.GetSemanticModel(node);
-        if (semanticModel.GetSymbolInfo(node).Symbol is not IParameterSymbol parameterSymbol)
+        if (semanticModel.GetDeclaredSymbol(node) is not IParameterSymbol parameterSymbol)
             return CommonSchemas.UnsupportedObject;
+
+        if (parameterSymbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? schemaString))
+        {
+            return new Builder()
+                .Apply(JsonSchema.FromText(schemaString));
+        }
 
         Metadata metadata = Throw.ForUnexpectedNull(_metadataVisitor.Visit(parameterSymbol));
 
@@ -99,23 +199,14 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         if (typeSyntax is null)
             return CommonSchemas.UnsupportedObject;
 
-        JsonValue? defaultValue = null;
-        if (node.Default?.Value is ExpressionSyntax initializer)
-        {
-            if (semanticModel.GetConstantValue(initializer) is { HasValue: true } constantValue)
-            {
-                defaultValue = JsonValue.Create(constantValue.Value);
-            }
-        }
-
-        return GetPropertySchema(typeSyntax, metadata, defaultValue);
+        return GetPropertySchema(typeSyntax, metadata, node.Default?.Value);
     }
 
     public override Builder? VisitIdentifierName(IdentifierNameSyntax node)
     {
         Throw.IfNullArgument(node);
 
-        using var trace = TraceScope.Enter(node.Identifier.Text);
+        using var trace = Tracer.Enter(node.Identifier.Text);
 
         TypeInfo typeInfo = _semanticModelCache.GetSemanticModel(node).GetTypeInfo(node);
         if (typeInfo.ConvertedType is not ITypeSymbol typeSymbol)
@@ -134,7 +225,7 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     public override Builder? VisitGenericName(GenericNameSyntax node)
     {
         Throw.IfNullArgument(node);
-        using var trace = TraceScope.Enter(node.Identifier.Text);
+        using var trace = Tracer.Enter(node.Identifier.Text);
 
         if (node.IsUnboundGenericName)
             return CommonSchemas.UnsupportedObject;
@@ -147,9 +238,10 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         if (!InitializeGenericTypeSymbols(out Builder? errorBuilder))
             return errorBuilder;
 
-        // Check if the symbol is a dictionary and get the bound interface symbol
-        INamedTypeSymbol? boundDictionarySymbol = boundTypeSymbol.ImplementsGenericInterface(_dictionaryOfKVSymbol)
-            ?? boundTypeSymbol.ImplementsGenericInterface(_readOnlyDictionaryOfKVSymbol);
+        // Check if the symbol is a dictionary
+        INamedTypeSymbol? boundDictionarySymbol = boundTypeSymbol.ImplementsGenericInterface(
+            _dictionaryOfKVSymbol,
+            _readOnlyDictionaryOfKVSymbol);
 
         if (boundDictionarySymbol is not null)
         {
@@ -160,7 +252,7 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
             }
 
             ITypeSymbol valueTypeSymbol = boundDictionarySymbol.TypeArguments.Last();
-            if (!valueTypeSymbol.IsJsonValueType(out Builder? valueSchema))
+            if (!valueTypeSymbol.IsJsonDefinedType(out Builder? valueSchema))
             {
                 valueSchema = valueTypeSymbol.FindTypeDeclaration()?.Accept(this);
                 if (valueSchema is null)
@@ -170,14 +262,14 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
             return CommonSchemas.Object.AdditionalProperties(valueSchema);
         }
 
-        // Check if the symbol is an enumerable and get the bound interface symbol
+        // Check if the symbol is an enumerable
         INamedTypeSymbol? boundEnumerableSymbol = boundTypeSymbol.AllInterfaces
             .FirstOrDefault(i => i.OriginalDefinition.Equals(_enumerableOfTSymbol, SymbolEqualityComparer.Default));
 
         if (boundEnumerableSymbol is not null)
         {
             ITypeSymbol elementTypeSymbol = boundEnumerableSymbol.TypeArguments.First();
-            if (!elementTypeSymbol.IsJsonValueType(out Builder? elementSchema))
+            if (!elementTypeSymbol.IsJsonDefinedType(out Builder? elementSchema))
             {
                 elementSchema = elementTypeSymbol.FindTypeDeclaration()?.Accept(this);
 
@@ -194,7 +286,7 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     public override Builder? VisitNullableType(NullableTypeSyntax node)
     {
         Throw.IfNullArgument(node);
-        using var trace = TraceScope.Enter(node.Kind().ToString());
+        using var trace = Tracer.Enter(node.Kind().ToString());
 
         return CommonSchemas.Nullable(
             Throw.ForUnexpectedNull(
@@ -204,14 +296,14 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     public override Builder? VisitPredefinedType(PredefinedTypeSyntax node)
     {
         Throw.IfNullArgument(node);
-        using var trace = TraceScope.Enter(node.Keyword.Text);
+        using var trace = Tracer.Enter(node.Keyword.Text);
 
         if (_semanticModelCache.GetSemanticModel(node).GetTypeInfo(node).Type is not INamedTypeSymbol typeSymbol)
         {
             return CommonSchemas.UnsupportedObject;
         }
 
-        if (typeSymbol.IsJsonValueType(out Builder? valueTypeSchema))
+        if (typeSymbol.IsJsonDefinedType(out Builder? valueTypeSchema))
         {
             return valueTypeSchema;
         }
@@ -222,7 +314,7 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     public override Builder? VisitArrayType(ArrayTypeSyntax node)
     {
         Throw.IfNullArgument(node);
-        using var trace = TraceScope.Enter(node.Kind().ToString());
+        using var trace = Tracer.Enter(node.Kind().ToString());
 
         Builder? elementSchema = node.ElementType.Accept(this);
         if (elementSchema is null)
@@ -233,40 +325,60 @@ public class DeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 
     private Builder? VisitTypeDeclaration(TypeDeclarationSyntax node)
     {
-        Builder builder = CommonSchemas.Object;
-
-        var properties = new Dictionary<string, JsonSchema>();
-
-        foreach (PropertyDeclarationSyntax property in node.Members.OfType<PropertyDeclarationSyntax>())
-        {
-            if (property.Accept(this) is Builder propertyBuilder)
-            {
-                properties[property.Identifier.Text] = propertyBuilder;
-            }
-        }
-
-        foreach (ParameterSyntax parameter in node.ParameterList?.Parameters ?? [])
-        {
-            if (parameter.Accept(this) is Builder parameterBuilder)
-            {
-                properties[parameter.Identifier.Text] = parameterBuilder;
-            }
-        }
-
-        return builder.Properties(properties);
-    }
-
-    private Builder GetPropertySchema(TypeSyntax typeSyntax, Metadata metadata, JsonNode? defaultValue)
-    {
-        if (typeSyntax.Accept(this) is not Builder typeSchema)
+        if (_semanticModelCache.GetSemanticModel(node).GetDeclaredSymbol(node) is not ITypeSymbol typeSymbol)
             return CommonSchemas.UnsupportedObject;
 
-        typeSchema.Apply(metadata);
+        string typeId = typeSymbol.GetDefCacheKey();
+        if (_cachedTypeSchemas.TryGetValue(typeId, out _))
+        {
+            return CommonSchemas.DefRef(typeId);
+        }
 
-        if (defaultValue is not null)
-            typeSchema.Default(defaultValue);
+        if (typeSymbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? schemaString))
+        {
+            return _cachedTypeSchemas[typeId] = new Builder()
+                .Apply(JsonSchema.FromText(schemaString));
+        }
 
-        return typeSchema;
+        Builder builder = DeclaredTypeSyntaxVisitor.CreateTypeSchema(node, this);
+        _cachedTypeSchemas[typeId] = builder;
+
+        return CommonSchemas.DefRef(typeId);
+    }
+
+    private Builder GetPropertySchema(TypeSyntax typeSyntax, Metadata metadata, ExpressionSyntax? defaultExpression)
+    {
+        SemanticModel semanticModel = _semanticModelCache.GetSemanticModel(typeSyntax);
+        if (semanticModel.GetTypeInfo(typeSyntax).Type is not ITypeSymbol typeSymbol)
+            return CommonSchemas.UnsupportedObject;
+
+        Builder? propertyBuilder = null;
+
+        // These kinds are never directly cached
+        if (typeSyntax.Kind() is SyntaxKind.NullableType or SyntaxKind.ArrayType or SyntaxKind.PredefinedType)
+            propertyBuilder = typeSyntax.Accept(this);
+
+        string typeId = typeSymbol.GetDefCacheKey();
+        if (propertyBuilder is null && _cachedTypeSchemas.TryGetValue(typeId, out _))
+            propertyBuilder = CommonSchemas.DefRef(typeId);
+
+        if (propertyBuilder is null && typeSyntax.Accept(this) is Builder builder)
+            propertyBuilder = builder;
+
+        if (propertyBuilder is null)
+            return CommonSchemas.UnsupportedObject;
+
+        propertyBuilder.Apply(metadata);
+
+        JsonNode? defaultValue = null;
+        if (defaultExpression is not null && semanticModel.GetConstantValue(defaultExpression) is { HasValue: true } constantValue)
+        {
+            defaultValue = JsonValue.Create(constantValue.Value);
+        }
+
+        return defaultValue is not null
+            ? propertyBuilder.Default(defaultValue)
+            : propertyBuilder;
     }
 
     [MemberNotNullWhen(true, nameof(_enumerableOfTSymbol), nameof(_dictionaryOfKVSymbol), nameof(_readOnlyDictionaryOfKVSymbol))]

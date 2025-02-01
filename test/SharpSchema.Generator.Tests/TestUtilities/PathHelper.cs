@@ -1,4 +1,7 @@
-﻿namespace SharpSchema.Generator.Tests.Utilities;
+﻿using System;
+using Microsoft.IO;
+
+namespace SharpSchema.Generator.Tests.TestUtilities;
 
 public static class PathHelper
 {
@@ -15,15 +18,11 @@ public static class PathHelper
         while (!string.IsNullOrEmpty(currentPath))
         {
             if (Directory.Exists(Path.Combine(currentPath, ".git")))
-            {
                 return currentPath;
-            }
 
             DirectoryInfo? parentDirectory = Directory.GetParent(currentPath);
             if (parentDirectory is null)
-            {
                 break;
-            }
 
             currentPath = parentDirectory.FullName;
         }

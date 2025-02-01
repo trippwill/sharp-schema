@@ -1,0 +1,27 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/T:SharpSchema.Generator.Tests.DeclaredTypeSyntaxVisitorTests.Address"
+      },
+      "title": "Data"
+    }
+  },
+  "$defs": {
+    "#/$defs/T:SharpSchema.Generator.Tests.DeclaredTypeSyntaxVisitorTests.Address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string",
+          "title": "Street"
+        },
+        "city": {
+          "type": "string",
+          "title": "City"
+        }
+      }
+    }
+  }
+}

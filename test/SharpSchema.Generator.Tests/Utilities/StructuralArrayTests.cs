@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using SharpSchema.Generator.Model;
+using Xunit;
 
-namespace SharpSchema.Generator.Tests
+namespace SharpSchema.Generator.Tests.Utilities
 {
     internal record struct ItemNode : ISchemaNode, IComparable<ItemNode>
     {

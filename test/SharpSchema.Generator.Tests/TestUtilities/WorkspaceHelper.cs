@@ -1,7 +1,8 @@
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 
-namespace SharpSchema.Generator.Tests.Utilities;
+namespace SharpSchema.Generator.Tests.TestUtilities;
 
 public static class WorkspaceHelper
 {

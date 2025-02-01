@@ -3,9 +3,11 @@ using Microsoft.CodeAnalysis;
 using SharpSchema.Generator.Model;
 using SharpSchema.Generator.Tests.VerifyConverters;
 using SharpSchema.Generator.Utilities;
+using VerifyTests;
+using Xunit;
 using Xunit.Abstractions;
 
-namespace SharpSchema.Generator.Tests;
+namespace SharpSchema.Generator.Tests.AllFeaturesProject;
 
 public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
 {

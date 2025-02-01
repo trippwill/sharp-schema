@@ -14,6 +14,11 @@ internal static class AttributeDataExtensions
     public static T? GetConstructorArgument<T>(this AttributeData attributeData, int argumentIndex)
         where T : notnull
     {
+        if (argumentIndex >= attributeData.ConstructorArguments.Length)
+        {
+            return default;
+        }
+
         TypedConstant constructorArgument = attributeData.ConstructorArguments[argumentIndex];
         return constructorArgument.Value is T value ? value : default;
     }

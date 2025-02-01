@@ -134,14 +134,17 @@ internal static class SymbolExtensions
     /// Checks if the symbol implements the specified generic interface.
     /// </summary>
     /// <param name="symbol">The type symbol to check.</param>
-    /// <param name="interfaceSymbol">The generic interface symbol to check against.</param>
+    /// <param name="interfaceSymbols">The generic interface symbols to check against.</param>
     /// <returns>The implemented generic interface symbol if found; otherwise, null.</returns>
-    public static INamedTypeSymbol? ImplementsGenericInterface(this ITypeSymbol symbol, INamedTypeSymbol interfaceSymbol)
+    public static INamedTypeSymbol? ImplementsGenericInterface(this ITypeSymbol symbol, params INamedTypeSymbol[] interfaceSymbols)
     {
         foreach (var i in symbol.AllInterfaces)
         {
-            if (i.OriginalDefinition.Equals(interfaceSymbol, SymbolEqualityComparer.Default))
-                return i;
+            foreach (var interfaceSymbol in interfaceSymbols)
+            {
+                if (i.OriginalDefinition.Equals(interfaceSymbol, SymbolEqualityComparer.Default))
+                    return i;
+            }
         }
 
         return null;
@@ -204,9 +207,9 @@ internal static class SymbolExtensions
         symbol.ContainingAssembly.Name.GetSchemaHash(),
         (long)symbol.Kind);
 
-    public static string GetDefCacheKey(this ISymbol symbol) => symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+    public static string GetDefCacheKey(this ITypeSymbol symbol) => symbol.GetDocumentationCommentId() ?? symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-    public static bool IsJsonValueType(this ITypeSymbol symbol, [NotNullWhen(true)] out JsonSchemaBuilder? schema)
+    public static bool IsJsonDefinedType(this ITypeSymbol symbol, [NotNullWhen(true)] out JsonSchemaBuilder? schema)
     {
         if (symbol.SpecialType == SpecialType.None)
         {

@@ -1,9 +1,11 @@
+using System.Threading.Tasks;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
-using SharpSchema.Generator.Tests.Utilities;
+using SharpSchema.Generator.Tests.TestUtilities;
+using Xunit;
 
-namespace SharpSchema.Generator.Tests;
+namespace SharpSchema.Generator.Tests.AllFeaturesProject;
 
 public class AllFeaturesProjectFixture : IAsyncLifetime
 {

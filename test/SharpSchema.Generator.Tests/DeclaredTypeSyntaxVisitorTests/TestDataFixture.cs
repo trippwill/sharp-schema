@@ -6,10 +6,8 @@ using Json.Schema;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.IO;
-using SharpSchema.Annotations;
+using System.IO;
 using SharpSchema.Generator.Tests.TestUtilities;
-using SharpSchema.Generator.Utilities;
 using Xunit;
 
 namespace SharpSchema.Generator.Tests.DeclaredTypeSyntaxVisitorTests;

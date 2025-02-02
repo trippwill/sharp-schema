@@ -1,4 +1,5 @@
 ﻿using Json.Schema;
+using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator.Model;
 
@@ -6,6 +7,11 @@ using Builder = JsonSchemaBuilder;
 
 internal static class CommonSchemas
 {
+    static CommonSchemas()
+    {
+        SchemaKeywordRegistry.Register<UnsupportedObjectKeyword>();
+    }
+
     public const string DefUriFormat = "#/$defs/{0}";
 
     public static Builder Null => new Builder().Type(SchemaValueType.Null);
@@ -99,9 +105,8 @@ internal static class CommonSchemas
         .Format(Formats.DateTime)
         .Comment("System.DateTime");
 
-    public static Builder UnsupportedObject => new Builder()
-        .Type(SchemaValueType.Object)
-        .Title("Unsupported object");
+    public static Builder UnsupportedObject(string value) => new Builder()
+        .UnsupportedObject(value);
 
     public static Builder DefRef(string key) => new Builder()
         .Ref(string.Format(DefUriFormat, key));

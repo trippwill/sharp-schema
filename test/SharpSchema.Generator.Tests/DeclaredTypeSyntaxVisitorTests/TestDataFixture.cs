@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Json.Schema;
@@ -8,6 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.IO;
 using SharpSchema.Annotations;
 using SharpSchema.Generator.Tests.TestUtilities;
+using SharpSchema.Generator.Utilities;
 using Xunit;
 
 namespace SharpSchema.Generator.Tests.DeclaredTypeSyntaxVisitorTests;
@@ -20,17 +22,21 @@ public class TestDataFixture
     public TestDataFixture()
     {
         string pathToTestData = PathHelper.GetRepoPath(
-            Path.Combine(
                 "test",
                 "SharpSchema.Generator.Tests",
                 "DeclaredTypeSyntaxVisitorTests",
-                "TestData.cs"));
+                "TestData.cs");
+
+        // Create an array of syntax tree from all cs files in src/SharpSchema.Annotations/
+        string[] annotationFiles = Directory.GetFiles(
+            PathHelper.GetRepoPath("src", "SharpSchema.Annotations"), "*.cs", SearchOption.AllDirectories);
+
+        List<SyntaxTree> annotationSyntaxTrees = [.. annotationFiles.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file)))];
 
         _syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText(pathToTestData));
         _compilation = CSharpCompilation.Create("TestDataCompilation")
             .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
-            .AddReferences(MetadataReference.CreateFromFile(typeof(SchemaOverrideAttribute).Assembly.Location))
-            .AddSyntaxTrees(_syntaxTree);
+            .AddSyntaxTrees([.. annotationSyntaxTrees, _syntaxTree]);
     }
 
     public DeclaredTypeSyntaxVisitor GetVisitor() => new(_compilation);

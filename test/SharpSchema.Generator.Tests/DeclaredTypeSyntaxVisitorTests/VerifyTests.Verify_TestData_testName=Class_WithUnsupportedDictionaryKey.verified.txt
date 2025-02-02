@@ -1,0 +1,9 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "data": {
+      "$unsupportedObject": "Key type for 'Dictionary' must be a string.",
+      "title": "Data"
+    }
+  }
+}

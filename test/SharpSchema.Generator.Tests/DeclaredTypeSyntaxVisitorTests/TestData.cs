@@ -40,6 +40,11 @@ public class Class_WithDictionaryOfReferenceTypes
     public Dictionary<string, Address> Data { get; set; }
 }
 
+public class Class_WithUnsupportedDictionaryKey
+{
+    public Dictionary<Address, int> Data { get; set; }
+}
+
 /// <summary>
 /// Demonstrates param-based XML metadata.
 /// </summary>
@@ -86,17 +91,34 @@ public class Class_WithSchemaOverride
 }
 
 public record Record_WithSchemaOverride(
-    [property: SchemaOverride("{\"type\":\"string\",\"maxLength\":50}")] string Name,
+    [property: SchemaOverride("[{\"type\":\"string\",\"maxLength\":50}]")] string Name,
     [property: SchemaOverride("{\"type\":\"integer\",\"minimum\":0}")] int Age
 );
 
-public class Class_WithTypeSchemaOverride
+public class Class_WithBadTypeSchemaOverride
 {
-    public Custom Custom { get; set; }
+    public BadOverride Custom { get; set; }
 }
 
-[SchemaOverride("{\"type\":\"object\",\"properties\":{\"custom\":\"string\"}}")]
-public record Custom();
+public class Class_WithTypeSchemaOverride
+{
+    public GoodOverride Custom { get; set; }
+}
+
+[SchemaOverride("{invalidJson}")]
+public record BadOverride();
+
+[SchemaOverride(/* lang=json */ """
+    {
+      "type": "object",
+        "properties": {
+            "custom": {
+                "type": "string"
+            }
+        }
+    }
+    """)]
+public record GoodOverride();
 
 public record Address
 {

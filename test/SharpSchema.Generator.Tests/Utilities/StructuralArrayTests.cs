@@ -1,20 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using SharpSchema.Generator.Model;
+using SharpSchema.Generator.Utilities;
 using Xunit;
 
 namespace SharpSchema.Generator.Tests.Utilities
 {
-    internal record struct ItemNode : ISchemaNode, IComparable<ItemNode>
+    internal record struct ItemNode : IComparable<ItemNode>
     {
         public int Value;
 
         public static implicit operator ItemNode(int value) => new() { Value = value };
 
         public static implicit operator int(ItemNode item) => item.Value;
-
-        public readonly long GetSchemaHash() => Value;
 
         public readonly int CompareTo(ItemNode other) => Value.CompareTo(other.Value);
     }

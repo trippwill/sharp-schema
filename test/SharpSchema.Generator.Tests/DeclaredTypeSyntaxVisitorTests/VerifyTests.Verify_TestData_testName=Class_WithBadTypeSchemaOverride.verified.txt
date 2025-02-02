@@ -1,0 +1,9 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "custom": {
+      "$unsupportedObject": "Failed to parse schema override: 'i' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 0 | BytePositionInLine: 1.",
+      "title": "Custom"
+    }
+  }
+}

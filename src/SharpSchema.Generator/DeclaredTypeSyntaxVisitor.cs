@@ -7,7 +7,6 @@ using Json.Schema;
 using System.Text.Json.Nodes;
 using System.Diagnostics.CodeAnalysis;
 using Humanizer;
-using System.Xml.Linq;
 using SharpSchema.Annotations;
 
 namespace SharpSchema.Generator;
@@ -164,15 +163,11 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     {
         Throw.IfNullArgument(node);
 
-        SemanticModel semanticModel = _semanticModelCache.GetSemanticModel(node);
-        if (semanticModel.GetDeclaredSymbol(node) is not IPropertySymbol propertySymbol)
-            return CommonSchemas.UnsupportedObject;
+        if (node.GetDeclaredSymbol(_semanticModelCache) is not IPropertySymbol propertySymbol)
+            return CommonSchemas.UnsupportedObject($"Failed to build schema for property '{node.Identifier}'.");
 
-        if (propertySymbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? schemaString))
-        {
-            return new Builder()
-                .Apply(JsonSchema.FromText(schemaString));
-        }
+        if (GetOverrideSchema(propertySymbol) is Builder overrideSchema)
+            return overrideSchema;
 
         Metadata metadata = Throw.ForUnexpectedNull(_metadataVisitor.Visit(propertySymbol));
 
@@ -185,19 +180,16 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 
         SemanticModel semanticModel = _semanticModelCache.GetSemanticModel(node);
         if (semanticModel.GetDeclaredSymbol(node) is not IParameterSymbol parameterSymbol)
-            return CommonSchemas.UnsupportedObject;
+            return CommonSchemas.UnsupportedObject($"Failed to build schema for parameter '{node.Identifier}'.");
 
-        if (parameterSymbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? schemaString))
-        {
-            return new Builder()
-                .Apply(JsonSchema.FromText(schemaString));
-        }
+        if (GetOverrideSchema(parameterSymbol) is Builder overrideSchema)
+            return overrideSchema;
 
         Metadata metadata = Throw.ForUnexpectedNull(_metadataVisitor.Visit(parameterSymbol));
 
         TypeSyntax? typeSyntax = node.Type;
         if (typeSyntax is null)
-            return CommonSchemas.UnsupportedObject;
+            return CommonSchemas.UnsupportedObject($"Failed to build schema for parameter type '{typeSyntax}'.");
 
         return GetPropertySchema(typeSyntax, metadata, node.Default?.Value);
     }
@@ -210,16 +202,14 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 
         TypeInfo typeInfo = _semanticModelCache.GetSemanticModel(node).GetTypeInfo(node);
         if (typeInfo.ConvertedType is not ITypeSymbol typeSymbol)
-        {
-            return CommonSchemas.UnsupportedObject;
-        }
+            return CommonSchemas.UnsupportedObject($"Failed to build schema for identifier '{node.Identifier}'.");
 
         return typeSymbol.DeclaringSyntaxReferences
             .Select(reference => reference.GetSyntax())
             .OfType<TypeDeclarationSyntax>()
             .Select(declaration => declaration.Accept(this))
             .FirstOrDefault(schema => schema is not null)
-            ?? CommonSchemas.UnsupportedObject;
+            ?? CommonSchemas.UnsupportedObject($"Could not find declaration for identifier '{node.Identifier}'.");
     }
 
     public override Builder? VisitGenericName(GenericNameSyntax node)
@@ -228,12 +218,12 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         using var trace = Tracer.Enter(node.Identifier.Text);
 
         if (node.IsUnboundGenericName)
-            return CommonSchemas.UnsupportedObject;
+            return CommonSchemas.UnsupportedObject($"Failed to evaluate unbound generic type '{node.Identifier}'.");
 
         SemanticModel semanticModel = _semanticModelCache.GetSemanticModel(node);
 
         if (semanticModel.GetTypeInfo(node).Type is not ITypeSymbol boundTypeSymbol)
-            return CommonSchemas.UnsupportedObject.Comment($"{node.Identifier.Text}: Node does not produce a type symbol.");
+            return CommonSchemas.UnsupportedObject($"Node '{node.Identifier.Text}' does not produce a type symbol.");
 
         if (!InitializeGenericTypeSymbols(out Builder? errorBuilder))
             return errorBuilder;
@@ -248,7 +238,7 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
             ITypeSymbol keyTypeSymbol = boundDictionarySymbol.TypeArguments.First();
             if (keyTypeSymbol.GetSchemaValueType() != SchemaValueType.String)
             {
-                return CommonSchemas.UnsupportedObject.Comment($"{node.Identifier.Text}: Key type must be a string.");
+                return CommonSchemas.UnsupportedObject($"Key type for '{node.Identifier.Text}' must be a string.");
             }
 
             ITypeSymbol valueTypeSymbol = boundDictionarySymbol.TypeArguments.Last();
@@ -256,7 +246,7 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
             {
                 valueSchema = valueTypeSymbol.FindTypeDeclaration()?.Accept(this);
                 if (valueSchema is null)
-                    return CommonSchemas.UnsupportedObject.Comment($"{node.Identifier.Text}: Could not find schema for value type.");
+                    return CommonSchemas.UnsupportedObject($"Could not find schema for value type of '{node.Identifier.Text}'.");
             }
 
             return CommonSchemas.Object.AdditionalProperties(valueSchema);
@@ -274,7 +264,7 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
                 elementSchema = elementTypeSymbol.FindTypeDeclaration()?.Accept(this);
 
                 if (elementSchema is null)
-                    return CommonSchemas.UnsupportedObject.Comment($"{node.Identifier.Text}: Could not find schema for element type.");
+                    return CommonSchemas.UnsupportedObject($"Could not find schema for element type of '{node.Identifier.Text}'.");
             }
 
             return CommonSchemas.ArrayOf(elementSchema);
@@ -300,7 +290,7 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 
         if (_semanticModelCache.GetSemanticModel(node).GetTypeInfo(node).Type is not INamedTypeSymbol typeSymbol)
         {
-            return CommonSchemas.UnsupportedObject;
+            return CommonSchemas.UnsupportedObject($"Failed to build schema for predefined type '{node}'.");
         }
 
         if (typeSymbol.IsJsonDefinedType(out Builder? valueTypeSchema))
@@ -308,7 +298,7 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
             return valueTypeSchema;
         }
 
-        return CommonSchemas.UnsupportedObject;
+        return CommonSchemas.UnsupportedObject($"Unexpected built-in type '{node.Keyword.Text}'.");
     }
 
     public override Builder? VisitArrayType(ArrayTypeSyntax node)
@@ -318,7 +308,7 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 
         Builder? elementSchema = node.ElementType.Accept(this);
         if (elementSchema is null)
-            return CommonSchemas.UnsupportedObject;
+            return CommonSchemas.UnsupportedObject($"Failed to build schema for array element type '{node.ElementType}'.");
 
         return CommonSchemas.ArrayOf(elementSchema);
     }
@@ -326,7 +316,7 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     private Builder? VisitTypeDeclaration(TypeDeclarationSyntax node)
     {
         if (_semanticModelCache.GetSemanticModel(node).GetDeclaredSymbol(node) is not ITypeSymbol typeSymbol)
-            return CommonSchemas.UnsupportedObject;
+            return CommonSchemas.UnsupportedObject($"Failed building schema for {node.Identifier.ValueText}");
 
         string typeId = typeSymbol.GetDefCacheKey();
         if (_cachedTypeSchemas.TryGetValue(typeId, out _))
@@ -334,10 +324,9 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
             return CommonSchemas.DefRef(typeId);
         }
 
-        if (typeSymbol.TryGetConstructorArgument<SchemaOverrideAttribute, string>(0, out string? schemaString))
+        if (GetOverrideSchema(typeSymbol) is Builder overrideSchema)
         {
-            return _cachedTypeSchemas[typeId] = new Builder()
-                .Apply(JsonSchema.FromText(schemaString));
+            return overrideSchema;
         }
 
         Builder builder = DeclaredTypeSyntaxVisitor.CreateTypeSchema(node, this);
@@ -346,27 +335,46 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         return CommonSchemas.DefRef(typeId);
     }
 
+    private static Builder? GetOverrideSchema(ISymbol symbol)
+    {
+        if (symbol.GetAttributeData<SchemaOverrideAttribute>() is AttributeData data
+            && data.GetConstructorArgument<string>(0) is string schemaString)
+        {
+            try
+            {
+                return new Builder()
+                    .Apply(JsonSchema.FromText(schemaString));
+            }
+            catch (System.Text.Json.JsonException ex)
+            {
+                return CommonSchemas.UnsupportedObject($"Failed to parse schema override: {ex.Message}");
+            }
+        }
+
+        return null;
+    }
+
     private Builder GetPropertySchema(TypeSyntax typeSyntax, Metadata metadata, ExpressionSyntax? defaultExpression)
     {
         SemanticModel semanticModel = _semanticModelCache.GetSemanticModel(typeSyntax);
         if (semanticModel.GetTypeInfo(typeSyntax).Type is not ITypeSymbol typeSymbol)
-            return CommonSchemas.UnsupportedObject;
+            return CommonSchemas.UnsupportedObject($"Failed to build schema for type '{typeSyntax}'.");
 
         Builder? propertyBuilder = null;
 
         // These kinds are never directly cached
         if (typeSyntax.Kind() is SyntaxKind.NullableType or SyntaxKind.ArrayType or SyntaxKind.PredefinedType)
-            propertyBuilder = typeSyntax.Accept(this);
+            propertyBuilder = this.Visit(typeSyntax);
 
         string typeId = typeSymbol.GetDefCacheKey();
         if (propertyBuilder is null && _cachedTypeSchemas.TryGetValue(typeId, out _))
             propertyBuilder = CommonSchemas.DefRef(typeId);
 
-        if (propertyBuilder is null && typeSyntax.Accept(this) is Builder builder)
+        if (propertyBuilder is null && this.Visit(typeSyntax) is Builder builder)
             propertyBuilder = builder;
 
         if (propertyBuilder is null)
-            return CommonSchemas.UnsupportedObject;
+            return CommonSchemas.UnsupportedObject($"Failed to build schema for type '{typeSymbol.Name}'.");
 
         propertyBuilder.Apply(metadata);
 
@@ -387,21 +395,21 @@ internal class CachingDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         _enumerableOfTSymbol ??= _compilation.GetTypeByMetadataName(IEnumerableMetadataName);
         if (_enumerableOfTSymbol is null)
         {
-            errorBuilder = CommonSchemas.UnsupportedObject.Comment("Could not find symbol for IEnumerable<T>.");
+            errorBuilder = CommonSchemas.UnsupportedObject("Could not find symbol for 'IEnumerable<T>'.");
             return false;
         }
 
         _dictionaryOfKVSymbol ??= _compilation.GetTypeByMetadataName(IDictionaryMetadataName);
         if (_dictionaryOfKVSymbol is null)
         {
-            errorBuilder = CommonSchemas.UnsupportedObject.Comment("Could not find symbol for IDictionary<K, V>.");
+            errorBuilder = CommonSchemas.UnsupportedObject("Could not find symbol for 'IDictionary<K, V>'.");
             return false;
         }
 
         _readOnlyDictionaryOfKVSymbol ??= _compilation.GetTypeByMetadataName(IReadOnlyDictionaryMetadataName);
         if (_readOnlyDictionaryOfKVSymbol is null)
         {
-            errorBuilder = CommonSchemas.UnsupportedObject.Comment("Could not find symbol for IReadOnlyDictionary<K, V>.");
+            errorBuilder = CommonSchemas.UnsupportedObject("Could not find symbol for 'IReadOnlyDictionary<K, V>'.");
             return false;
         }
 

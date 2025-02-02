@@ -1,5 +1,4 @@
 ﻿using Json.Schema;
-using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator.Model;
 
@@ -14,12 +13,4 @@ public record SchemaTree(
         JsonSchema Schema,
         string? Filename,
         string? Id,
-        string? CommonNamespace) : ISchemaNode
-{
-    /// <inheritdoc />
-    public long GetSchemaHash() => SchemaHash.Combine(
-        Schema.GetHashCode(),
-        Filename.GetSchemaHash(),
-        Id.GetSchemaHash(),
-        CommonNamespace.GetSchemaHash());
-}
+        string? CommonNamespace);

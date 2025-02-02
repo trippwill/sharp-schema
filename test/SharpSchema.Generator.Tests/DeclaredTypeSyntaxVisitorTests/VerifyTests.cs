@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Json.Schema;
 using SharpSchema.Generator.Tests.TestUtilities;
@@ -24,49 +23,28 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
 
     public void Dispose() => Tracer.Writer = null;
 
-    [Fact]
-    public async Task Class_WithDocComments() => await RunTestAsync();
-
-    [Fact]
-    public async Task Class_WithValueTypes() => await RunTestAsync();
-
-    [Fact]
-    public async Task Struct_WithNullableValueTypes() => await RunTestAsync();
-
-    [Fact]
-    public async Task Record_WithReferenceTypeProperties() => await RunTestAsync();
-
-    [Fact]
-    public async Task Record_WithReferenceTypeParameters() => await RunTestAsync();
-
-    [Fact]
-    public async Task Record_WithValueTypeParameters() => await RunTestAsync();
-
-    [Fact]
-    public async Task Class_WithIEnumerableProperty() => await RunTestAsync();
-
-    [Fact]
-    public async Task Class_WithDictionaryOfValueTypes() => await RunTestAsync();
-
-    [Fact]
-    public async Task Class_WithDictionaryOfReferenceTypes() => await RunTestAsync();
-
-    [Fact(Skip = "Not Working")]
-    public async Task Class_WithSchemaOverride() => await RunTestAsync();
-
-    [Fact(Skip = "Not Working")]
-    public async Task Record_WithSchemaOverride() => await RunTestAsync();
-
-    [Fact(Skip = "Not Working")]
-    public async Task Class_WithTypeSchemaOverride() => await RunTestAsync();
-
-    private async Task RunTestAsync([CallerMemberName] string? testName = null)
+    [Theory]
+    [InlineData(nameof(Struct_WithNullableValueTypes))]
+    [InlineData(nameof(Record_WithReferenceTypeProperties))]
+    [InlineData(nameof(Record_WithReferenceTypeParameters))]
+    [InlineData(nameof(Record_WithValueTypeParameters))]
+    [InlineData(nameof(Record_WithSchemaOverride))]
+    [InlineData(nameof(Class_WithIEnumerableProperty))]
+    [InlineData(nameof(Class_WithDictionaryOfValueTypes))]
+    [InlineData(nameof(Class_WithDictionaryOfReferenceTypes))]
+    [InlineData(nameof(Class_WithDocComments))]
+    [InlineData(nameof(Class_WithValueTypes))]
+    [InlineData(nameof(Class_WithSchemaOverride))]
+    [InlineData(nameof(Class_WithTypeSchemaOverride))]
+    [InlineData(nameof(Class_WithBadTypeSchemaOverride))]
+    [InlineData(nameof(Class_WithUnsupportedDictionaryKey))]
+    public Task Verify_TestData(string testName)
     {
         DeclaredTypeSyntaxVisitor visitor = _fixture.GetVisitor();
         JsonSchemaBuilder builder = _fixture.GetJsonSchemaBuilder(visitor, testName);
         _output.WriteSeparator();
         string schemaString = builder.Build().SerializeToJson();
         _output.WriteLine(schemaString);
-        await Verifier.Verify(schemaString);
+        return Verifier.Verify(schemaString).UseParameters(testName);
     }
 }

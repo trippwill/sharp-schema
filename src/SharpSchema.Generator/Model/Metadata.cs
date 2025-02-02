@@ -14,30 +14,13 @@ namespace SharpSchema.Generator.Model;
 /// <param name="Examples">Examples for the schema member.</param>
 /// <param name="Comment">Additional comments for the schema member.</param>
 /// <param name="Deprecated">Indicates if the schema member is deprecated.</param>
-public record Metadata(string Title, string? Description, List<string>? Examples, string? Comment, bool Deprecated)
-    : ISchemaNode
+public record Metadata(
+    string Title,
+    string? Description,
+    List<string>? Examples,
+    string? Comment,
+    bool Deprecated)
 {
-    /// <inheritdoc />
-    public long GetSchemaHash() => SchemaHash.Combine(
-        this.Title.GetSchemaHash(),
-        this.Description.GetSchemaHash(),
-        GetElementsSchemaHash(this.Examples),
-        this.Comment.GetSchemaHash(),
-        this.Deprecated ? 1 : 0);
-
-    private static long GetElementsSchemaHash(List<string>? strings)
-    {
-        if (strings is null) return 0;
-
-        long hash = 0;
-        foreach (string str in strings)
-        {
-            hash = SchemaHash.Combine(hash, str.GetSchemaHash());
-        }
-
-        return hash;
-    }
-
     /// <inheritdoc />
     public override string ToString()
     {
@@ -56,11 +39,6 @@ public record Metadata(string Title, string? Description, List<string>? Examples
         private const string CommentElement = "comment";
         private const string ExampleElement = "example";
         private const string DeprecatedElement = "deprecated";
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SymbolVisitor"/> class.
-        /// </summary>
-        internal SymbolVisitor() { }
 
         /// <summary>
         /// Visits a named type symbol and extracts <see cref="Metadata"/>.

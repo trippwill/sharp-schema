@@ -1,0 +1,13 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

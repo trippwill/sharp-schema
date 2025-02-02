@@ -52,16 +52,73 @@ internal static class SymbolExtensions
     /// </summary>
     /// <typeparam name="T">The type of the attribute.</typeparam>
     /// <param name="symbol">The symbol.</param>
+    /// <param name="searchBaseAndInterfaces">Indicates whether to search for attributes on base classes and interfaces.</param>
     /// <returns>The attribute data if found; otherwise, null.</returns>
-    public static AttributeData? GetAttributeData<T>(this ISymbol symbol) where T : Attribute
+    public static AttributeData? GetAttributeData<T>(this ISymbol symbol, bool searchBaseAndInterfaces = false) where T : Attribute
     {
-        foreach (var attribute in symbol.GetAttributes())
+        // Search for the attribute on the symbol itself
+        foreach (AttributeData attribute in symbol.GetAttributes())
         {
-            if (attribute.AttributeClass?.Name == typeof(T).Name)
+            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
                 return attribute;
         }
 
+        // If searchBaseAndInterfaces is true, search on base classes and interfaces
+        if (searchBaseAndInterfaces)
+        {
+            if (symbol is INamedTypeSymbol namedTypeSymbol)
+            {
+                // Search on base classes
+                INamedTypeSymbol? baseType = namedTypeSymbol.BaseType;
+                while (baseType != null)
+                {
+                    foreach (AttributeData attribute in baseType.GetAttributes())
+                    {
+                        if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                            return attribute;
+                    }
+                    baseType = baseType.BaseType;
+                }
+
+                // Search on interfaces
+                foreach (INamedTypeSymbol interfaceType in namedTypeSymbol.AllInterfaces)
+                {
+                    foreach (AttributeData attribute in interfaceType.GetAttributes())
+                    {
+                        if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                            return attribute;
+                    }
+                }
+            }
+        }
+
         return null;
+    }
+
+    public static bool MatchesType<T>(this INamedTypeSymbol typeSymbol)
+    {
+        const string globalPrefix = "global::";
+
+        // Get full metadata name, including generics
+        string typeSymbolFullName = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        ReadOnlySpan<char> normalizedSymbolName = typeSymbolFullName.AsSpan();
+        if (normalizedSymbolName.StartsWith(globalPrefix.AsSpan()))
+        {
+            normalizedSymbolName = normalizedSymbolName[globalPrefix.Length..];
+        }
+
+        // Handle open generic types
+        Type runtimeType = typeof(T);
+        if (runtimeType.IsGenericTypeDefinition)
+        {
+            // Convert `typeof(List<>)` to "System.Collections.Generic.List`1"
+            string openGenericName = runtimeType.FullName!.Split('[')[0];
+            return normalizedSymbolName.StartsWith(openGenericName.AsSpan());
+        }
+
+        // Handle concrete generic types
+        string runtimeTypeName = runtimeType.FullName!;
+        return normalizedSymbolName.SequenceEqual(runtimeTypeName.AsSpan());
     }
 
     /// <summary>
@@ -180,33 +237,6 @@ internal static class SymbolExtensions
         }
     }
 
-    /// <summary>
-    /// Tries to get the constructor argument of the specified attribute type from the symbol.
-    /// </summary>
-    /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <param name="symbol">The symbol.</param>
-    /// <param name="argumentIndex">The index of the argument.</param>
-    /// <param name="result">The result if found; otherwise, default.</param>
-    /// <returns>True if the constructor argument is found; otherwise, false.</returns>
-    public static bool TryGetConstructorArgument<TAttribute, TResult>(this ISymbol symbol, int argumentIndex, [NotNullWhen(true)] out TResult? result)
-        where TAttribute : Attribute
-        where TResult : notnull
-    {
-        result = default;
-        AttributeData? attributeData = symbol.GetAttributeData<TAttribute>();
-        if (attributeData is null) return false;
-
-        result = attributeData.GetConstructorArgument<TResult>(argumentIndex);
-        return result is not null;
-    }
-
-    public static long GetSchemaHash(this ISymbol symbol) => SchemaHash.Combine(
-        symbol.Name.GetSchemaHash(),
-        symbol.ContainingNamespace.Name.GetSchemaHash(),
-        symbol.ContainingAssembly.Name.GetSchemaHash(),
-        (long)symbol.Kind);
-
     public static string GetDefCacheKey(this ITypeSymbol symbol) => symbol.GetDocumentationCommentId() ?? symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
     public static bool IsJsonDefinedType(this ITypeSymbol symbol, [NotNullWhen(true)] out JsonSchemaBuilder? schema)
@@ -228,7 +258,7 @@ internal static class SymbolExtensions
             SpecialType.System_Int16 => CommonSchemas.System_Int16,
             SpecialType.System_Int32 => CommonSchemas.System_Int32,
             SpecialType.System_Int64 => CommonSchemas.System_Int64,
-            SpecialType.System_Object => CommonSchemas.UnsupportedObject,
+            SpecialType.System_Object => throw new InvalidOperationException("System.Object does not map to a json defined type."),
             SpecialType.System_SByte => CommonSchemas.System_SByte,
             SpecialType.System_Single => CommonSchemas.System_Single,
             SpecialType.System_String => CommonSchemas.String,

@@ -22,7 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\SharpSchema.Annotations\**\*.cs" Link="Annotations\%(RecursiveDir)%(Filename)%(Extension)" />
+    <!--<Compile Include="..\SharpSchema.Annotations\**\*.cs" Link="Annotations\%(RecursiveDir)%(Filename)%(Extension)" />-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpSchema.Annotations\SharpSchema.Annotations.csproj" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

@@ -1,15 +1,15 @@
 ﻿using System;
-using Microsoft.IO;
+using System.IO;
 
 namespace SharpSchema.Generator.Tests.TestUtilities;
 
 public static class PathHelper
 {
-    public static string GetRepoPath(string relativePath)
+    public static string GetRepoPath(params string[] relativePath)
     {
         string basePath = AppContext.BaseDirectory;
         string repoRoot = FindRepoRoot(basePath);
-        string projectPath = Path.GetFullPath(Path.Combine(repoRoot, relativePath));
+        string projectPath = Path.GetFullPath(Path.Combine(repoRoot, Path.Combine(relativePath)));
         return projectPath;
     }
 

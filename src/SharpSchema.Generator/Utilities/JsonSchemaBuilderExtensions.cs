@@ -37,4 +37,15 @@ internal static class JsonSchemaBuilderExtensions
 
         return builder;
     }
+
+    public static JsonSchemaBuilder UnsupportedObject(this JsonSchemaBuilder builder, string value)
+    {
+        builder.Add(new UnsupportedObjectKeyword(value));
+        return builder;
+    }
+
+    public static UnsupportedObjectKeyword? GetUnsupportedObject(this JsonSchemaBuilder builder)
+    {
+        return builder.Get<UnsupportedObjectKeyword>();
+    }
 }

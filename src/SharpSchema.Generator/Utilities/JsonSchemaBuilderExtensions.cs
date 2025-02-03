@@ -6,7 +6,7 @@ namespace SharpSchema.Generator.Utilities;
 
 internal static class JsonSchemaBuilderExtensions
 {
-    public static JsonSchemaBuilder Apply(this JsonSchemaBuilder builder, Metadata? data)
+    public static JsonSchemaBuilder ApplyMetadata(this JsonSchemaBuilder builder, Metadata? data)
     {
         using var scope = Tracer.Enter($"{data}");
 
@@ -30,8 +30,10 @@ internal static class JsonSchemaBuilderExtensions
         return builder;
     }
 
-    public static JsonSchemaBuilder Apply(this JsonSchemaBuilder builder, JsonSchema schema)
+    public static JsonSchemaBuilder ApplySchema(this JsonSchemaBuilder builder, JsonSchema schema)
     {
+        using var trace = Tracer.Enter($"{schema.BaseUri}");
+
         foreach (IJsonSchemaKeyword keyword in schema.Keywords ?? [])
             builder.Add(keyword);
 

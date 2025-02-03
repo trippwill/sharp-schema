@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SharpSchema.Annotations;
 
 namespace SharpSchema.Generator.Tests.DeclaredTypeSyntaxVisitorTests;
@@ -22,7 +21,32 @@ public class Class_WithDocComments
 public class Class_WithValueTypes
 {
     public string Name { get; set; }
+
     public int Age { get; set; }
+
+    public bool IsAdult { get; set; }
+
+    public byte Byte { get; set; }
+
+    public sbyte SByte { get; set; }
+
+    public short Short { get; set; }
+
+    public ushort UShort { get; set; }
+
+    public uint UInt { get; set; }
+
+    public long Long { get; set; }
+
+    public ulong ULong { get; set; }
+
+    public float Float { get; set; }
+
+    public double Double { get; set; }
+
+    public decimal Decimal { get; set; }
+
+    public char Char { get; set; }
 }
 
 public class Class_WithIEnumerableProperty
@@ -69,6 +93,7 @@ public record Record_WithReferenceTypeParameters(Address Address, Address? Nulla
 public struct Struct_WithNullableValueTypes
 {
     public string? Name { get; set; }
+
     public int? Age { get; set; }
 }
 
@@ -91,8 +116,8 @@ public class Class_WithSchemaOverride
 }
 
 public record Record_WithSchemaOverride(
-    [property: SchemaOverride("[{\"type\":\"string\",\"maxLength\":50}]")] string Name,
-    [property: SchemaOverride("{\"type\":\"integer\",\"minimum\":0}")] int Age
+    [SchemaOverride("{\"type\":\"string\",\"maxLength\":50}")] string Name,
+    [SchemaOverride("{\"type\":\"integer\",\"minimum\":0}")] int Age
 );
 
 public class Class_WithBadTypeSchemaOverride
@@ -103,6 +128,28 @@ public class Class_WithBadTypeSchemaOverride
 public class Class_WithTypeSchemaOverride
 {
     public GoodOverride Custom { get; set; }
+}
+
+public class Class_WithIgnoredProperty
+{
+    [SchemaIgnore]
+    public string Ignored { get; set; }
+
+    public string NotIgnored { get; set; }
+}
+
+public record Record_WithIgnoredParameter(
+    [SchemaIgnore] string Ignored,
+    string NotIgnored
+);
+
+public record Class_WithInternalProperties
+{
+    internal string Internal { get; set; }
+
+    protected string Protected { get; set; }
+
+    private string Private { get; set; }
 }
 
 [SchemaOverride("{invalidJson}")]

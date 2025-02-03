@@ -1,13 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 using Json.Schema;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SharpSchema.Annotations;
 using SharpSchema.Generator.Model;
 
 namespace SharpSchema.Generator.Utilities;
-
 /// <summary>
 /// Provides extension methods for symbols.
 /// </summary>
@@ -19,15 +16,9 @@ internal static class SymbolExtensions
     /// <param name="symbol">The named type symbol.</param>
     /// <param name="allowedAccessibilities">The allowed accessibilities.</param>
     /// <returns>True if the symbol should process accessibility; otherwise, false.</returns>
-    public static bool ShouldProcessAccessibility(this INamedTypeSymbol symbol, AllowedAccessibilities allowedAccessibilities)
+    public static bool ShouldProcessAccessibility(this INamedTypeSymbol symbol, Accessibilities allowedAccessibilities)
     {
-        return symbol.DeclaredAccessibility switch
-        {
-            Accessibility.Public => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Public),
-            Accessibility.Internal => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Internal),
-            Accessibility.Private => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Private),
-            _ => false,
-        };
+        return symbol.DeclaredAccessibility.ShouldProcessAccessibility(allowedAccessibilities);
     }
 
     /// <summary>
@@ -36,13 +27,18 @@ internal static class SymbolExtensions
     /// <param name="symbol">The property symbol.</param>
     /// <param name="allowedAccessibilities">The allowed accessibilities.</param>
     /// <returns>True if the property symbol should process accessibility; otherwise, false.</returns>
-    public static bool ShouldProcessAccessibility(this IPropertySymbol symbol, AllowedAccessibilities allowedAccessibilities)
+    public static bool ShouldProcessAccessibility(this IPropertySymbol symbol, Accessibilities allowedAccessibilities)
     {
-        return symbol.DeclaredAccessibility switch
+        return symbol.DeclaredAccessibility.ShouldProcessAccessibility(allowedAccessibilities);
+    }
+
+    private static bool ShouldProcessAccessibility(this Accessibility accessibility, Accessibilities allowedAccessibilities)
+    {
+        return accessibility switch
         {
-            Accessibility.Public => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Public),
-            Accessibility.Internal => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Internal),
-            Accessibility.Private => allowedAccessibilities.CheckFlag(AllowedAccessibilities.Private),
+            Accessibility.Public => allowedAccessibilities.CheckFlag(Accessibilities.Public),
+            Accessibility.Internal => allowedAccessibilities.CheckFlag(Accessibilities.Internal),
+            Accessibility.Private => allowedAccessibilities.CheckFlag(Accessibilities.Private),
             _ => false,
         };
     }
@@ -52,9 +48,10 @@ internal static class SymbolExtensions
     /// </summary>
     /// <typeparam name="T">The type of the attribute.</typeparam>
     /// <param name="symbol">The symbol.</param>
-    /// <param name="searchBaseAndInterfaces">Indicates whether to search for attributes on base classes and interfaces.</param>
+    /// <param name="traversal">Indicates whether to search for attributes on base classes and interfaces.</param>
     /// <returns>The attribute data if found; otherwise, null.</returns>
-    public static AttributeData? GetAttributeData<T>(this ISymbol symbol, bool searchBaseAndInterfaces = false) where T : Attribute
+    public static AttributeData? GetAttributeData<T>(this ISymbol symbol, Traversal traversal = Traversal.SymbolOnly)
+        where T : Attribute
     {
         // Search for the attribute on the symbol itself
         foreach (AttributeData attribute in symbol.GetAttributes())
@@ -63,23 +60,26 @@ internal static class SymbolExtensions
                 return attribute;
         }
 
-        // If searchBaseAndInterfaces is true, search on base classes and interfaces
-        if (searchBaseAndInterfaces)
+        if (symbol is INamedTypeSymbol namedTypeSymbol)
         {
-            if (symbol is INamedTypeSymbol namedTypeSymbol)
+            if (traversal.CheckFlag(Traversal.SymbolAndBases))
             {
                 // Search on base classes
                 INamedTypeSymbol? baseType = namedTypeSymbol.BaseType;
-                while (baseType != null)
+                while (baseType is not null)
                 {
                     foreach (AttributeData attribute in baseType.GetAttributes())
                     {
                         if (attribute.AttributeClass?.MatchesType<T>() ?? false)
                             return attribute;
                     }
+
                     baseType = baseType.BaseType;
                 }
+            }
 
+            if (traversal.CheckFlag(Traversal.SymbolAndInterfaces))
+            {
                 // Search on interfaces
                 foreach (INamedTypeSymbol interfaceType in namedTypeSymbol.AllInterfaces)
                 {
@@ -121,6 +121,19 @@ internal static class SymbolExtensions
         return normalizedSymbolName.SequenceEqual(runtimeTypeName.AsSpan());
     }
 
+    public static bool ShouldProcess(this IParameterSymbol symbol, GeneratorOptions options)
+    {
+        return symbol.IsValidForGeneration()
+            && !symbol.IsIgnoredForGeneration();
+    }
+
+    public static bool ShouldProcess(this IPropertySymbol symbol, GeneratorOptions options)
+    {
+        return symbol.IsValidForGeneration()
+            && symbol.ShouldProcessAccessibility(options.Accessibilities)
+            && !symbol.IsIgnoredForGeneration();
+    }
+
     /// <summary>
     /// Determines if the property symbol is valid for generation.
     /// </summary>
@@ -128,11 +141,21 @@ internal static class SymbolExtensions
     /// <returns>True if the property symbol is valid for generation; otherwise, false.</returns>
     public static bool IsValidForGeneration(this IPropertySymbol symbol)
     {
+        return IsValidForGeneration((ISymbol)symbol)
+            && !symbol.IsIndexer
+            && !symbol.IsWriteOnly;
+    }
+
+    /// <summary>
+    /// Determines if the property symbol is valid for generation.
+    /// </summary>
+    /// <param name="symbol">The property symbol.</param>
+    /// <returns>True if the property symbol is valid for generation; otherwise, false.</returns>
+    public static bool IsValidForGeneration(this ISymbol symbol)
+    {
         return !symbol.IsStatic
             && !symbol.IsAbstract
-            && !symbol.IsIndexer
             && !symbol.IsVirtual
-            && !symbol.IsWriteOnly
             && !symbol.IsImplicitlyDeclared;
     }
 
@@ -149,29 +172,6 @@ internal static class SymbolExtensions
             && !symbol.IsImplicitClass
             && !symbol.IsExtern
             && !symbol.IsImplicitlyDeclared;
-    }
-
-    /// <summary>
-    /// Determines if the symbol is ignored for generation based on specific attributes.
-    /// </summary>
-    /// <param name="symbol">The symbol.</param>
-    /// <returns>True if the symbol is ignored for generation; otherwise, false.</returns>
-    public static bool IsIgnoredForGeneration(this ISymbol symbol)
-    {
-        if (symbol.GetAttributeData<SchemaIgnoreAttribute>() is not null) return true;
-
-        if (symbol.GetAttributeData<JsonIgnoreAttribute>() is AttributeData jsonIgnoreAttribute)
-        {
-            // Filter out properties that have JsonIgnoreAttribute without any named arguments
-            if (jsonIgnoreAttribute.NamedArguments.Length == 0)
-                return true;
-
-            // Filter out properties that have JsonIgnoreAttribute with named argument "Condition" and value "Always"
-            if (jsonIgnoreAttribute.GetNamedArgument<JsonIgnoreCondition>("Condition") == JsonIgnoreCondition.Always)
-                return true;
-        }
-
-        return false;
     }
 
     /// <summary>

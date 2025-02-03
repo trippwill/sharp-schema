@@ -7,7 +7,7 @@ namespace SharpSchema.Annotations;
 /// <summary>
 /// Indicates whether a property is required in a schema.
 /// </summary>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+[AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
 public class SchemaRequiredAttribute(bool isRequired = true) : SchemaAttribute
 #else

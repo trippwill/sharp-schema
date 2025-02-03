@@ -3,14 +3,11 @@
   "properties": {
     "name": {
       "type": "string",
-      "title": "Name"
+      "maxLength": 50
     },
     "age": {
       "type": "integer",
-      "minimum": -2147483648,
-      "maximum": 2147483647,
-      "$comment": "System.Int32",
-      "title": "Age"
+      "minimum": 0
     }
   }
 }

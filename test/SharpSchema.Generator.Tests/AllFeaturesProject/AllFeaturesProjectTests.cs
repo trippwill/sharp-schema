@@ -122,12 +122,12 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
     //    return schemaRootInfos;
     //}
 
-    public static TheoryData<AllowedAccessibilities, AllowedAccessibilities> VerifyOptions()
+    public static TheoryData<Accessibilities, Accessibilities> VerifyOptions()
     {
         return new()
         {
-            { AllowedAccessibilities.Default, AllowedAccessibilities.Default},
-            { AllowedAccessibilities.Any, AllowedAccessibilities.Any }
+            { Accessibilities.Default, Accessibilities.Default},
+            { Accessibilities.Any, Accessibilities.Any }
         };
     }
 }

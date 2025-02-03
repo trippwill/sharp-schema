@@ -10,7 +10,7 @@ namespace SharpSchema.Annotations;
 /// <remarks>
 /// This attribute is used to specify the format of a schema.
 /// </remarks>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+[AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
 public class SchemaFormatAttribute(string format) : SchemaAttribute
 #else

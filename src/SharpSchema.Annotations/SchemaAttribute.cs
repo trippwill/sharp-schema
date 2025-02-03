@@ -13,4 +13,9 @@ public abstract class SchemaAttribute : Attribute
 internal abstract class SchemaAttribute : Attribute
 #endif
 {
+    internal const AttributeTargets SupportedTypes = AttributeTargets.Class | AttributeTargets.Struct;
+
+    internal const AttributeTargets SupportedMembers = AttributeTargets.Property | AttributeTargets.Parameter;
+
+    internal const AttributeTargets EnumTargets = AttributeTargets.Field | AttributeTargets.Enum;
 }

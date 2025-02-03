@@ -29,6 +29,7 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
     [InlineData(nameof(Record_WithReferenceTypeParameters))]
     [InlineData(nameof(Record_WithValueTypeParameters))]
     [InlineData(nameof(Record_WithSchemaOverride))]
+    [InlineData(nameof(Record_WithIgnoredParameter))]
     [InlineData(nameof(Class_WithIEnumerableProperty))]
     [InlineData(nameof(Class_WithDictionaryOfValueTypes))]
     [InlineData(nameof(Class_WithDictionaryOfReferenceTypes))]
@@ -38,6 +39,8 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
     [InlineData(nameof(Class_WithTypeSchemaOverride))]
     [InlineData(nameof(Class_WithBadTypeSchemaOverride))]
     [InlineData(nameof(Class_WithUnsupportedDictionaryKey))]
+    [InlineData(nameof(Class_WithIgnoredProperty))]
+    [InlineData(nameof(Class_WithInternalProperties))]
     public Task Verify_TestData(string testName)
     {
         DeclaredTypeSyntaxVisitor visitor = _fixture.GetVisitor();

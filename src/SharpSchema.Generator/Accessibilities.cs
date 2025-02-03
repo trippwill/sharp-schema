@@ -4,7 +4,7 @@
 /// Specifies the allowed accessibilities.
 /// </summary>
 [Flags]
-public enum AllowedAccessibilities
+public enum Accessibilities
 {
     /// <summary>
     /// Indicates public accessibility.

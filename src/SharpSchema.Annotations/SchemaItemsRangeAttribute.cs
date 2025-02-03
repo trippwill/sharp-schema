@@ -10,7 +10,7 @@ namespace SharpSchema.Annotations;
 /// <remarks>
 /// This attribute can be used to define the minimum and maximum items of an array schema, and to set the uniqueItems constraint.
 /// </remarks>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+[AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
 public class SchemaItemsRangeAttribute : SchemaAttribute
 #else

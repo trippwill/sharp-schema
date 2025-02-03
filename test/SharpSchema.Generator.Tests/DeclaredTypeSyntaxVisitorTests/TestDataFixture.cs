@@ -37,7 +37,7 @@ public class TestDataFixture
             .AddSyntaxTrees([.. annotationSyntaxTrees, _syntaxTree]);
     }
 
-    public DeclaredTypeSyntaxVisitor GetVisitor() => new(_compilation);
+    public DeclaredTypeSyntaxVisitor GetVisitor() => new(_compilation, GeneratorOptions.Default);
 
     public JsonSchemaBuilder GetJsonSchemaBuilder(DeclaredTypeSyntaxVisitor visitor, [CallerMemberName] string? testName = null)
     {

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace SharpSchema.Generator.Utilities;
 
@@ -15,24 +14,32 @@ public static class Tracer
     /// <param name="message">The message to write.</param>
     public delegate void LineWriter(string message);
 
+    private static readonly string[] s_indents = new string[16];
     private static int s_indentLevel = 0;
-    private static readonly string[] s_indents = new string[32];
+    private static LineWriter? s_writer;
+    private static int s_indentWidth = 2;
 
     /// <summary>
-    /// The number of spaces per indentation level.
+    /// Sets the writer to use for writing trace messages.
     /// </summary>
-    public static int IndentWidth = 2;
+    public static LineWriter? Writer { set => s_writer = value; }
 
     /// <summary>
-    /// The writer to use for writing trace messages.
+    /// Sets the number of spaces per indentation level.
     /// </summary>
-    public static LineWriter? Writer;
+    public static int IndentWidth { set => s_indentWidth = value; }
 
     /// <summary>
     /// Writes a trace message followed by a newline.
     /// </summary>
     /// <param name="message">The message to write.</param>
-    public static void WriteLine(string message) => Writer?.Invoke(message);
+    /// <param name="caller">The name of the caller member.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void WriteLine(string message, [CallerMemberName] string? caller = null)
+    {
+        const string format = "{0}[{1}] {2}";
+        s_writer?.Invoke(string.Format(format, GetIndent(), caller, message));
+    }
 
     /// <summary>
     /// Enters a new trace scope with the specified message.
@@ -42,8 +49,7 @@ public static class Tracer
     /// <returns>A <see cref="TraceScope"/> instance representing the new scope.</returns>
     public static TraceScope Enter(string message, [CallerMemberName] string? caller = null)
     {
-        const string format = "{0}[{1}] {2}";
-        WriteLine(string.Format(format, GetIndent(), caller, message));
+        WriteLine(message, caller);
         s_indentLevel++;
         return new TraceScope();
     }
@@ -54,11 +60,11 @@ public static class Tracer
         if (indent < s_indents.Length)
         {
             if (s_indents[indent] is null)
-                s_indents[indent] = new string(' ', indent * IndentWidth);
+                s_indents[indent] = new string(' ', indent * s_indentWidth);
             return s_indents[indent];
         }
 
-        return string.Intern(new string(' ', indent * IndentWidth));
+        return string.Intern(new string(' ', indent * s_indentWidth));
     }
 
     /// <summary>
@@ -66,6 +72,15 @@ public static class Tracer
     /// </summary>
     public readonly struct TraceScope() : IDisposable
     {
+        /// <summary>
+        /// Writes a trace message followed by a newline.
+        /// </summary>
+        /// <param name="message">The message to write.</param>
+        /// <param name="caller">The name of the caller member.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteLine(string message, [CallerMemberName] string? caller = null)
+            => Tracer.WriteLine(message, caller);
+
         /// <summary>
         /// Decreases the indent level when the scope is disposed.
         /// </summary>

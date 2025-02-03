@@ -9,7 +9,7 @@ namespace SharpSchema.Annotations;
 /// Represents a schema meta attribute.
 /// </summary>
 [ExcludeFromCodeCoverage]
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Enum)]
+[AttributeUsage(SupportedTypes | SupportedMembers | EnumTargets)]
 #if SHARPSCHEMA_ASSEMBLY
 public class SchemaMetaAttribute : SchemaAttribute
 #else

@@ -9,6 +9,9 @@
       "title": "Data"
     }
   },
+  "required": [
+    "data"
+  ],
   "$defs": {
     "#/$defs/T:SharpSchema.Generator.Tests.DeclaredTypeSyntaxVisitorTests.Address": {
       "type": "object",
@@ -21,7 +24,11 @@
           "type": "string",
           "title": "City"
         }
-      }
+      },
+      "required": [
+        "street",
+        "city"
+      ]
     }
   }
 }

@@ -5,5 +5,8 @@
       "type": "string",
       "title": "Not Ignored"
     }
-  }
+  },
+  "required": [
+    "notIgnored"
+  ]
 }

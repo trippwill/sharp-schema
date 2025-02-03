@@ -93,5 +93,21 @@
       "$comment": "System.Char",
       "title": "Char"
     }
-  }
+  },
+  "required": [
+    "name",
+    "age",
+    "isAdult",
+    "byte",
+    "sByte",
+    "short",
+    "uShort",
+    "uInt",
+    "long",
+    "uLong",
+    "float",
+    "double",
+    "decimal",
+    "char"
+  ]
 }

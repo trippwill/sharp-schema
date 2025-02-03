@@ -13,5 +13,9 @@
       "title": "Age",
       "description": "The age of the person."
     }
-  }
+  },
+  "required": [
+    "name",
+    "age"
+  ]
 }

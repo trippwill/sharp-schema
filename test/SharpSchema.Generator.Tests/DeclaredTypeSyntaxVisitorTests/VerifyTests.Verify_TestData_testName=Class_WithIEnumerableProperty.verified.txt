@@ -11,5 +11,8 @@
       },
       "title": "Numbers"
     }
-  }
+  },
+  "required": [
+    "numbers"
+  ]
 }

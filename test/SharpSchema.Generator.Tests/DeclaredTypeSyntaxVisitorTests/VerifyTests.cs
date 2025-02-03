@@ -41,6 +41,8 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
     [InlineData(nameof(Class_WithUnsupportedDictionaryKey))]
     [InlineData(nameof(Class_WithIgnoredProperty))]
     [InlineData(nameof(Class_WithInternalProperties))]
+    [InlineData(nameof(Class_WithArrayProperty))]
+    [InlineData(nameof(Class_WithInvalidProperties))]
     public Task Verify_TestData(string testName)
     {
         DeclaredTypeSyntaxVisitor visitor = _fixture.GetVisitor();

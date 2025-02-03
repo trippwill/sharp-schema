@@ -54,6 +54,24 @@ public class Class_WithIEnumerableProperty
     public List<int> Numbers { get; set; }
 }
 
+public class Class_WithArrayProperty
+{
+    public int[] Numbers { get; set; }
+
+    public string?[] Names { get; set; }
+
+    public Address[]? Addresses { get; set; }
+}
+
+public class Class_WithInvalidProperties
+{
+    public string Name { set { } }
+
+    public static string Static { get; set; }
+
+    public virtual string Virtual { get; set; }
+}
+
 public class Class_WithDictionaryOfValueTypes
 {
     public Dictionary<string, int> Data { get; set; }
@@ -150,6 +168,18 @@ public record Class_WithInternalProperties
     protected string Protected { get; set; }
 
     private string Private { get; set; }
+}
+
+public class Class_WithRequiredProperties
+{
+    public required int? RequiredInt { get; set; }
+
+    public string Required { get; set; }
+
+    public string? Optional { get; set; }
+
+    [SchemaRequired]
+    public string? Default { get; set; } = "default";
 }
 
 [SchemaOverride("{invalidJson}")]

@@ -1,0 +1,29 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "NameOfRecord",
+      "description": "The record's name.",
+      "examples": [
+        "John Doe"
+      ]
+    },
+    "age": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647,
+      "$comment": "System.Int32",
+      "title": "AgeOfRecord",
+      "description": "The record's age.",
+      "examples": [
+        "42",
+        "24"
+      ]
+    }
+  },
+  "required": [
+    "name",
+    "age"
+  ]
+}

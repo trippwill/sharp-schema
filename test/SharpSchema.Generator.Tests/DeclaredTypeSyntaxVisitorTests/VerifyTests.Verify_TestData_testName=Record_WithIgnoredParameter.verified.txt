@@ -1,0 +1,12 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "notIgnored": {
+      "type": "string",
+      "title": "Not Ignored"
+    }
+  },
+  "required": [
+    "notIgnored"
+  ]
+}

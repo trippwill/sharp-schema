@@ -1,0 +1,17 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "custom": {
+      "type": "object",
+      "properties": {
+        "custom": {
+          "type": "string"
+        }
+      },
+      "title": "Custom"
+    }
+  },
+  "required": [
+    "custom"
+  ]
+}

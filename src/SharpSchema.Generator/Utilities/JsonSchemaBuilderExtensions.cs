@@ -1,0 +1,53 @@
+﻿using System.Text.Json.Nodes;
+using Json.Schema;
+using SharpSchema.Generator.Model;
+
+namespace SharpSchema.Generator.Utilities;
+
+internal static class JsonSchemaBuilderExtensions
+{
+    public static JsonSchemaBuilder ApplyMetadata(this JsonSchemaBuilder builder, Metadata? data)
+    {
+        using var scope = Tracer.Enter($"{data}");
+
+        if (data is null)
+            return builder;
+
+        builder.Title(data.Title);
+
+        if (data.Description is string description)
+            builder.Description(description);
+
+        if (data.Deprecated)
+            builder.Deprecated(true);
+
+        if (data.Examples is List<string> examples && examples.Count > 0)
+            builder.Examples([.. examples.Select(e => JsonValue.Create(e))]);
+
+        if (data.Comment is string comment)
+            builder.Comment(comment);
+
+        return builder;
+    }
+
+    public static JsonSchemaBuilder ApplySchema(this JsonSchemaBuilder builder, JsonSchema schema)
+    {
+        using var trace = Tracer.Enter($"{schema.BaseUri}");
+
+        foreach (IJsonSchemaKeyword keyword in schema.Keywords ?? [])
+            builder.Add(keyword);
+
+        return builder;
+    }
+
+    public static JsonSchemaBuilder UnsupportedObject(this JsonSchemaBuilder builder, string value)
+    {
+        builder.Add(new UnsupportedObjectKeyword(value));
+        return builder;
+    }
+
+    public static UnsupportedObjectKeyword? GetUnsupportedObject(this JsonSchemaBuilder builder)
+    {
+        return builder.Get<UnsupportedObjectKeyword>();
+    }
+}

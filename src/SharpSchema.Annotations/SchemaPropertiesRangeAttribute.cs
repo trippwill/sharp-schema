@@ -1,7 +1,4 @@
-﻿// Copyright (c) Charles Willis. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-using System;
+﻿using System;
 
 #nullable enable
 
@@ -13,7 +10,7 @@ namespace SharpSchema.Annotations;
 /// <remarks>
 /// This attribute can be used to specify the minimum and maximum number of properties allowed in a schema.
 /// </remarks>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field)]
+[AttributeUsage(SupportedTypes | SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
 public class SchemaPropertiesRangeAttribute : SchemaAttribute
 #else

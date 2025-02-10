@@ -25,6 +25,7 @@
     <Company>trippwill</Company>
     <Authors>The contributors of the SharpSchema project.</Authors>
     <Copyright>© The contributors of the SharpSchema project. All rights reserved.</Copyright>
+    <Product>SharpSchema</Product>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>

@@ -20,11 +20,11 @@ public class Class_WithDocComments
 
 public class Class_WithValueTypes
 {
-    public string Name { get; set; }
+    public string String { get; set; }
 
-    public int Age { get; set; }
+    public int Int { get; set; }
 
-    public bool IsAdult { get; set; }
+    public bool Bool { get; set; }
 
     public byte Byte { get; set; }
 
@@ -106,7 +106,21 @@ public class Class_WithUnsupportedDictionaryKey
 /// </param>
 public record Record_WithValueTypeParameters(string Name, int Age = 42);
 
-public record Record_WithReferenceTypeParameters(Address Address, Address? NullableAddress, List<Address>? Addresses);
+public record Record_WithSchemaMetaParameters(
+    [SchemaMeta(Title = "NameOfRecord", Description = "The record's name.", Examples = ["John Doe"])]
+    string Name,
+    [SchemaMeta(Title = "AgeOfRecord", Description = "The record's age.", Examples = ["42", "24"])]
+    int Age);
+
+public record Record_WithReferenceTypeParameters(
+    Address Address,
+    Address? NullableAddress,
+    List<Address>? Addresses);
+
+public record Record_WithParametersAndProperties(string Name, int Age)
+{
+    public required Address Address { get; set; }
+}
 
 public struct Struct_WithNullableValueTypes
 {

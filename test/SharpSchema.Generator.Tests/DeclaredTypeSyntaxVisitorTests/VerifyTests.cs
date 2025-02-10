@@ -30,6 +30,8 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
     [InlineData(nameof(Record_WithValueTypeParameters))]
     [InlineData(nameof(Record_WithSchemaOverride))]
     [InlineData(nameof(Record_WithIgnoredParameter))]
+    [InlineData(nameof(Record_WithParametersAndProperties))]
+    [InlineData(nameof(Record_WithSchemaMetaParameters))]
     [InlineData(nameof(Class_WithIEnumerableProperty))]
     [InlineData(nameof(Class_WithDictionaryOfValueTypes))]
     [InlineData(nameof(Class_WithDictionaryOfReferenceTypes))]

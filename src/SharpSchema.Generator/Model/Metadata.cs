@@ -113,7 +113,7 @@ public record Metadata(
                     title = element.Element(TitleElement)?.Value ?? title;
                     description = element.Element(DescriptionElement)?.Value ?? description;
                     comment = element.Element(CommentElement)?.Value ?? comment;
-                    examples ??= element.Elements(ExampleElement).Select(e => e.Value).ToList();
+                    examples ??= [.. element.Elements(ExampleElement).Select(e => e.Value)];
                     if (element.Element(DeprecatedElement) is not null)
                         deprecated = true;
                 }
@@ -125,7 +125,7 @@ public record Metadata(
                 title = data.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Title)) ?? title;
                 description = data.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Description)) ?? description;
                 comment = data.GetNamedArgument<string>(nameof(SchemaMetaAttribute.Comment)) ?? comment;
-                examples = data.GetNamedArgument<List<string>>(nameof(SchemaMetaAttribute.Examples)) ?? examples;
+                examples = data.GetNamedArgumentArray<string>(nameof(SchemaMetaAttribute.Examples)) ?? examples;
                 deprecated = data.GetNamedArgument<bool>(nameof(SchemaMetaAttribute.Deprecated)) || deprecated;
             }
 

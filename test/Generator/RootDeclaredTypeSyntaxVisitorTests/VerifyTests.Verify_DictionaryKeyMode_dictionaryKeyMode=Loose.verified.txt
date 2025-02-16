@@ -1,0 +1,19 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "$comment": "Key type 'Address' must be convertible to string.",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": -2147483648,
+        "maximum": 2147483647,
+        "$comment": "System.Int32"
+      },
+      "title": "Data"
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

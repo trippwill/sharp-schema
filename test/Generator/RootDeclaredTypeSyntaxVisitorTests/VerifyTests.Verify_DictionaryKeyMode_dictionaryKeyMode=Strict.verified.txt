@@ -1,0 +1,12 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "data": {
+      "$unsupportedObject": "Key type 'Address' must be string.",
+      "title": "Data"
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

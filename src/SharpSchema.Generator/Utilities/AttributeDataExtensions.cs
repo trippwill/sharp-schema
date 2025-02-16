@@ -43,11 +43,9 @@ internal static class AttributeDataExtensions
                     result.Add(item);
                 }
             }
-
-            return result;
         }
 
-        throw new InvalidOperationException($"Cannot get named argument '{argumentName}' as an array.");
+        return result;
     }
 
     public static T? GetConstructorArgument<T>(this AttributeData attributeData, int argumentIndex)
@@ -88,9 +86,8 @@ internal static class AttributeDataExtensions
                     result.Add(item);
                 }
             }
-            return result;
         }
 
-        throw new InvalidOperationException($"Cannot get constructor argument '{argumentIndex}' as an array.");
+        return result;
     }
 }

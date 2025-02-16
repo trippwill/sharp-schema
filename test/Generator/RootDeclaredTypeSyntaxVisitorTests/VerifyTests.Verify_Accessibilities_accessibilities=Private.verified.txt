@@ -1,0 +1,12 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "private": {
+      "type": "string",
+      "title": "Private"
+    }
+  },
+  "required": [
+    "private"
+  ]
+}

@@ -1,0 +1,45 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "valueTypes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": -2147483648,
+        "maximum": 2147483647,
+        "$comment": "System.Int32"
+      },
+      "title": "Value Types"
+    },
+    "referenceTypes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Address"
+      },
+      "title": "Reference Types"
+    }
+  },
+  "required": [
+    "valueTypes",
+    "referenceTypes"
+  ],
+  "$defs": {
+    "#/$defs/T:SharpSchema.Generator.TestData.Address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string",
+          "title": "Street"
+        },
+        "city": {
+          "type": "string",
+          "title": "City"
+        }
+      },
+      "required": [
+        "street",
+        "city"
+      ]
+    }
+  }
+}

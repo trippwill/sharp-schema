@@ -154,7 +154,6 @@ internal static class SymbolExtensions
     public static bool IsValidForGeneration(this ISymbol symbol)
     {
         return !symbol.IsStatic
-            && !symbol.IsAbstract
             && !symbol.IsVirtual
             && !symbol.IsImplicitlyDeclared;
     }
@@ -193,15 +192,16 @@ internal static class SymbolExtensions
     /// <param name="symbol">The type symbol to check.</param>
     /// <param name="interfaceSymbols">The generic interface symbols to check against.</param>
     /// <returns>The implemented generic interface symbol if found; otherwise, null.</returns>
-    public static INamedTypeSymbol? ImplementsGenericInterface(this ITypeSymbol symbol, params INamedTypeSymbol[] interfaceSymbols)
+    public static INamedTypeSymbol? ImplementsGenericInterface(this INamedTypeSymbol symbol, params INamedTypeSymbol[] interfaceSymbols)
     {
-        foreach (var i in symbol.AllInterfaces)
+        foreach (INamedTypeSymbol testInterfaceSymbol in interfaceSymbols)
         {
-            foreach (var interfaceSymbol in interfaceSymbols)
-            {
-                if (i.OriginalDefinition.Equals(interfaceSymbol, SymbolEqualityComparer.Default))
-                    return i;
-            }
+            if (symbol.TypeKind == TypeKind.Interface
+                && symbol.OriginalDefinition.MetadataName == testInterfaceSymbol.OriginalDefinition.MetadataName)
+                return symbol;
+
+            return symbol.AllInterfaces.FirstOrDefault(
+                i => i.OriginalDefinition.MetadataName == testInterfaceSymbol.OriginalDefinition.MetadataName);
         }
 
         return null;

@@ -1,0 +1,44 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Name"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647,
+      "$comment": "System.Int32",
+      "title": "Age"
+    },
+    "address": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Address",
+      "title": "Address"
+    }
+  },
+  "required": [
+    "name",
+    "age",
+    "address"
+  ],
+  "$defs": {
+    "#/$defs/T:SharpSchema.Generator.TestData.Address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string",
+          "title": "Street"
+        },
+        "city": {
+          "type": "string",
+          "title": "City"
+        }
+      },
+      "required": [
+        "street",
+        "city"
+      ]
+    }
+  }
+}

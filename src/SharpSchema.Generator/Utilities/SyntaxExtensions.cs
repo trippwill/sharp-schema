@@ -38,13 +38,8 @@ internal static class SyntaxExtensions
 
         Builder builder = CommonSchemas.Object;
 
-        var properties = new Dictionary<string, JsonSchema>();
-        var requiredProperties = new List<string>();
-
-        foreach (MemberDeclarationSyntax member in node.Members)
-        {
-            ProcessMember(member);
-        }
+        var properties = new Dictionary<string, JsonSchema>(StringComparer.OrdinalIgnoreCase);
+        var requiredProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         // Collect primary-constructor parameters
         if (node.ParameterList is not null)
@@ -53,6 +48,11 @@ internal static class SyntaxExtensions
             {
                 ProcessParameter(parameter);
             }
+        }
+
+        foreach (MemberDeclarationSyntax member in node.Members)
+        {
+            ProcessMember(member);
         }
 
         // Apply collected properties and required properties

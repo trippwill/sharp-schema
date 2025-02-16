@@ -1,0 +1,12 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "internal": {
+      "type": "string",
+      "title": "Internal"
+    }
+  },
+  "required": [
+    "internal"
+  ]
+}

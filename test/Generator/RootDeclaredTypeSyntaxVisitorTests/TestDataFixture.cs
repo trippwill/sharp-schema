@@ -12,6 +12,7 @@ using DiffEngine;
 using SharpSchema.Generator;
 using SharpSchema.Test.Generator.TestUtilities;
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 
 namespace SharpSchema.Test.Generator.RootDeclaredTypeSyntaxVisitorTests;
 
@@ -39,7 +40,8 @@ public class TestDataFixture
         _compilation = CSharpCompilation.Create("TestDataCompilation")
             .AddReferences(
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(ImmutableArray).Assembly.Location))
+                MetadataReference.CreateFromFile(typeof(ImmutableArray).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(JsonIgnoreAttribute).Assembly.Location))
             .AddSyntaxTrees([.. annotationSyntaxTrees, _syntaxTree]);
     }
 

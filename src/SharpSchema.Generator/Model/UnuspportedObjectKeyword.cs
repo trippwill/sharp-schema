@@ -3,6 +3,7 @@ using Json.Schema;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using SharpSchema.Generator.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SharpSchema.Generator.Model;
 
@@ -19,6 +20,7 @@ namespace SharpSchema.Generator.Model;
 [Vocabulary(Vocabularies.Metadata202012Id)]
 [Vocabulary(Vocabularies.MetadataNextId)]
 [JsonConverter(typeof(UnsupportedObjectKeywordJsonConverter))]
+[ExcludeFromCodeCoverage]
 public class UnsupportedObjectKeyword : IJsonSchemaKeyword
 {
     /// <summary>

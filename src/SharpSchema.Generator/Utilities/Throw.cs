@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace SharpSchema.Generator.Utilities;
 
+[ExcludeFromCodeCoverage]
 internal static class Throw
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

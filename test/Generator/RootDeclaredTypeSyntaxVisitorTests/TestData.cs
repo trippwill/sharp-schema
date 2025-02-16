@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 using SharpSchema.Annotations;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
@@ -189,6 +190,9 @@ public class Class_WithIgnoredProperty
 {
     [SchemaIgnore]
     public string Ignored { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
+    public string AlsoIgnored { get; set; }
 
     public string NotIgnored { get; set; }
 }

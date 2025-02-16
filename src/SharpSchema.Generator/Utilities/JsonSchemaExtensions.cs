@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Json.More;
 using Json.Schema;
 
@@ -7,6 +8,7 @@ namespace SharpSchema.Generator.Utilities;
 /// <summary>
 /// Extension methods for <see cref="JsonSchema"/>.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class JsonSchemaExtensions
 {
     /// <summary>

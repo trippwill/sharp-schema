@@ -9,57 +9,11 @@ namespace SharpSchema.Generator;
 using Builder = JsonSchemaBuilder;
 
 /// <summary>
-/// The options for the generator.
-/// </summary>
-/// <param name="Accessibilities">The accessibilities to consider.</param>
-/// <param name="Traversal">The traversal options.</param>
-/// <param name="DictionaryKeyMode">The mode for dictionary keys.</param>
-public record GeneratorOptions(
-    Accessibilities Accessibilities = Accessibilities.Public,
-    Traversal Traversal = Traversal.SymbolOnly,
-    DictionaryKeyMode DictionaryKeyMode = DictionaryKeyMode.Loose)
-{
-    /// <summary>
-    /// Gets the default generator options.
-    /// </summary>
-    public static GeneratorOptions Default { get; } = new GeneratorOptions();
-}
-
-/// <summary>
-/// Specifies the mode for dictionary keys.
-/// </summary>
-public enum DictionaryKeyMode
-{
-    /// <summary>
-    /// Loose mode allows any type of dictionary key,
-    /// adding a $comment to the schema for non-string keys.
-    /// </summary>
-    Loose = 1,
-
-    /// <summary>
-    /// Strict mode requires dictionary keys to be strings,
-    /// returning an $unsupportedObject for non-string keys.
-    /// </summary>
-    Strict,
-
-    /// <summary>
-    /// Silent mode allows any type of dictionary key.
-    /// </summary>
-    Silent,
-
-    /// <summary>
-    /// Skip mode skips properties with Dictionary of non-string keys.
-    /// </summary>
-    Skip,
-}
-
-/// <summary>
 /// Visits C# syntax nodes to generate JSON schema builders.
 /// </summary>
 public class RootDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 {
     private readonly LeafDeclaredTypeSyntaxVisitor _cachingVisitor;
-    private readonly GeneratorOptions _options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RootDeclaredTypeSyntaxVisitor"/> class.
@@ -69,7 +23,6 @@ public class RootDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     public RootDeclaredTypeSyntaxVisitor(Compilation compilation, GeneratorOptions options)
     {
         _cachingVisitor = new(compilation, options);
-        _options = options;
     }
 
     /// <inheritdoc />
@@ -82,7 +35,17 @@ public class RootDeclaredTypeSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     {
         Throw.IfNullArgument(node);
         using var trace = Tracer.Enter($"[ROOT] {node.Kind()}");
-        return base.Visit(node);
+        Builder? builder = base.Visit(node);
+
+        Builder result = new Builder()
+            .Schema("http://json-schema.org/draft-07/schema#");
+
+        if (builder is not null)
+        {
+            result.ApplySchema(builder);
+        }
+
+        return result;
     }
 
     /// <inheritdoc />

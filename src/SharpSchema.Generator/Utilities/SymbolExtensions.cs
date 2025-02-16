@@ -5,31 +5,16 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpSchema.Generator.Model;
 
 namespace SharpSchema.Generator.Utilities;
+
 /// <summary>
 /// Provides extension methods for symbols.
 /// </summary>
 internal static class SymbolExtensions
 {
-    /// <summary>
-    /// Determines if the property symbol should be processed based on its accessibility and the provided options.
-    /// </summary>
-    /// <param name="symbol">The property symbol.</param>
-    /// <param name="allowedAccessibilities">The allowed accessibilities.</param>
-    /// <returns>True if the property symbol should process accessibility; otherwise, false.</returns>
-    public static bool ShouldProcessAccessibility(this IPropertySymbol symbol, Accessibilities allowedAccessibilities)
+    public static AttributeHandler GetAttributeHandler<T>(this ISymbol symbol, Traversal traversal = Traversal.SymbolOnly)
+        where T : Attribute
     {
-        return symbol.DeclaredAccessibility.ShouldProcessAccessibility(allowedAccessibilities);
-    }
-
-    private static bool ShouldProcessAccessibility(this Accessibility accessibility, Accessibilities allowedAccessibilities)
-    {
-        return accessibility switch
-        {
-            Accessibility.Public => allowedAccessibilities.CheckFlag(Accessibilities.Public),
-            Accessibility.Internal => allowedAccessibilities.CheckFlag(Accessibilities.Internal),
-            Accessibility.Private => allowedAccessibilities.CheckFlag(Accessibilities.Private),
-            _ => false,
-        };
+        return new AttributeHandler(GetAttributeData<T>(symbol, traversal));
     }
 
     /// <summary>
@@ -51,7 +36,7 @@ internal static class SymbolExtensions
 
         if (symbol is INamedTypeSymbol namedTypeSymbol)
         {
-            if (traversal.CheckFlag(Traversal.SymbolAndBases))
+            if (traversal.CheckFlag(Traversal.Bases))
             {
                 // Search on base classes
                 INamedTypeSymbol? baseType = namedTypeSymbol.BaseType;
@@ -67,7 +52,7 @@ internal static class SymbolExtensions
                 }
             }
 
-            if (traversal.CheckFlag(Traversal.SymbolAndInterfaces))
+            if (traversal.CheckFlag(Traversal.Interfaces))
             {
                 // Search on interfaces
                 foreach (INamedTypeSymbol interfaceType in namedTypeSymbol.AllInterfaces)
@@ -82,6 +67,17 @@ internal static class SymbolExtensions
         }
 
         return null;
+    }
+
+    public static TValue? GetAttributeConstructorArgument<TAttribute, TValue>(this ISymbol symbol, int argumentIndex, Traversal traversal = Traversal.SymbolOnly)
+        where TAttribute : Attribute
+        where TValue : notnull
+    {
+        AttributeData? attributeData = symbol.GetAttributeData<TAttribute>(traversal);
+        if (attributeData is null)
+            return default;
+
+        return attributeData.GetConstructorArgument<TValue>(argumentIndex);
     }
 
     public static bool MatchesType<T>(this INamedTypeSymbol typeSymbol)
@@ -110,56 +106,38 @@ internal static class SymbolExtensions
         return normalizedSymbolName.SequenceEqual(runtimeTypeName.AsSpan());
     }
 
-    public static bool ShouldProcess(this IParameterSymbol symbol, GeneratorOptions options)
-    {
-        return symbol.IsValidForGeneration()
-            && !symbol.IsIgnoredForGeneration();
-    }
-
-    public static bool ShouldProcess(this IPropertySymbol symbol, GeneratorOptions options)
-    {
-        return symbol.IsValidForGeneration()
-            && symbol.ShouldProcessAccessibility(options.Accessibilities)
-            && !symbol.IsIgnoredForGeneration();
-    }
-
     /// <summary>
-    /// Determines if the property symbol is valid for generation.
+    /// Determines if the symbol is valid for generation.
     /// </summary>
-    /// <param name="symbol">The property symbol.</param>
-    /// <returns>True if the property symbol is valid for generation; otherwise, false.</returns>
-    public static bool IsValidForGeneration(this IPropertySymbol symbol)
-    {
-        return IsValidForGeneration((ISymbol)symbol)
-            && !symbol.IsIndexer
-            && !symbol.IsWriteOnly;
-    }
-
-    /// <summary>
-    /// Determines if the property symbol is valid for generation.
-    /// </summary>
-    /// <param name="symbol">The property symbol.</param>
-    /// <returns>True if the property symbol is valid for generation; otherwise, false.</returns>
+    /// <param name="symbol">The symbol.</param>
+    /// <returns>True if the symbol is valid for generation; otherwise, false.</returns>
     public static bool IsValidForGeneration(this ISymbol symbol)
     {
         return !symbol.IsStatic
             && !symbol.IsVirtual
-            && !symbol.IsImplicitlyDeclared;
-    }
+            && !symbol.IsImplicitlyDeclared
+            && symbol switch
+            {
+                IPropertySymbol property => IsValidPropertySymbol(property),
+                INamedTypeSymbol namedType => IsValidNamedTypeSymbol(namedType),
+                _ => true
+            };
 
-    /// <summary>
-    /// Determines if the named type symbol is valid for generation.
-    /// </summary>
-    /// <param name="symbol">The named type symbol.</param>
-    /// <returns>True if the named type symbol is valid for generation; otherwise, false.</returns>
-    public static bool IsValidForGeneration(this INamedTypeSymbol symbol)
-    {
-        return !symbol.IsStatic
-            && !symbol.IsAnonymousType
-            && !symbol.IsComImport
-            && !symbol.IsImplicitClass
-            && !symbol.IsExtern
-            && !symbol.IsImplicitlyDeclared;
+        static bool IsValidNamedTypeSymbol(INamedTypeSymbol symbol)
+        {
+            return !symbol.IsStatic
+                && !symbol.IsAnonymousType
+                && !symbol.IsComImport
+                && !symbol.IsImplicitClass
+                && !symbol.IsExtern
+                && !symbol.IsImplicitlyDeclared;
+        }
+
+        static bool IsValidPropertySymbol(IPropertySymbol symbol)
+        {
+            return !symbol.IsIndexer
+                && !symbol.IsWriteOnly;
+        }
     }
 
     /// <summary>
@@ -167,20 +145,40 @@ internal static class SymbolExtensions
     /// </summary>
     /// <param name="symbol">The symbol.</param>
     /// <returns>The type declaration syntax if found; otherwise, null.</returns>
-    public static TypeDeclarationSyntax? FindTypeDeclaration(this ISymbol symbol)
+    public static TypeDeclarationSyntax? FindTypeDeclaration(this INamedTypeSymbol symbol)
     {
-        return symbol.DeclaringSyntaxReferences
-            .Select(r => r.GetSyntax())
-            .OfType<TypeDeclarationSyntax>()
-            .FirstOrDefault();
+        foreach (SyntaxReference reference in symbol.DeclaringSyntaxReferences)
+        {
+            SyntaxNode syntax = reference.GetSyntax();
+            if (syntax is TypeDeclarationSyntax typeDeclarationSyntax)
+            {
+                return typeDeclarationSyntax;
+            }
+        }
+
+        return null;
+    }
+
+    public static BaseTypeDeclarationSyntax? FindBaseTypeDeclaration(this ITypeSymbol symbol)
+    {
+        foreach (SyntaxReference reference in symbol.DeclaringSyntaxReferences)
+        {
+            SyntaxNode syntax = reference.GetSyntax();
+            if (syntax is BaseTypeDeclarationSyntax baseTypeDeclarationSyntax)
+            {
+                return baseTypeDeclarationSyntax;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Checks if the symbol implements the specified generic interface.
+    /// Checks if the symbol implements any of the specified generic interface.
     /// </summary>
     /// <param name="symbol">The type symbol to check.</param>
     /// <param name="interfaceSymbols">The generic interface symbols to check against.</param>
-    /// <returns>The implemented generic interface symbol if found; otherwise, null.</returns>
+    /// <returns>The first implemented generic interface symbol if found; otherwise, null.</returns>
     public static INamedTypeSymbol? ImplementsGenericInterface(this INamedTypeSymbol symbol, params INamedTypeSymbol[] interfaceSymbols)
     {
         foreach (INamedTypeSymbol testInterfaceSymbol in interfaceSymbols)
@@ -194,6 +192,18 @@ internal static class SymbolExtensions
         }
 
         return null;
+    }
+
+    public static bool InheritsFrom(this INamedTypeSymbol symbol, INamedTypeSymbol baseType)
+    {
+        INamedTypeSymbol? current = symbol.BaseType;
+        while (current is not null)
+        {
+            if (SymbolEqualityComparer.Default.Equals(current, baseType))
+                return true;
+            current = current.BaseType;
+        }
+        return false;
     }
 
     public static string GetDefCacheKey(this ITypeSymbol symbol) => symbol.GetDocumentationCommentId() ?? symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);

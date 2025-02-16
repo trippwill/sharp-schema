@@ -32,7 +32,7 @@ internal static class SyntaxExtensions
         return semanticModel.GetDeclaredSymbol(node);
     }
 
-    public static Builder CreateTypeSchema(this TypeDeclarationSyntax node, CSharpSyntaxVisitor<Builder?> typeVisitor)
+    public static Builder CreateTypeSchema(this TypeDeclarationSyntax node, LeafDeclaredTypeSyntaxVisitor typeVisitor)
     {
         Throw.IfNullArgument(node);
 
@@ -64,6 +64,21 @@ internal static class SyntaxExtensions
         if (requiredProperties.Count > 0)
         {
             builder = builder.Required(requiredProperties);
+        }
+
+        if (typeVisitor.Options.Traversal.CheckFlag(Traversal.Bases))
+        {
+            // Apply base types
+            if (node.BaseList is not null)
+            {
+                foreach (BaseTypeSyntax baseType in node.BaseList.Types)
+                {
+                    if (typeVisitor.Visit(baseType) is Builder baseTypeBuilder)
+                    {
+                        builder.MergeBaseProperties(baseTypeBuilder);
+                    }
+                }
+            }
         }
 
         return builder;

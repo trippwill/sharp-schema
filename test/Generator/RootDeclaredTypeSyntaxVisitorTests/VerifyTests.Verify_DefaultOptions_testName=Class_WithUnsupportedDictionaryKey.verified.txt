@@ -1,9 +1,10 @@
 ﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
     "data": {
       "type": "object",
-      "$comment": "Key type 'Address' must be convertible to string.",
+      "$comment": "Ensure key type 'Address' is convertible to string.",
       "additionalProperties": {
         "type": "integer",
         "minimum": -2147483648,

@@ -27,12 +27,14 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
 
     [Theory]
     [InlineData(nameof(Struct_WithNullableValueTypes))]
+    [InlineData(nameof(Struct_WithAbstractProperties))]
     [InlineData(nameof(Record_WithReferenceTypeProperties))]
     [InlineData(nameof(Record_WithReferenceTypeParameters))]
     [InlineData(nameof(Record_WithValueTypeParameters))]
     [InlineData(nameof(Record_WithSchemaOverride))]
     [InlineData(nameof(Record_WithIgnoredParameter))]
     [InlineData(nameof(Record_WithParametersAndProperties))]
+    [InlineData(nameof(Record_WithAbstractParameters))]
     [InlineData(nameof(Class_WithDictionaryProperties))]
     [InlineData(nameof(Class_WithDocComments))]
     [InlineData(nameof(Class_WithValueTypes))]
@@ -43,6 +45,8 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
     [InlineData(nameof(Class_WithInternalProperties))]
     [InlineData(nameof(Class_WithArrayProperties))]
     [InlineData(nameof(Class_WithInvalidProperties))]
+    [InlineData(nameof(Class_ExtendsAbstractClass))]
+    [InlineData(nameof(Record_WithGenericAbstractProperty), Skip = "Not Yet Implemented")]
     public Task Verify_DefaultOptions(string testName)
     {
         RootDeclaredTypeSyntaxVisitor visitor = _fixture.GetVisitor(GeneratorOptions.Default);
@@ -91,5 +95,42 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
         string schemaString = builder.Build().SerializeToJson();
         _output.WriteLine(schemaString);
         return Verifier.Verify(schemaString).UseParameters(accessibilities);
+    }
+
+    [InlineData(EnumHandling.String)]
+    [InlineData(EnumHandling.UnderlyingType)]
+    [Theory]
+    public Task Verify_EnumHandling(EnumHandling enumHandling)
+    {
+        GeneratorOptions options = new()
+        {
+            EnumHandling = enumHandling
+        };
+        RootDeclaredTypeSyntaxVisitor visitor = _fixture.GetVisitor(options);
+        JsonSchemaBuilder builder = _fixture.GetJsonSchemaBuilder(visitor, nameof(Record_WithAbstractParameters));
+        _output.WriteSeparator();
+        string schemaString = builder.Build().SerializeToJson();
+        _output.WriteLine(schemaString);
+        return Verifier.Verify(schemaString).UseParameters(enumHandling);
+    }
+
+    [InlineData(Traversal.SymbolOnly)]
+    [InlineData(Traversal.Bases)]
+    [InlineData(Traversal.Interfaces)]
+    [InlineData(Traversal.Full)]
+    [Theory]
+    public Task Verify_Traversal(Traversal traversal)
+    {
+        GeneratorOptions options = new()
+        {
+            Traversal = traversal
+        };
+
+        RootDeclaredTypeSyntaxVisitor visitor = _fixture.GetVisitor(options);
+        JsonSchemaBuilder builder = _fixture.GetJsonSchemaBuilder(visitor, nameof(Class_ExtendsAbstractClass));
+        _output.WriteSeparator();
+        string schemaString = builder.Build().SerializeToJson();
+        _output.WriteLine(schemaString);
+        return Verifier.Verify(schemaString).UseParameters(traversal);
     }
 }

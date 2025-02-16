@@ -1,7 +1,8 @@
 ﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
-    "name": {
+    "string": {
       "oneOf": [
         {
           "type": "string"
@@ -10,9 +11,9 @@
           "type": "null"
         }
       ],
-      "title": "Name"
+      "title": "String"
     },
-    "age": {
+    "int": {
       "oneOf": [
         {
           "type": "integer",
@@ -24,7 +25,161 @@
           "type": "null"
         }
       ],
-      "title": "Age"
+      "title": "Int"
+    },
+    "byte": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255,
+          "$comment": "System.Byte"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Byte"
+    },
+    "sByte": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": -128,
+          "maximum": 127,
+          "$comment": "System.SByte"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "S Byte"
+    },
+    "short": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": -32768,
+          "maximum": 32767,
+          "$comment": "System.Int16"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Short"
+    },
+    "uShort": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535,
+          "$comment": "System.UInt16"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "U Short"
+    },
+    "uInt": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295,
+          "$comment": "System.UInt32"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "U Int"
+    },
+    "long": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": -9223372036854775808,
+          "maximum": 9223372036854775807,
+          "$comment": "System.Int64"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Long"
+    },
+    "uLong": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 18446744073709551615,
+          "$comment": "System.UInt64"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "U Long"
+    },
+    "float": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": -79228162514264337593543950335,
+          "maximum": 79228162514264337593543950335,
+          "$comment": "System.Single"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Float"
+    },
+    "double": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": -79228162514264337593543950335,
+          "maximum": 79228162514264337593543950335,
+          "$comment": "System.Double"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Double"
+    },
+    "decimal": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": -79228162514264337593543950335,
+          "maximum": 79228162514264337593543950335,
+          "$comment": "System.Decimal"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Decimal"
+    },
+    "char": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1,
+          "$comment": "System.Char"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Char"
     }
   }
 }

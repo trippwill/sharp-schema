@@ -1,4 +1,5 @@
 ﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
     "numbersArray": {
@@ -78,7 +79,7 @@
     "stringImmutableArray"
   ],
   "$defs": {
-    "#/$defs/T:SharpSchema.Generator.TestData.Address": {
+    "T:SharpSchema.Generator.TestData.Address": {
       "type": "object",
       "properties": {
         "street": {

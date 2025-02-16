@@ -1,4 +1,5 @@
 ﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
     "name": {
@@ -23,7 +24,7 @@
     "person"
   ],
   "$defs": {
-    "#/$defs/T:SharpSchema.Generator.TestData.Address": {
+    "T:SharpSchema.Generator.TestData.Address": {
       "type": "object",
       "properties": {
         "street": {
@@ -40,7 +41,7 @@
         "city"
       ]
     },
-    "#/$defs/T:SharpSchema.Generator.TestData.Office": {
+    "T:SharpSchema.Generator.TestData.Office": {
       "type": "object",
       "properties": {
         "name": {
@@ -57,7 +58,7 @@
         "address"
       ]
     },
-    "#/$defs/T:SharpSchema.Generator.TestData.Person": {
+    "T:SharpSchema.Generator.TestData.Person": {
       "type": "object",
       "properties": {
         "name": {

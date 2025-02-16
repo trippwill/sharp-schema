@@ -1,7 +1,4 @@
-﻿// Copyright (c) Charles Willis. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-using System;
+﻿using System;
 
 #nullable enable
 
@@ -10,7 +7,7 @@ namespace SharpSchema.Annotations;
 /// <summary>
 /// Specifies a constant value for a property or field in a schema.
 /// </summary>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+[AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
 public class SchemaConstAttribute(object value) : SchemaAttribute
 #else

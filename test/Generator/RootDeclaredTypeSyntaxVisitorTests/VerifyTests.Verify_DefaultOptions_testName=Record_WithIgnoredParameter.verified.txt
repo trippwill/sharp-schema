@@ -1,0 +1,13 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "notIgnored": {
+      "type": "string",
+      "title": "Not Ignored"
+    }
+  },
+  "required": [
+    "notIgnored"
+  ]
+}

@@ -1,0 +1,29 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "NameOfRecord",
+      "description": "The record's name.",
+      "examples": [
+        "John Doe"
+      ]
+    },
+    "age": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647,
+      "$comment": "System.Int32",
+      "title": "NameOfRecord",
+      "description": "The record's name.",
+      "examples": [
+        "42"
+      ],
+      "default": 42
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

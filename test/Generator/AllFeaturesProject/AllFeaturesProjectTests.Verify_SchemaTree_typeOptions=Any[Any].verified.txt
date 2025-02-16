@@ -1,0 +1,3370 @@
+﻿{
+  RootType: {
+    Properties: [
+      {
+        MemberType: {
+          Kind: System,
+          Symbol: {
+            SymbolKind: NamedType,
+            Name: String
+          }
+        },
+        DefaultValueSyntax: {
+          Value: "Contoso"
+        },
+        Symbol: {
+          SymbolKind: Property,
+          Name: Name
+        },
+        Metadata: {
+          Title: Company Name,
+          Description: The name of the company.,
+          Examples: [
+            Acme Corp
+          ],
+          Deprecated: false
+        }
+      },
+      {
+        MemberType: {
+          ElementType: {
+            Properties: [
+              {
+                MemberType: {
+                  ElementType: {
+                    Kind: System,
+                    Symbol: {
+                      SymbolKind: NamedType,
+                      Name: String
+                    }
+                  },
+                  Kind: Nullable,
+                  Symbol: {
+                    SymbolKind: NamedType,
+                    Name: String
+                  }
+                },
+                Symbol: {
+                  SymbolKind: Property,
+                  Name: Name
+                },
+                Metadata: {
+                  Title: Department Name,
+                  Description: The name of the department.,
+                  Examples: [
+                    Human Resources
+                  ],
+                  Deprecated: false
+                }
+              },
+              {
+                MemberType: {
+                  ElementType: {
+                    Properties: [
+                      {
+                        MemberType: {
+                          Kind: System,
+                          Symbol: {
+                            SymbolKind: NamedType,
+                            Name: String
+                          }
+                        },
+                        DefaultValueSyntax: {
+                          Value: "New Team"
+                        },
+                        Symbol: {
+                          SymbolKind: Property,
+                          Name: Name
+                        },
+                        Metadata: {
+                          Title: Team Name,
+                          Description: The name of the team.,
+                          Examples: [
+                            Development Team
+                          ],
+                          Deprecated: false
+                        }
+                      },
+                      {
+                        MemberType: {
+                          ElementType: {
+                            Properties: [
+                              {
+                                MemberType: {
+                                  ElementType: {
+                                    Kind: System,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: String
+                                    }
+                                  },
+                                  Kind: Nullable,
+                                  Symbol: {
+                                    SymbolKind: NamedType,
+                                    Name: String
+                                  }
+                                },
+                                Symbol: {
+                                  SymbolKind: Property,
+                                  Name: Name
+                                },
+                                Metadata: {
+                                  Title: Project Name,
+                                  Description: The name of the project.,
+                                  Examples: [
+                                    Project X
+                                  ],
+                                  Deprecated: false
+                                }
+                              },
+                              {
+                                MemberType: {
+                                  ElementType: {
+                                    Kind: System,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: Decimal
+                                    }
+                                  },
+                                  Kind: Nullable,
+                                  Symbol: {
+                                    SymbolKind: NamedType,
+                                    Name: Nullable
+                                  }
+                                },
+                                Symbol: {
+                                  SymbolKind: Property,
+                                  Name: Budget
+                                },
+                                Metadata: {
+                                  Title: Project Budget,
+                                  Description: The budget of the project.,
+                                  Examples: [
+                                    100000
+                                  ],
+                                  Deprecated: false
+                                }
+                              },
+                              {
+                                MemberType: {
+                                  ElementType: {
+                                    Properties: [
+                                      {
+                                        MemberType: {
+                                          ElementType: {
+                                            Kind: System,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: String
+                                            }
+                                          },
+                                          Kind: Nullable,
+                                          Symbol: {
+                                            SymbolKind: NamedType,
+                                            Name: String
+                                          }
+                                        },
+                                        Symbol: {
+                                          SymbolKind: Property,
+                                          Name: Name
+                                        },
+                                        Metadata: {
+                                          Title: Task Name,
+                                          Description: The name of the task.,
+                                          Examples: [
+                                            Design Database
+                                          ],
+                                          Deprecated: false
+                                        }
+                                      },
+                                      {
+                                        MemberType: {
+                                          Kind: System,
+                                          Symbol: {
+                                            SymbolKind: NamedType,
+                                            Name: Int32
+                                          }
+                                        },
+                                        DefaultValueSyntax: {
+                                          Value: 40
+                                        },
+                                        Symbol: {
+                                          SymbolKind: Property,
+                                          Name: EstimatedHours
+                                        },
+                                        Metadata: {
+                                          Title: Estimated Hours,
+                                          Description: The estimated hours to complete the task.,
+                                          Examples: [
+                                            40
+                                          ],
+                                          Deprecated: false
+                                        }
+                                      }
+                                    ],
+                                    Kind: Custom,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: Task
+                                    },
+                                    Metadata: {
+                                      Title: Task,
+                                      Deprecated: false
+                                    }
+                                  },
+                                  BaseType: {
+                                    Kind: System,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: List
+                                    }
+                                  },
+                                  TypeArguments: [
+                                    {
+                                      Properties: [
+                                        {
+                                          MemberType: {
+                                            ElementType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Kind: Nullable,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: String
+                                            }
+                                          },
+                                          Symbol: {
+                                            SymbolKind: Property,
+                                            Name: Name
+                                          },
+                                          Metadata: {
+                                            Title: Task Name,
+                                            Description: The name of the task.,
+                                            Examples: [
+                                              Design Database
+                                            ],
+                                            Deprecated: false
+                                          }
+                                        },
+                                        {
+                                          MemberType: {
+                                            Kind: System,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: Int32
+                                            }
+                                          },
+                                          DefaultValueSyntax: {
+                                            Value: 40
+                                          },
+                                          Symbol: {
+                                            SymbolKind: Property,
+                                            Name: EstimatedHours
+                                          },
+                                          Metadata: {
+                                            Title: Estimated Hours,
+                                            Description: The estimated hours to complete the task.,
+                                            Examples: [
+                                              40
+                                            ],
+                                            Deprecated: false
+                                          }
+                                        }
+                                      ],
+                                      Kind: Custom,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Task
+                                      },
+                                      Metadata: {
+                                        Title: Task,
+                                        Deprecated: false
+                                      }
+                                    }
+                                  ],
+                                  Kind: Array,
+                                  Symbol: {
+                                    SymbolKind: NamedType,
+                                    Name: List
+                                  }
+                                },
+                                Symbol: {
+                                  SymbolKind: Property,
+                                  Name: Tasks
+                                },
+                                Metadata: {
+                                  Title: Tasks,
+                                  Description: A list of tasks in the project.,
+                                  Deprecated: false
+                                }
+                              }
+                            ],
+                            Kind: Custom,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: Project
+                            },
+                            Metadata: {
+                              Title: Project,
+                              Deprecated: false
+                            }
+                          },
+                          BaseType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: List
+                            }
+                          },
+                          TypeArguments: [
+                            {
+                              Properties: [
+                                {
+                                  MemberType: {
+                                    ElementType: {
+                                      Kind: System,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: String
+                                      }
+                                    },
+                                    Kind: Nullable,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: String
+                                    }
+                                  },
+                                  Symbol: {
+                                    SymbolKind: Property,
+                                    Name: Name
+                                  },
+                                  Metadata: {
+                                    Title: Project Name,
+                                    Description: The name of the project.,
+                                    Examples: [
+                                      Project X
+                                    ],
+                                    Deprecated: false
+                                  }
+                                },
+                                {
+                                  MemberType: {
+                                    ElementType: {
+                                      Kind: System,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Decimal
+                                      }
+                                    },
+                                    Kind: Nullable,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: Nullable
+                                    }
+                                  },
+                                  Symbol: {
+                                    SymbolKind: Property,
+                                    Name: Budget
+                                  },
+                                  Metadata: {
+                                    Title: Project Budget,
+                                    Description: The budget of the project.,
+                                    Examples: [
+                                      100000
+                                    ],
+                                    Deprecated: false
+                                  }
+                                },
+                                {
+                                  MemberType: {
+                                    ElementType: {
+                                      Properties: [
+                                        {
+                                          MemberType: {
+                                            ElementType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Kind: Nullable,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: String
+                                            }
+                                          },
+                                          Symbol: {
+                                            SymbolKind: Property,
+                                            Name: Name
+                                          },
+                                          Metadata: {
+                                            Title: Task Name,
+                                            Description: The name of the task.,
+                                            Examples: [
+                                              Design Database
+                                            ],
+                                            Deprecated: false
+                                          }
+                                        },
+                                        {
+                                          MemberType: {
+                                            Kind: System,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: Int32
+                                            }
+                                          },
+                                          DefaultValueSyntax: {
+                                            Value: 40
+                                          },
+                                          Symbol: {
+                                            SymbolKind: Property,
+                                            Name: EstimatedHours
+                                          },
+                                          Metadata: {
+                                            Title: Estimated Hours,
+                                            Description: The estimated hours to complete the task.,
+                                            Examples: [
+                                              40
+                                            ],
+                                            Deprecated: false
+                                          }
+                                        }
+                                      ],
+                                      Kind: Custom,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Task
+                                      },
+                                      Metadata: {
+                                        Title: Task,
+                                        Deprecated: false
+                                      }
+                                    },
+                                    BaseType: {
+                                      Kind: System,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: List
+                                      }
+                                    },
+                                    TypeArguments: [
+                                      {
+                                        Properties: [
+                                          {
+                                            MemberType: {
+                                              ElementType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Kind: Nullable,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: Name
+                                            },
+                                            Metadata: {
+                                              Title: Task Name,
+                                              Description: The name of the task.,
+                                              Examples: [
+                                                Design Database
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          },
+                                          {
+                                            MemberType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Int32
+                                              }
+                                            },
+                                            DefaultValueSyntax: {
+                                              Value: 40
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: EstimatedHours
+                                            },
+                                            Metadata: {
+                                              Title: Estimated Hours,
+                                              Description: The estimated hours to complete the task.,
+                                              Examples: [
+                                                40
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          }
+                                        ],
+                                        Kind: Custom,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Task
+                                        },
+                                        Metadata: {
+                                          Title: Task,
+                                          Deprecated: false
+                                        }
+                                      }
+                                    ],
+                                    Kind: Array,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: List
+                                    }
+                                  },
+                                  Symbol: {
+                                    SymbolKind: Property,
+                                    Name: Tasks
+                                  },
+                                  Metadata: {
+                                    Title: Tasks,
+                                    Description: A list of tasks in the project.,
+                                    Deprecated: false
+                                  }
+                                }
+                              ],
+                              Kind: Custom,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: Project
+                              },
+                              Metadata: {
+                                Title: Project,
+                                Deprecated: false
+                              }
+                            }
+                          ],
+                          Kind: Array,
+                          Symbol: {
+                            SymbolKind: NamedType,
+                            Name: List
+                          }
+                        },
+                        Symbol: {
+                          SymbolKind: Property,
+                          Name: Projects
+                        },
+                        Metadata: {
+                          Title: Projects,
+                          Description: A list of projects the team is working on.,
+                          Deprecated: false
+                        }
+                      }
+                    ],
+                    Kind: Custom,
+                    Symbol: {
+                      SymbolKind: NamedType,
+                      Name: Team
+                    },
+                    Metadata: {
+                      Title: Team,
+                      Deprecated: false
+                    }
+                  },
+                  BaseType: {
+                    Kind: System,
+                    Symbol: {
+                      SymbolKind: NamedType,
+                      Name: List
+                    }
+                  },
+                  TypeArguments: [
+                    {
+                      Properties: [
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          DefaultValueSyntax: {
+                            Value: "New Team"
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: Name
+                          },
+                          Metadata: {
+                            Title: Team Name,
+                            Description: The name of the team.,
+                            Examples: [
+                              Development Team
+                            ],
+                            Deprecated: false
+                          }
+                        },
+                        {
+                          MemberType: {
+                            ElementType: {
+                              Properties: [
+                                {
+                                  MemberType: {
+                                    ElementType: {
+                                      Kind: System,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: String
+                                      }
+                                    },
+                                    Kind: Nullable,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: String
+                                    }
+                                  },
+                                  Symbol: {
+                                    SymbolKind: Property,
+                                    Name: Name
+                                  },
+                                  Metadata: {
+                                    Title: Project Name,
+                                    Description: The name of the project.,
+                                    Examples: [
+                                      Project X
+                                    ],
+                                    Deprecated: false
+                                  }
+                                },
+                                {
+                                  MemberType: {
+                                    ElementType: {
+                                      Kind: System,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Decimal
+                                      }
+                                    },
+                                    Kind: Nullable,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: Nullable
+                                    }
+                                  },
+                                  Symbol: {
+                                    SymbolKind: Property,
+                                    Name: Budget
+                                  },
+                                  Metadata: {
+                                    Title: Project Budget,
+                                    Description: The budget of the project.,
+                                    Examples: [
+                                      100000
+                                    ],
+                                    Deprecated: false
+                                  }
+                                },
+                                {
+                                  MemberType: {
+                                    ElementType: {
+                                      Properties: [
+                                        {
+                                          MemberType: {
+                                            ElementType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Kind: Nullable,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: String
+                                            }
+                                          },
+                                          Symbol: {
+                                            SymbolKind: Property,
+                                            Name: Name
+                                          },
+                                          Metadata: {
+                                            Title: Task Name,
+                                            Description: The name of the task.,
+                                            Examples: [
+                                              Design Database
+                                            ],
+                                            Deprecated: false
+                                          }
+                                        },
+                                        {
+                                          MemberType: {
+                                            Kind: System,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: Int32
+                                            }
+                                          },
+                                          DefaultValueSyntax: {
+                                            Value: 40
+                                          },
+                                          Symbol: {
+                                            SymbolKind: Property,
+                                            Name: EstimatedHours
+                                          },
+                                          Metadata: {
+                                            Title: Estimated Hours,
+                                            Description: The estimated hours to complete the task.,
+                                            Examples: [
+                                              40
+                                            ],
+                                            Deprecated: false
+                                          }
+                                        }
+                                      ],
+                                      Kind: Custom,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Task
+                                      },
+                                      Metadata: {
+                                        Title: Task,
+                                        Deprecated: false
+                                      }
+                                    },
+                                    BaseType: {
+                                      Kind: System,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: List
+                                      }
+                                    },
+                                    TypeArguments: [
+                                      {
+                                        Properties: [
+                                          {
+                                            MemberType: {
+                                              ElementType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Kind: Nullable,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: Name
+                                            },
+                                            Metadata: {
+                                              Title: Task Name,
+                                              Description: The name of the task.,
+                                              Examples: [
+                                                Design Database
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          },
+                                          {
+                                            MemberType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Int32
+                                              }
+                                            },
+                                            DefaultValueSyntax: {
+                                              Value: 40
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: EstimatedHours
+                                            },
+                                            Metadata: {
+                                              Title: Estimated Hours,
+                                              Description: The estimated hours to complete the task.,
+                                              Examples: [
+                                                40
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          }
+                                        ],
+                                        Kind: Custom,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Task
+                                        },
+                                        Metadata: {
+                                          Title: Task,
+                                          Deprecated: false
+                                        }
+                                      }
+                                    ],
+                                    Kind: Array,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: List
+                                    }
+                                  },
+                                  Symbol: {
+                                    SymbolKind: Property,
+                                    Name: Tasks
+                                  },
+                                  Metadata: {
+                                    Title: Tasks,
+                                    Description: A list of tasks in the project.,
+                                    Deprecated: false
+                                  }
+                                }
+                              ],
+                              Kind: Custom,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: Project
+                              },
+                              Metadata: {
+                                Title: Project,
+                                Deprecated: false
+                              }
+                            },
+                            BaseType: {
+                              Kind: System,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: List
+                              }
+                            },
+                            TypeArguments: [
+                              {
+                                Properties: [
+                                  {
+                                    MemberType: {
+                                      ElementType: {
+                                        Kind: System,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: String
+                                        }
+                                      },
+                                      Kind: Nullable,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: String
+                                      }
+                                    },
+                                    Symbol: {
+                                      SymbolKind: Property,
+                                      Name: Name
+                                    },
+                                    Metadata: {
+                                      Title: Project Name,
+                                      Description: The name of the project.,
+                                      Examples: [
+                                        Project X
+                                      ],
+                                      Deprecated: false
+                                    }
+                                  },
+                                  {
+                                    MemberType: {
+                                      ElementType: {
+                                        Kind: System,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Decimal
+                                        }
+                                      },
+                                      Kind: Nullable,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Nullable
+                                      }
+                                    },
+                                    Symbol: {
+                                      SymbolKind: Property,
+                                      Name: Budget
+                                    },
+                                    Metadata: {
+                                      Title: Project Budget,
+                                      Description: The budget of the project.,
+                                      Examples: [
+                                        100000
+                                      ],
+                                      Deprecated: false
+                                    }
+                                  },
+                                  {
+                                    MemberType: {
+                                      ElementType: {
+                                        Properties: [
+                                          {
+                                            MemberType: {
+                                              ElementType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Kind: Nullable,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: Name
+                                            },
+                                            Metadata: {
+                                              Title: Task Name,
+                                              Description: The name of the task.,
+                                              Examples: [
+                                                Design Database
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          },
+                                          {
+                                            MemberType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Int32
+                                              }
+                                            },
+                                            DefaultValueSyntax: {
+                                              Value: 40
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: EstimatedHours
+                                            },
+                                            Metadata: {
+                                              Title: Estimated Hours,
+                                              Description: The estimated hours to complete the task.,
+                                              Examples: [
+                                                40
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          }
+                                        ],
+                                        Kind: Custom,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Task
+                                        },
+                                        Metadata: {
+                                          Title: Task,
+                                          Deprecated: false
+                                        }
+                                      },
+                                      BaseType: {
+                                        Kind: System,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: List
+                                        }
+                                      },
+                                      TypeArguments: [
+                                        {
+                                          Properties: [
+                                            {
+                                              MemberType: {
+                                                ElementType: {
+                                                  Kind: System,
+                                                  Symbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: String
+                                                  }
+                                                },
+                                                Kind: Nullable,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Symbol: {
+                                                SymbolKind: Property,
+                                                Name: Name
+                                              },
+                                              Metadata: {
+                                                Title: Task Name,
+                                                Description: The name of the task.,
+                                                Examples: [
+                                                  Design Database
+                                                ],
+                                                Deprecated: false
+                                              }
+                                            },
+                                            {
+                                              MemberType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: Int32
+                                                }
+                                              },
+                                              DefaultValueSyntax: {
+                                                Value: 40
+                                              },
+                                              Symbol: {
+                                                SymbolKind: Property,
+                                                Name: EstimatedHours
+                                              },
+                                              Metadata: {
+                                                Title: Estimated Hours,
+                                                Description: The estimated hours to complete the task.,
+                                                Examples: [
+                                                  40
+                                                ],
+                                                Deprecated: false
+                                              }
+                                            }
+                                          ],
+                                          Kind: Custom,
+                                          Symbol: {
+                                            SymbolKind: NamedType,
+                                            Name: Task
+                                          },
+                                          Metadata: {
+                                            Title: Task,
+                                            Deprecated: false
+                                          }
+                                        }
+                                      ],
+                                      Kind: Array,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: List
+                                      }
+                                    },
+                                    Symbol: {
+                                      SymbolKind: Property,
+                                      Name: Tasks
+                                    },
+                                    Metadata: {
+                                      Title: Tasks,
+                                      Description: A list of tasks in the project.,
+                                      Deprecated: false
+                                    }
+                                  }
+                                ],
+                                Kind: Custom,
+                                Symbol: {
+                                  SymbolKind: NamedType,
+                                  Name: Project
+                                },
+                                Metadata: {
+                                  Title: Project,
+                                  Deprecated: false
+                                }
+                              }
+                            ],
+                            Kind: Array,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: List
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: Projects
+                          },
+                          Metadata: {
+                            Title: Projects,
+                            Description: A list of projects the team is working on.,
+                            Deprecated: false
+                          }
+                        }
+                      ],
+                      Kind: Custom,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: Team
+                      },
+                      Metadata: {
+                        Title: Team,
+                        Deprecated: false
+                      }
+                    }
+                  ],
+                  Kind: Array,
+                  Symbol: {
+                    SymbolKind: NamedType,
+                    Name: List
+                  }
+                },
+                Symbol: {
+                  SymbolKind: Property,
+                  Name: Teams
+                },
+                Metadata: {
+                  Title: Teams,
+                  Description: A list of teams in the department.,
+                  Deprecated: false
+                }
+              }
+            ],
+            Kind: Custom,
+            Symbol: {
+              SymbolKind: NamedType,
+              Name: Department
+            },
+            Metadata: {
+              Title: Department,
+              Deprecated: false
+            }
+          },
+          BaseType: {
+            Kind: System,
+            Symbol: {
+              SymbolKind: NamedType,
+              Name: List
+            }
+          },
+          TypeArguments: [
+            {
+              Properties: [
+                {
+                  MemberType: {
+                    ElementType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Kind: Nullable,
+                    Symbol: {
+                      SymbolKind: NamedType,
+                      Name: String
+                    }
+                  },
+                  Symbol: {
+                    SymbolKind: Property,
+                    Name: Name
+                  },
+                  Metadata: {
+                    Title: Department Name,
+                    Description: The name of the department.,
+                    Examples: [
+                      Human Resources
+                    ],
+                    Deprecated: false
+                  }
+                },
+                {
+                  MemberType: {
+                    ElementType: {
+                      Properties: [
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          DefaultValueSyntax: {
+                            Value: "New Team"
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: Name
+                          },
+                          Metadata: {
+                            Title: Team Name,
+                            Description: The name of the team.,
+                            Examples: [
+                              Development Team
+                            ],
+                            Deprecated: false
+                          }
+                        },
+                        {
+                          MemberType: {
+                            ElementType: {
+                              Properties: [
+                                {
+                                  MemberType: {
+                                    ElementType: {
+                                      Kind: System,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: String
+                                      }
+                                    },
+                                    Kind: Nullable,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: String
+                                    }
+                                  },
+                                  Symbol: {
+                                    SymbolKind: Property,
+                                    Name: Name
+                                  },
+                                  Metadata: {
+                                    Title: Project Name,
+                                    Description: The name of the project.,
+                                    Examples: [
+                                      Project X
+                                    ],
+                                    Deprecated: false
+                                  }
+                                },
+                                {
+                                  MemberType: {
+                                    ElementType: {
+                                      Kind: System,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Decimal
+                                      }
+                                    },
+                                    Kind: Nullable,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: Nullable
+                                    }
+                                  },
+                                  Symbol: {
+                                    SymbolKind: Property,
+                                    Name: Budget
+                                  },
+                                  Metadata: {
+                                    Title: Project Budget,
+                                    Description: The budget of the project.,
+                                    Examples: [
+                                      100000
+                                    ],
+                                    Deprecated: false
+                                  }
+                                },
+                                {
+                                  MemberType: {
+                                    ElementType: {
+                                      Properties: [
+                                        {
+                                          MemberType: {
+                                            ElementType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Kind: Nullable,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: String
+                                            }
+                                          },
+                                          Symbol: {
+                                            SymbolKind: Property,
+                                            Name: Name
+                                          },
+                                          Metadata: {
+                                            Title: Task Name,
+                                            Description: The name of the task.,
+                                            Examples: [
+                                              Design Database
+                                            ],
+                                            Deprecated: false
+                                          }
+                                        },
+                                        {
+                                          MemberType: {
+                                            Kind: System,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: Int32
+                                            }
+                                          },
+                                          DefaultValueSyntax: {
+                                            Value: 40
+                                          },
+                                          Symbol: {
+                                            SymbolKind: Property,
+                                            Name: EstimatedHours
+                                          },
+                                          Metadata: {
+                                            Title: Estimated Hours,
+                                            Description: The estimated hours to complete the task.,
+                                            Examples: [
+                                              40
+                                            ],
+                                            Deprecated: false
+                                          }
+                                        }
+                                      ],
+                                      Kind: Custom,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Task
+                                      },
+                                      Metadata: {
+                                        Title: Task,
+                                        Deprecated: false
+                                      }
+                                    },
+                                    BaseType: {
+                                      Kind: System,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: List
+                                      }
+                                    },
+                                    TypeArguments: [
+                                      {
+                                        Properties: [
+                                          {
+                                            MemberType: {
+                                              ElementType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Kind: Nullable,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: Name
+                                            },
+                                            Metadata: {
+                                              Title: Task Name,
+                                              Description: The name of the task.,
+                                              Examples: [
+                                                Design Database
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          },
+                                          {
+                                            MemberType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Int32
+                                              }
+                                            },
+                                            DefaultValueSyntax: {
+                                              Value: 40
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: EstimatedHours
+                                            },
+                                            Metadata: {
+                                              Title: Estimated Hours,
+                                              Description: The estimated hours to complete the task.,
+                                              Examples: [
+                                                40
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          }
+                                        ],
+                                        Kind: Custom,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Task
+                                        },
+                                        Metadata: {
+                                          Title: Task,
+                                          Deprecated: false
+                                        }
+                                      }
+                                    ],
+                                    Kind: Array,
+                                    Symbol: {
+                                      SymbolKind: NamedType,
+                                      Name: List
+                                    }
+                                  },
+                                  Symbol: {
+                                    SymbolKind: Property,
+                                    Name: Tasks
+                                  },
+                                  Metadata: {
+                                    Title: Tasks,
+                                    Description: A list of tasks in the project.,
+                                    Deprecated: false
+                                  }
+                                }
+                              ],
+                              Kind: Custom,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: Project
+                              },
+                              Metadata: {
+                                Title: Project,
+                                Deprecated: false
+                              }
+                            },
+                            BaseType: {
+                              Kind: System,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: List
+                              }
+                            },
+                            TypeArguments: [
+                              {
+                                Properties: [
+                                  {
+                                    MemberType: {
+                                      ElementType: {
+                                        Kind: System,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: String
+                                        }
+                                      },
+                                      Kind: Nullable,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: String
+                                      }
+                                    },
+                                    Symbol: {
+                                      SymbolKind: Property,
+                                      Name: Name
+                                    },
+                                    Metadata: {
+                                      Title: Project Name,
+                                      Description: The name of the project.,
+                                      Examples: [
+                                        Project X
+                                      ],
+                                      Deprecated: false
+                                    }
+                                  },
+                                  {
+                                    MemberType: {
+                                      ElementType: {
+                                        Kind: System,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Decimal
+                                        }
+                                      },
+                                      Kind: Nullable,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Nullable
+                                      }
+                                    },
+                                    Symbol: {
+                                      SymbolKind: Property,
+                                      Name: Budget
+                                    },
+                                    Metadata: {
+                                      Title: Project Budget,
+                                      Description: The budget of the project.,
+                                      Examples: [
+                                        100000
+                                      ],
+                                      Deprecated: false
+                                    }
+                                  },
+                                  {
+                                    MemberType: {
+                                      ElementType: {
+                                        Properties: [
+                                          {
+                                            MemberType: {
+                                              ElementType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Kind: Nullable,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: Name
+                                            },
+                                            Metadata: {
+                                              Title: Task Name,
+                                              Description: The name of the task.,
+                                              Examples: [
+                                                Design Database
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          },
+                                          {
+                                            MemberType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Int32
+                                              }
+                                            },
+                                            DefaultValueSyntax: {
+                                              Value: 40
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: EstimatedHours
+                                            },
+                                            Metadata: {
+                                              Title: Estimated Hours,
+                                              Description: The estimated hours to complete the task.,
+                                              Examples: [
+                                                40
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          }
+                                        ],
+                                        Kind: Custom,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Task
+                                        },
+                                        Metadata: {
+                                          Title: Task,
+                                          Deprecated: false
+                                        }
+                                      },
+                                      BaseType: {
+                                        Kind: System,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: List
+                                        }
+                                      },
+                                      TypeArguments: [
+                                        {
+                                          Properties: [
+                                            {
+                                              MemberType: {
+                                                ElementType: {
+                                                  Kind: System,
+                                                  Symbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: String
+                                                  }
+                                                },
+                                                Kind: Nullable,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Symbol: {
+                                                SymbolKind: Property,
+                                                Name: Name
+                                              },
+                                              Metadata: {
+                                                Title: Task Name,
+                                                Description: The name of the task.,
+                                                Examples: [
+                                                  Design Database
+                                                ],
+                                                Deprecated: false
+                                              }
+                                            },
+                                            {
+                                              MemberType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: Int32
+                                                }
+                                              },
+                                              DefaultValueSyntax: {
+                                                Value: 40
+                                              },
+                                              Symbol: {
+                                                SymbolKind: Property,
+                                                Name: EstimatedHours
+                                              },
+                                              Metadata: {
+                                                Title: Estimated Hours,
+                                                Description: The estimated hours to complete the task.,
+                                                Examples: [
+                                                  40
+                                                ],
+                                                Deprecated: false
+                                              }
+                                            }
+                                          ],
+                                          Kind: Custom,
+                                          Symbol: {
+                                            SymbolKind: NamedType,
+                                            Name: Task
+                                          },
+                                          Metadata: {
+                                            Title: Task,
+                                            Deprecated: false
+                                          }
+                                        }
+                                      ],
+                                      Kind: Array,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: List
+                                      }
+                                    },
+                                    Symbol: {
+                                      SymbolKind: Property,
+                                      Name: Tasks
+                                    },
+                                    Metadata: {
+                                      Title: Tasks,
+                                      Description: A list of tasks in the project.,
+                                      Deprecated: false
+                                    }
+                                  }
+                                ],
+                                Kind: Custom,
+                                Symbol: {
+                                  SymbolKind: NamedType,
+                                  Name: Project
+                                },
+                                Metadata: {
+                                  Title: Project,
+                                  Deprecated: false
+                                }
+                              }
+                            ],
+                            Kind: Array,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: List
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: Projects
+                          },
+                          Metadata: {
+                            Title: Projects,
+                            Description: A list of projects the team is working on.,
+                            Deprecated: false
+                          }
+                        }
+                      ],
+                      Kind: Custom,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: Team
+                      },
+                      Metadata: {
+                        Title: Team,
+                        Deprecated: false
+                      }
+                    },
+                    BaseType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: List
+                      }
+                    },
+                    TypeArguments: [
+                      {
+                        Properties: [
+                          {
+                            MemberType: {
+                              Kind: System,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: String
+                              }
+                            },
+                            DefaultValueSyntax: {
+                              Value: "New Team"
+                            },
+                            Symbol: {
+                              SymbolKind: Property,
+                              Name: Name
+                            },
+                            Metadata: {
+                              Title: Team Name,
+                              Description: The name of the team.,
+                              Examples: [
+                                Development Team
+                              ],
+                              Deprecated: false
+                            }
+                          },
+                          {
+                            MemberType: {
+                              ElementType: {
+                                Properties: [
+                                  {
+                                    MemberType: {
+                                      ElementType: {
+                                        Kind: System,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: String
+                                        }
+                                      },
+                                      Kind: Nullable,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: String
+                                      }
+                                    },
+                                    Symbol: {
+                                      SymbolKind: Property,
+                                      Name: Name
+                                    },
+                                    Metadata: {
+                                      Title: Project Name,
+                                      Description: The name of the project.,
+                                      Examples: [
+                                        Project X
+                                      ],
+                                      Deprecated: false
+                                    }
+                                  },
+                                  {
+                                    MemberType: {
+                                      ElementType: {
+                                        Kind: System,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Decimal
+                                        }
+                                      },
+                                      Kind: Nullable,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: Nullable
+                                      }
+                                    },
+                                    Symbol: {
+                                      SymbolKind: Property,
+                                      Name: Budget
+                                    },
+                                    Metadata: {
+                                      Title: Project Budget,
+                                      Description: The budget of the project.,
+                                      Examples: [
+                                        100000
+                                      ],
+                                      Deprecated: false
+                                    }
+                                  },
+                                  {
+                                    MemberType: {
+                                      ElementType: {
+                                        Properties: [
+                                          {
+                                            MemberType: {
+                                              ElementType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Kind: Nullable,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: String
+                                              }
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: Name
+                                            },
+                                            Metadata: {
+                                              Title: Task Name,
+                                              Description: The name of the task.,
+                                              Examples: [
+                                                Design Database
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          },
+                                          {
+                                            MemberType: {
+                                              Kind: System,
+                                              Symbol: {
+                                                SymbolKind: NamedType,
+                                                Name: Int32
+                                              }
+                                            },
+                                            DefaultValueSyntax: {
+                                              Value: 40
+                                            },
+                                            Symbol: {
+                                              SymbolKind: Property,
+                                              Name: EstimatedHours
+                                            },
+                                            Metadata: {
+                                              Title: Estimated Hours,
+                                              Description: The estimated hours to complete the task.,
+                                              Examples: [
+                                                40
+                                              ],
+                                              Deprecated: false
+                                            }
+                                          }
+                                        ],
+                                        Kind: Custom,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Task
+                                        },
+                                        Metadata: {
+                                          Title: Task,
+                                          Deprecated: false
+                                        }
+                                      },
+                                      BaseType: {
+                                        Kind: System,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: List
+                                        }
+                                      },
+                                      TypeArguments: [
+                                        {
+                                          Properties: [
+                                            {
+                                              MemberType: {
+                                                ElementType: {
+                                                  Kind: System,
+                                                  Symbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: String
+                                                  }
+                                                },
+                                                Kind: Nullable,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Symbol: {
+                                                SymbolKind: Property,
+                                                Name: Name
+                                              },
+                                              Metadata: {
+                                                Title: Task Name,
+                                                Description: The name of the task.,
+                                                Examples: [
+                                                  Design Database
+                                                ],
+                                                Deprecated: false
+                                              }
+                                            },
+                                            {
+                                              MemberType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: Int32
+                                                }
+                                              },
+                                              DefaultValueSyntax: {
+                                                Value: 40
+                                              },
+                                              Symbol: {
+                                                SymbolKind: Property,
+                                                Name: EstimatedHours
+                                              },
+                                              Metadata: {
+                                                Title: Estimated Hours,
+                                                Description: The estimated hours to complete the task.,
+                                                Examples: [
+                                                  40
+                                                ],
+                                                Deprecated: false
+                                              }
+                                            }
+                                          ],
+                                          Kind: Custom,
+                                          Symbol: {
+                                            SymbolKind: NamedType,
+                                            Name: Task
+                                          },
+                                          Metadata: {
+                                            Title: Task,
+                                            Deprecated: false
+                                          }
+                                        }
+                                      ],
+                                      Kind: Array,
+                                      Symbol: {
+                                        SymbolKind: NamedType,
+                                        Name: List
+                                      }
+                                    },
+                                    Symbol: {
+                                      SymbolKind: Property,
+                                      Name: Tasks
+                                    },
+                                    Metadata: {
+                                      Title: Tasks,
+                                      Description: A list of tasks in the project.,
+                                      Deprecated: false
+                                    }
+                                  }
+                                ],
+                                Kind: Custom,
+                                Symbol: {
+                                  SymbolKind: NamedType,
+                                  Name: Project
+                                },
+                                Metadata: {
+                                  Title: Project,
+                                  Deprecated: false
+                                }
+                              },
+                              BaseType: {
+                                Kind: System,
+                                Symbol: {
+                                  SymbolKind: NamedType,
+                                  Name: List
+                                }
+                              },
+                              TypeArguments: [
+                                {
+                                  Properties: [
+                                    {
+                                      MemberType: {
+                                        ElementType: {
+                                          Kind: System,
+                                          Symbol: {
+                                            SymbolKind: NamedType,
+                                            Name: String
+                                          }
+                                        },
+                                        Kind: Nullable,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: String
+                                        }
+                                      },
+                                      Symbol: {
+                                        SymbolKind: Property,
+                                        Name: Name
+                                      },
+                                      Metadata: {
+                                        Title: Project Name,
+                                        Description: The name of the project.,
+                                        Examples: [
+                                          Project X
+                                        ],
+                                        Deprecated: false
+                                      }
+                                    },
+                                    {
+                                      MemberType: {
+                                        ElementType: {
+                                          Kind: System,
+                                          Symbol: {
+                                            SymbolKind: NamedType,
+                                            Name: Decimal
+                                          }
+                                        },
+                                        Kind: Nullable,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: Nullable
+                                        }
+                                      },
+                                      Symbol: {
+                                        SymbolKind: Property,
+                                        Name: Budget
+                                      },
+                                      Metadata: {
+                                        Title: Project Budget,
+                                        Description: The budget of the project.,
+                                        Examples: [
+                                          100000
+                                        ],
+                                        Deprecated: false
+                                      }
+                                    },
+                                    {
+                                      MemberType: {
+                                        ElementType: {
+                                          Properties: [
+                                            {
+                                              MemberType: {
+                                                ElementType: {
+                                                  Kind: System,
+                                                  Symbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: String
+                                                  }
+                                                },
+                                                Kind: Nullable,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: String
+                                                }
+                                              },
+                                              Symbol: {
+                                                SymbolKind: Property,
+                                                Name: Name
+                                              },
+                                              Metadata: {
+                                                Title: Task Name,
+                                                Description: The name of the task.,
+                                                Examples: [
+                                                  Design Database
+                                                ],
+                                                Deprecated: false
+                                              }
+                                            },
+                                            {
+                                              MemberType: {
+                                                Kind: System,
+                                                Symbol: {
+                                                  SymbolKind: NamedType,
+                                                  Name: Int32
+                                                }
+                                              },
+                                              DefaultValueSyntax: {
+                                                Value: 40
+                                              },
+                                              Symbol: {
+                                                SymbolKind: Property,
+                                                Name: EstimatedHours
+                                              },
+                                              Metadata: {
+                                                Title: Estimated Hours,
+                                                Description: The estimated hours to complete the task.,
+                                                Examples: [
+                                                  40
+                                                ],
+                                                Deprecated: false
+                                              }
+                                            }
+                                          ],
+                                          Kind: Custom,
+                                          Symbol: {
+                                            SymbolKind: NamedType,
+                                            Name: Task
+                                          },
+                                          Metadata: {
+                                            Title: Task,
+                                            Deprecated: false
+                                          }
+                                        },
+                                        BaseType: {
+                                          Kind: System,
+                                          Symbol: {
+                                            SymbolKind: NamedType,
+                                            Name: List
+                                          }
+                                        },
+                                        TypeArguments: [
+                                          {
+                                            Properties: [
+                                              {
+                                                MemberType: {
+                                                  ElementType: {
+                                                    Kind: System,
+                                                    Symbol: {
+                                                      SymbolKind: NamedType,
+                                                      Name: String
+                                                    }
+                                                  },
+                                                  Kind: Nullable,
+                                                  Symbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: String
+                                                  }
+                                                },
+                                                Symbol: {
+                                                  SymbolKind: Property,
+                                                  Name: Name
+                                                },
+                                                Metadata: {
+                                                  Title: Task Name,
+                                                  Description: The name of the task.,
+                                                  Examples: [
+                                                    Design Database
+                                                  ],
+                                                  Deprecated: false
+                                                }
+                                              },
+                                              {
+                                                MemberType: {
+                                                  Kind: System,
+                                                  Symbol: {
+                                                    SymbolKind: NamedType,
+                                                    Name: Int32
+                                                  }
+                                                },
+                                                DefaultValueSyntax: {
+                                                  Value: 40
+                                                },
+                                                Symbol: {
+                                                  SymbolKind: Property,
+                                                  Name: EstimatedHours
+                                                },
+                                                Metadata: {
+                                                  Title: Estimated Hours,
+                                                  Description: The estimated hours to complete the task.,
+                                                  Examples: [
+                                                    40
+                                                  ],
+                                                  Deprecated: false
+                                                }
+                                              }
+                                            ],
+                                            Kind: Custom,
+                                            Symbol: {
+                                              SymbolKind: NamedType,
+                                              Name: Task
+                                            },
+                                            Metadata: {
+                                              Title: Task,
+                                              Deprecated: false
+                                            }
+                                          }
+                                        ],
+                                        Kind: Array,
+                                        Symbol: {
+                                          SymbolKind: NamedType,
+                                          Name: List
+                                        }
+                                      },
+                                      Symbol: {
+                                        SymbolKind: Property,
+                                        Name: Tasks
+                                      },
+                                      Metadata: {
+                                        Title: Tasks,
+                                        Description: A list of tasks in the project.,
+                                        Deprecated: false
+                                      }
+                                    }
+                                  ],
+                                  Kind: Custom,
+                                  Symbol: {
+                                    SymbolKind: NamedType,
+                                    Name: Project
+                                  },
+                                  Metadata: {
+                                    Title: Project,
+                                    Deprecated: false
+                                  }
+                                }
+                              ],
+                              Kind: Array,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: List
+                              }
+                            },
+                            Symbol: {
+                              SymbolKind: Property,
+                              Name: Projects
+                            },
+                            Metadata: {
+                              Title: Projects,
+                              Description: A list of projects the team is working on.,
+                              Deprecated: false
+                            }
+                          }
+                        ],
+                        Kind: Custom,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: Team
+                        },
+                        Metadata: {
+                          Title: Team,
+                          Deprecated: false
+                        }
+                      }
+                    ],
+                    Kind: Array,
+                    Symbol: {
+                      SymbolKind: NamedType,
+                      Name: List
+                    }
+                  },
+                  Symbol: {
+                    SymbolKind: Property,
+                    Name: Teams
+                  },
+                  Metadata: {
+                    Title: Teams,
+                    Description: A list of teams in the department.,
+                    Deprecated: false
+                  }
+                }
+              ],
+              Kind: Custom,
+              Symbol: {
+                SymbolKind: NamedType,
+                Name: Department
+              },
+              Metadata: {
+                Title: Department,
+                Deprecated: false
+              }
+            }
+          ],
+          Kind: Array,
+          Symbol: {
+            SymbolKind: NamedType,
+            Name: List
+          }
+        },
+        Symbol: {
+          SymbolKind: Property,
+          Name: Departments
+        },
+        Metadata: {
+          Title: Departments,
+          Description: A list of departments in the company.,
+          Deprecated: false
+        }
+      },
+      {
+        MemberType: {
+          ElementType: {
+            KeyType: {
+              Kind: System,
+              Symbol: {
+                SymbolKind: NamedType,
+                Name: String
+              }
+            },
+            ValueType: {
+              Properties: [
+                {
+                  MemberType: {
+                    Kind: System,
+                    Symbol: {
+                      SymbolKind: NamedType,
+                      Name: String
+                    }
+                  },
+                  Symbol: {
+                    SymbolKind: Property,
+                    Name: Name
+                  },
+                  Metadata: {
+                    Title: Employee Name,
+                    Description: The name of the employee.,
+                    Examples: [
+                      John Doe
+                    ],
+                    Deprecated: false
+                  }
+                },
+                {
+                  MemberType: {
+                    ElementType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Kind: Nullable,
+                    Symbol: {
+                      SymbolKind: NamedType,
+                      Name: String
+                    }
+                  },
+                  Symbol: {
+                    SymbolKind: Property,
+                    Name: Position
+                  },
+                  Metadata: {
+                    Title: Position,
+                    Description: The position of the employee.,
+                    Examples: [
+                      Software Engineer
+                    ],
+                    Deprecated: false
+                  }
+                },
+                {
+                  MemberType: {
+                    Properties: [
+                      {
+                        MemberType: {
+                          Kind: System,
+                          Symbol: {
+                            SymbolKind: NamedType,
+                            Name: String
+                          }
+                        },
+                        Symbol: {
+                          SymbolKind: Property,
+                          Name: Street
+                        },
+                        Metadata: {
+                          Title: Street,
+                          Description: The street of the address.,
+                          Examples: [
+                            123 Main St
+                          ],
+                          Deprecated: false
+                        }
+                      },
+                      {
+                        MemberType: {
+                          Kind: System,
+                          Symbol: {
+                            SymbolKind: NamedType,
+                            Name: String
+                          }
+                        },
+                        Symbol: {
+                          SymbolKind: Property,
+                          Name: City
+                        },
+                        Metadata: {
+                          Title: City,
+                          Description: The city of the address.,
+                          Examples: [
+                            Metropolis,
+                            Central City
+                          ],
+                          Deprecated: false
+                        }
+                      },
+                      {
+                        MemberType: {
+                          Kind: System,
+                          Symbol: {
+                            SymbolKind: NamedType,
+                            Name: String
+                          }
+                        },
+                        Symbol: {
+                          SymbolKind: Property,
+                          Name: PostalCode
+                        },
+                        Metadata: {
+                          Title: Postal Code,
+                          Description: The postal code of the address.,
+                          Examples: [
+                            12345,
+                            67890
+                          ],
+                          Deprecated: false
+                        }
+                      },
+                      {
+                        MemberType: {
+                          Kind: System,
+                          Symbol: {
+                            SymbolKind: NamedType,
+                            Name: String
+                          }
+                        },
+                        Symbol: {
+                          SymbolKind: Property,
+                          Name: ZipCode
+                        },
+                        Metadata: {
+                          Title: Zip Code,
+                          Deprecated: true
+                        }
+                      }
+                    ],
+                    Kind: Custom,
+                    Symbol: {
+                      SymbolKind: NamedType,
+                      Name: Address
+                    },
+                    Metadata: {
+                      Title: Address,
+                      Deprecated: false
+                    }
+                  },
+                  Symbol: {
+                    SymbolKind: Property,
+                    Name: EmployeeAddress
+                  },
+                  Metadata: {
+                    Title: Employee Address,
+                    Description: The address of the employee.,
+                    Deprecated: false
+                  }
+                }
+              ],
+              Kind: Custom,
+              Symbol: {
+                SymbolKind: NamedType,
+                Name: Employee
+              },
+              Metadata: {
+                Title: Employee,
+                Deprecated: false
+              }
+            },
+            BaseType: {
+              Kind: System,
+              Symbol: {
+                SymbolKind: NamedType,
+                Name: Dictionary
+              }
+            },
+            TypeArguments: [
+              {
+                Kind: System,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              {
+                Properties: [
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Property,
+                      Name: Name
+                    },
+                    Metadata: {
+                      Title: Employee Name,
+                      Description: The name of the employee.,
+                      Examples: [
+                        John Doe
+                      ],
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      ElementType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Kind: Nullable,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Property,
+                      Name: Position
+                    },
+                    Metadata: {
+                      Title: Position,
+                      Description: The position of the employee.,
+                      Examples: [
+                        Software Engineer
+                      ],
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      Properties: [
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: Street
+                          },
+                          Metadata: {
+                            Title: Street,
+                            Description: The street of the address.,
+                            Examples: [
+                              123 Main St
+                            ],
+                            Deprecated: false
+                          }
+                        },
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: City
+                          },
+                          Metadata: {
+                            Title: City,
+                            Description: The city of the address.,
+                            Examples: [
+                              Metropolis,
+                              Central City
+                            ],
+                            Deprecated: false
+                          }
+                        },
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: PostalCode
+                          },
+                          Metadata: {
+                            Title: Postal Code,
+                            Description: The postal code of the address.,
+                            Examples: [
+                              12345,
+                              67890
+                            ],
+                            Deprecated: false
+                          }
+                        },
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: ZipCode
+                          },
+                          Metadata: {
+                            Title: Zip Code,
+                            Deprecated: true
+                          }
+                        }
+                      ],
+                      Kind: Custom,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: Address
+                      },
+                      Metadata: {
+                        Title: Address,
+                        Deprecated: false
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Property,
+                      Name: EmployeeAddress
+                    },
+                    Metadata: {
+                      Title: Employee Address,
+                      Description: The address of the employee.,
+                      Deprecated: false
+                    }
+                  }
+                ],
+                Kind: Custom,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: Employee
+                },
+                Metadata: {
+                  Title: Employee,
+                  Deprecated: false
+                }
+              }
+            ],
+            Kind: Map,
+            Symbol: {
+              SymbolKind: NamedType,
+              Name: Dictionary
+            }
+          },
+          Kind: Nullable,
+          Symbol: {
+            SymbolKind: NamedType,
+            Name: Dictionary
+          }
+        },
+        Symbol: {
+          SymbolKind: Property,
+          Name: Employees
+        },
+        Metadata: {
+          Title: Employees,
+          Description: A dictionary of employees by their ID.,
+          Deprecated: false
+        }
+      },
+      {
+        MemberType: {
+          Properties: [
+            {
+              MemberType: {
+                Kind: System,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              Symbol: {
+                SymbolKind: Property,
+                Name: Street
+              },
+              Metadata: {
+                Title: Street,
+                Description: The street of the address.,
+                Examples: [
+                  123 Main St
+                ],
+                Deprecated: false
+              }
+            },
+            {
+              MemberType: {
+                Kind: System,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              Symbol: {
+                SymbolKind: Property,
+                Name: City
+              },
+              Metadata: {
+                Title: City,
+                Description: The city of the address.,
+                Examples: [
+                  Metropolis,
+                  Central City
+                ],
+                Deprecated: false
+              }
+            },
+            {
+              MemberType: {
+                Kind: System,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              Symbol: {
+                SymbolKind: Property,
+                Name: PostalCode
+              },
+              Metadata: {
+                Title: Postal Code,
+                Description: The postal code of the address.,
+                Examples: [
+                  12345,
+                  67890
+                ],
+                Deprecated: false
+              }
+            },
+            {
+              MemberType: {
+                Kind: System,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: String
+                }
+              },
+              Symbol: {
+                SymbolKind: Property,
+                Name: ZipCode
+              },
+              Metadata: {
+                Title: Zip Code,
+                Deprecated: true
+              }
+            }
+          ],
+          Kind: Custom,
+          Symbol: {
+            SymbolKind: NamedType,
+            Name: Address
+          },
+          Metadata: {
+            Title: Address,
+            Deprecated: false
+          }
+        },
+        Symbol: {
+          SymbolKind: Property,
+          Name: CompanyAddress
+        },
+        Metadata: {
+          Title: Company Address,
+          Description: The address of the company.,
+          Deprecated: false
+        }
+      },
+      {
+        MemberType: {
+          ElementType: {
+            Implementations: [
+              {
+                Properties: [
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: AssetId
+                    },
+                    Metadata: {
+                      Title: Asset Id,
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: AssetName
+                    },
+                    Metadata: {
+                      Title: Asset Name,
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      Properties: [
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: Street
+                          },
+                          Metadata: {
+                            Title: Street,
+                            Description: The street of the address.,
+                            Examples: [
+                              123 Main St
+                            ],
+                            Deprecated: false
+                          }
+                        },
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: City
+                          },
+                          Metadata: {
+                            Title: City,
+                            Description: The city of the address.,
+                            Examples: [
+                              Metropolis,
+                              Central City
+                            ],
+                            Deprecated: false
+                          }
+                        },
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: PostalCode
+                          },
+                          Metadata: {
+                            Title: Postal Code,
+                            Description: The postal code of the address.,
+                            Examples: [
+                              12345,
+                              67890
+                            ],
+                            Deprecated: false
+                          }
+                        },
+                        {
+                          MemberType: {
+                            Kind: System,
+                            Symbol: {
+                              SymbolKind: NamedType,
+                              Name: String
+                            }
+                          },
+                          Symbol: {
+                            SymbolKind: Property,
+                            Name: ZipCode
+                          },
+                          Metadata: {
+                            Title: Zip Code,
+                            Deprecated: true
+                          }
+                        }
+                      ],
+                      Kind: Custom,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: Address
+                      },
+                      Metadata: {
+                        Title: Address,
+                        Deprecated: false
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: BuildingAddress
+                    },
+                    Metadata: {
+                      Title: Building Address,
+                      Deprecated: false
+                    }
+                  }
+                ],
+                Kind: Custom,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: Building
+                },
+                Metadata: {
+                  Title: Building,
+                  Deprecated: false
+                }
+              },
+              {
+                Properties: [
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: AssetId
+                    },
+                    Metadata: {
+                      Title: Asset Id,
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: AssetName
+                    },
+                    Metadata: {
+                      Title: Asset Name,
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: VehicleType
+                    },
+                    Metadata: {
+                      Title: Vehicle Type,
+                      Deprecated: false
+                    }
+                  }
+                ],
+                Kind: Custom,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: Vehicle
+                },
+                Metadata: {
+                  Title: Vehicle,
+                  Deprecated: false
+                }
+              },
+              {
+                Properties: [
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: AssetId
+                    },
+                    Metadata: {
+                      Title: Asset Id,
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: AssetName
+                    },
+                    Metadata: {
+                      Title: Asset Name,
+                      Deprecated: false
+                    }
+                  },
+                  {
+                    MemberType: {
+                      Kind: System,
+                      Symbol: {
+                        SymbolKind: NamedType,
+                        Name: String
+                      }
+                    },
+                    Symbol: {
+                      SymbolKind: Parameter,
+                      Name: EquipmentType
+                    },
+                    Metadata: {
+                      Title: Equipment Type,
+                      Deprecated: false
+                    }
+                  }
+                ],
+                Kind: Custom,
+                Symbol: {
+                  SymbolKind: NamedType,
+                  Name: Equipment
+                },
+                Metadata: {
+                  Title: Equipment,
+                  Deprecated: false
+                }
+              }
+            ],
+            Kind: Abstract,
+            Symbol: {
+              SymbolKind: NamedType,
+              Name: CompanyAsset
+            }
+          },
+          BaseType: {
+            Kind: System,
+            Symbol: {
+              SymbolKind: NamedType,
+              Name: Array
+            }
+          },
+          TypeArguments: [
+            {
+              Implementations: [
+                {
+                  Properties: [
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: AssetId
+                      },
+                      Metadata: {
+                        Title: Asset Id,
+                        Deprecated: false
+                      }
+                    },
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: AssetName
+                      },
+                      Metadata: {
+                        Title: Asset Name,
+                        Deprecated: false
+                      }
+                    },
+                    {
+                      MemberType: {
+                        Properties: [
+                          {
+                            MemberType: {
+                              Kind: System,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: String
+                              }
+                            },
+                            Symbol: {
+                              SymbolKind: Property,
+                              Name: Street
+                            },
+                            Metadata: {
+                              Title: Street,
+                              Description: The street of the address.,
+                              Examples: [
+                                123 Main St
+                              ],
+                              Deprecated: false
+                            }
+                          },
+                          {
+                            MemberType: {
+                              Kind: System,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: String
+                              }
+                            },
+                            Symbol: {
+                              SymbolKind: Property,
+                              Name: City
+                            },
+                            Metadata: {
+                              Title: City,
+                              Description: The city of the address.,
+                              Examples: [
+                                Metropolis,
+                                Central City
+                              ],
+                              Deprecated: false
+                            }
+                          },
+                          {
+                            MemberType: {
+                              Kind: System,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: String
+                              }
+                            },
+                            Symbol: {
+                              SymbolKind: Property,
+                              Name: PostalCode
+                            },
+                            Metadata: {
+                              Title: Postal Code,
+                              Description: The postal code of the address.,
+                              Examples: [
+                                12345,
+                                67890
+                              ],
+                              Deprecated: false
+                            }
+                          },
+                          {
+                            MemberType: {
+                              Kind: System,
+                              Symbol: {
+                                SymbolKind: NamedType,
+                                Name: String
+                              }
+                            },
+                            Symbol: {
+                              SymbolKind: Property,
+                              Name: ZipCode
+                            },
+                            Metadata: {
+                              Title: Zip Code,
+                              Deprecated: true
+                            }
+                          }
+                        ],
+                        Kind: Custom,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: Address
+                        },
+                        Metadata: {
+                          Title: Address,
+                          Deprecated: false
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: BuildingAddress
+                      },
+                      Metadata: {
+                        Title: Building Address,
+                        Deprecated: false
+                      }
+                    }
+                  ],
+                  Kind: Custom,
+                  Symbol: {
+                    SymbolKind: NamedType,
+                    Name: Building
+                  },
+                  Metadata: {
+                    Title: Building,
+                    Deprecated: false
+                  }
+                },
+                {
+                  Properties: [
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: AssetId
+                      },
+                      Metadata: {
+                        Title: Asset Id,
+                        Deprecated: false
+                      }
+                    },
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: AssetName
+                      },
+                      Metadata: {
+                        Title: Asset Name,
+                        Deprecated: false
+                      }
+                    },
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: VehicleType
+                      },
+                      Metadata: {
+                        Title: Vehicle Type,
+                        Deprecated: false
+                      }
+                    }
+                  ],
+                  Kind: Custom,
+                  Symbol: {
+                    SymbolKind: NamedType,
+                    Name: Vehicle
+                  },
+                  Metadata: {
+                    Title: Vehicle,
+                    Deprecated: false
+                  }
+                },
+                {
+                  Properties: [
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: AssetId
+                      },
+                      Metadata: {
+                        Title: Asset Id,
+                        Deprecated: false
+                      }
+                    },
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: AssetName
+                      },
+                      Metadata: {
+                        Title: Asset Name,
+                        Deprecated: false
+                      }
+                    },
+                    {
+                      MemberType: {
+                        Kind: System,
+                        Symbol: {
+                          SymbolKind: NamedType,
+                          Name: String
+                        }
+                      },
+                      Symbol: {
+                        SymbolKind: Parameter,
+                        Name: EquipmentType
+                      },
+                      Metadata: {
+                        Title: Equipment Type,
+                        Deprecated: false
+                      }
+                    }
+                  ],
+                  Kind: Custom,
+                  Symbol: {
+                    SymbolKind: NamedType,
+                    Name: Equipment
+                  },
+                  Metadata: {
+                    Title: Equipment,
+                    Deprecated: false
+                  }
+                }
+              ],
+              Kind: Abstract,
+              Symbol: {
+                SymbolKind: NamedType,
+                Name: CompanyAsset
+              }
+            }
+          ],
+          Kind: Array,
+          Symbol: {
+            SymbolKind: NamedType,
+            Name: Array
+          }
+        },
+        Symbol: {
+          SymbolKind: Property,
+          Name: Assets
+        },
+        Metadata: {
+          Title: Assets,
+          Deprecated: false
+        }
+      },
+      {
+        SchemaString: { "type": ["array", "integer", "boolean" ] },
+        Symbol: {
+          SymbolKind: Property,
+          Name: Extra
+        }
+      }
+    ],
+    Kind: Custom,
+    Symbol: {
+      SymbolKind: NamedType,
+      Name: Company
+    },
+    Metadata: {
+      Title: Company,
+      Deprecated: false
+    }
+  },
+  Filename: test.schema.json,
+  Id: https://sharpschema/test/company,
+  CommonNamespace: AllFeatures
+}

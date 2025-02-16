@@ -1,0 +1,40 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "abstract": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.AbstractClass",
+      "title": "Abstract"
+    },
+    "concrete": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Class_ExtendsAbstractClass",
+      "title": "Concrete"
+    }
+  },
+  "required": [
+    "abstract",
+    "concrete"
+  ],
+  "$defs": {
+    "T:SharpSchema.Generator.TestData.Class_ExtendsAbstractClass": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.AbstractClass": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Class_ExtendsAbstractClass"
+        }
+      ]
+    }
+  }
+}

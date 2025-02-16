@@ -1,0 +1,114 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "string": {
+      "type": "string",
+      "title": "String"
+    },
+    "int": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647,
+      "$comment": "System.Int32",
+      "title": "Int"
+    },
+    "bool": {
+      "type": "boolean",
+      "title": "Bool"
+    },
+    "byte": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "$comment": "System.Byte",
+      "title": "Byte"
+    },
+    "sByte": {
+      "type": "integer",
+      "minimum": -128,
+      "maximum": 127,
+      "$comment": "System.SByte",
+      "title": "S Byte"
+    },
+    "short": {
+      "type": "integer",
+      "minimum": -32768,
+      "maximum": 32767,
+      "$comment": "System.Int16",
+      "title": "Short"
+    },
+    "uShort": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
+      "$comment": "System.UInt16",
+      "title": "U Short"
+    },
+    "uInt": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "$comment": "System.UInt32",
+      "title": "U Int"
+    },
+    "long": {
+      "type": "integer",
+      "minimum": -9223372036854775808,
+      "maximum": 9223372036854775807,
+      "$comment": "System.Int64",
+      "title": "Long"
+    },
+    "uLong": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615,
+      "$comment": "System.UInt64",
+      "title": "U Long"
+    },
+    "float": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335,
+      "$comment": "System.Single",
+      "title": "Float"
+    },
+    "double": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335,
+      "$comment": "System.Double",
+      "title": "Double"
+    },
+    "decimal": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335,
+      "$comment": "System.Decimal",
+      "title": "Decimal"
+    },
+    "char": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1,
+      "$comment": "System.Char",
+      "title": "Char"
+    }
+  },
+  "required": [
+    "string",
+    "int",
+    "bool",
+    "byte",
+    "sByte",
+    "short",
+    "uShort",
+    "uInt",
+    "long",
+    "uLong",
+    "float",
+    "double",
+    "decimal",
+    "char"
+  ]
+}

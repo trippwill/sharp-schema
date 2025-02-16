@@ -1,7 +1,5 @@
-﻿// Copyright (c) Charles Willis. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-using System;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 #nullable enable
 
@@ -10,7 +8,8 @@ namespace SharpSchema.Annotations;
 /// <summary>
 /// Represents a schema meta attribute.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Enum)]
+[ExcludeFromCodeCoverage]
+[AttributeUsage(SupportedTypes | SupportedMembers | EnumTargets)]
 #if SHARPSCHEMA_ASSEMBLY
 public class SchemaMetaAttribute : SchemaAttribute
 #else
@@ -31,4 +30,14 @@ internal class SchemaMetaAttribute : SchemaAttribute
     /// Gets or sets the comment for the schema.
     /// </summary>
     public string? Comment { get; set; }
+
+    /// <summary>
+    /// Gets or sets an example for the schema.
+    /// </summary>
+    public string[]? Examples { get; set; }
+
+    /// <summary>
+    /// Gets or sets the deprecation status for the schema.
+    /// </summary>
+    public bool Deprecated { get; set; }
 }

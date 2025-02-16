@@ -11,17 +11,6 @@ namespace SharpSchema.Generator.Utilities;
 internal static class SymbolExtensions
 {
     /// <summary>
-    /// Determines if the symbol should be processed based on its accessibility and the provided options.
-    /// </summary>
-    /// <param name="symbol">The named type symbol.</param>
-    /// <param name="allowedAccessibilities">The allowed accessibilities.</param>
-    /// <returns>True if the symbol should process accessibility; otherwise, false.</returns>
-    public static bool ShouldProcessAccessibility(this INamedTypeSymbol symbol, Accessibilities allowedAccessibilities)
-    {
-        return symbol.DeclaredAccessibility.ShouldProcessAccessibility(allowedAccessibilities);
-    }
-
-    /// <summary>
     /// Determines if the property symbol should be processed based on its accessibility and the provided options.
     /// </summary>
     /// <param name="symbol">The property symbol.</param>
@@ -205,36 +194,6 @@ internal static class SymbolExtensions
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Checks if the type symbol implements the specified abstract class.
-    /// </summary>
-    /// <param name="typeSymbol">The type symbol to check.</param>
-    /// <param name="abstractClassSymbol">The abstract class symbol to check against.</param>
-    /// <returns>True if the type symbol implements the abstract class; otherwise, false.</returns>
-    public static bool ImplementsAbstractClass(this ITypeSymbol typeSymbol, INamedTypeSymbol abstractClassSymbol)
-    {
-        if (typeSymbol is null || abstractClassSymbol is null)
-            return false;
-
-        return CheckBaseType(typeSymbol.BaseType, abstractClassSymbol);
-
-        static bool CheckBaseType(INamedTypeSymbol? baseType, INamedTypeSymbol abstractClassSymbol)
-        {
-            if (baseType is null || baseType.SpecialType == SpecialType.System_Object || baseType.SpecialType == SpecialType.System_Void)
-                return false;
-
-            if (SymbolEqualityComparer.Default.Equals(baseType, abstractClassSymbol) ||
-                SymbolEqualityComparer.Default.Equals(baseType.OriginalDefinition, abstractClassSymbol))
-                return true;
-
-            if (CheckBaseType(baseType.BaseType, abstractClassSymbol))
-                return true;
-
-            return !SymbolEqualityComparer.Default.Equals(baseType, baseType.OriginalDefinition)
-                && CheckBaseType(baseType.OriginalDefinition, abstractClassSymbol);
-        }
     }
 
     public static string GetDefCacheKey(this ITypeSymbol symbol) => symbol.GetDocumentationCommentId() ?? symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);

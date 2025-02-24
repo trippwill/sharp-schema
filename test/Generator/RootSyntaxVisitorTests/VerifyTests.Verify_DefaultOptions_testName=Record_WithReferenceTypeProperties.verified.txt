@@ -1,0 +1,91 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Name"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647,
+      "$comment": "System.Int32",
+      "title": "Age"
+    },
+    "person": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Person",
+      "title": "Person"
+    }
+  },
+  "required": [
+    "name",
+    "age",
+    "person"
+  ],
+  "title": "Record Withreferencetypeproperties",
+  "$defs": {
+    "T:SharpSchema.Generator.TestData.Address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string",
+          "title": "Street"
+        },
+        "city": {
+          "type": "string",
+          "title": "City"
+        }
+      },
+      "required": [
+        "street",
+        "city"
+      ],
+      "title": "Address"
+    },
+    "T:SharpSchema.Generator.TestData.Office": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "address": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Address",
+          "title": "Address"
+        }
+      },
+      "required": [
+        "name",
+        "address"
+      ],
+      "title": "Office"
+    },
+    "T:SharpSchema.Generator.TestData.Person": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "age": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "$comment": "System.Int32",
+          "title": "Age"
+        },
+        "office": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Office",
+          "title": "Office"
+        }
+      },
+      "required": [
+        "name",
+        "age",
+        "office"
+      ],
+      "title": "Person"
+    }
+  }
+}

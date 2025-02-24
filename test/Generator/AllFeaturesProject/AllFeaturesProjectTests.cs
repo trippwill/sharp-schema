@@ -7,6 +7,7 @@ using SharpSchema.Generator.Utilities;
 using VerifyTests;
 using Xunit;
 using Xunit.Abstractions;
+using SharpSchema.Annotations;
 
 namespace SharpSchema.Test.Generator.AllFeaturesProject;
 
@@ -123,12 +124,12 @@ public class AllFeaturesProjectTests : IClassFixture<AllFeaturesProjectFixture>
     //    return schemaRootInfos;
     //}
 
-    public static TheoryData<Accessibilities, Accessibilities> VerifyOptions()
+    public static TheoryData<AccessibilityMode, AccessibilityMode> VerifyOptions()
     {
         return new()
         {
-            { Accessibilities.Public, Accessibilities.Public},
-            { Accessibilities.Any, Accessibilities.Any }
+            { AccessibilityMode.Public, AccessibilityMode.Public},
+            { AccessibilityMode.Any, AccessibilityMode.Any }
         };
     }
 }

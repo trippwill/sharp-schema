@@ -14,7 +14,7 @@ namespace SharpSchema.Generator.Model;
 /// <param name="Examples">Examples for the schema member.</param>
 /// <param name="Comment">Additional comments for the schema member.</param>
 /// <param name="Deprecated">Indicates if the schema member is deprecated.</param>
-public record Metadata(
+public record MemberMeta(
     string Title,
     string? Description,
     List<string>? Examples,
@@ -31,7 +31,7 @@ public record Metadata(
     /// <summary>
     /// A visitor that extracts member metadata from symbols.
     /// </summary>
-    internal class SymbolVisitor : SymbolVisitor<Metadata>
+    internal class SymbolVisitor : SymbolVisitor<MemberMeta>
     {
         private const string JsonSchemaTag = "jsonschema";
         private const string TitleElement = "title";
@@ -40,33 +40,35 @@ public record Metadata(
         private const string ExampleElement = "example";
         private const string DeprecatedElement = "deprecated";
 
+        public static SymbolVisitor Default { get; } = new();
+
         /// <summary>
-        /// Visits a named type symbol and extracts <see cref="Metadata"/>.
+        /// Visits a named type symbol and extracts <see cref="MemberMeta"/>.
         /// </summary>
         /// <param name="symbol">The named type symbol to visit.</param>
-        /// <returns>The extracted <see cref="Metadata"/>.</returns>
-        public override Metadata VisitNamedType(INamedTypeSymbol symbol) => CreateMetadata(symbol);
+        /// <returns>The extracted <see cref="MemberMeta"/>.</returns>
+        public override MemberMeta VisitNamedType(INamedTypeSymbol symbol) => CreateMetadata(symbol);
 
         /// <summary>
-        /// Visits a property symbol and extracts <see cref="Metadata"/>.
+        /// Visits a property symbol and extracts <see cref="MemberMeta"/>.
         /// </summary>
         /// <param name="symbol">The property symbol to visit.</param>
-        /// <returns>The extracted <see cref="Metadata"/>.</returns>
-        public override Metadata VisitProperty(IPropertySymbol symbol) => CreateMetadata(symbol);
+        /// <returns>The extracted <see cref="MemberMeta"/>.</returns>
+        public override MemberMeta VisitProperty(IPropertySymbol symbol) => CreateMetadata(symbol);
 
         /// <summary>
-        /// Visits a parameter symbol and extracts <see cref="Metadata"/>.
+        /// Visits a parameter symbol and extracts <see cref="MemberMeta"/>.
         /// </summary>
         /// <param name="symbol">The parameter symbol to visit.</param>
-        /// <returns>The extracted <see cref="Metadata"/>.</returns>
-        public override Metadata VisitParameter(IParameterSymbol symbol) => CreateMetadata(symbol);
+        /// <returns>The extracted <see cref="MemberMeta"/>.</returns>
+        public override MemberMeta VisitParameter(IParameterSymbol symbol) => CreateMetadata(symbol);
 
         /// <summary>
-        /// Creates a <see cref="Metadata"/> instance from the given symbol.
+        /// Creates a <see cref="MemberMeta"/> instance from the given symbol.
         /// </summary>
         /// <param name="symbol">The symbol to extract metadata from.</param>
-        /// <returns>The created <see cref="Metadata"/> instance.</returns>
-        private static Metadata CreateMetadata(ISymbol symbol)
+        /// <returns>The created <see cref="MemberMeta"/> instance.</returns>
+        private static MemberMeta CreateMetadata(ISymbol symbol)
         {
             using var trace = Tracer.Enter(symbol.Name);
 
@@ -129,7 +131,7 @@ public record Metadata(
                 deprecated = data.GetNamedArgument<bool>(nameof(SchemaMetaAttribute.Deprecated)) || deprecated;
             }
 
-            return new Metadata(title, description, examples, comment, deprecated);
+            return new MemberMeta(title, description, examples, comment, deprecated);
         }
     }
 }

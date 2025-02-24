@@ -1,0 +1,24 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "badOverride": {
+      "$unsupportedObject": "Failed to parse schema override: 'i' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 0 | BytePositionInLine: 1.",
+      "title": "Bad Override"
+    },
+    "goodOverride": {
+      "type": "object",
+      "properties": {
+        "custom": {
+          "type": "string"
+        }
+      },
+      "title": "Good Override"
+    }
+  },
+  "required": [
+    "badOverride",
+    "goodOverride"
+  ],
+  "title": "Class Withtypeschemaoverride"
+}

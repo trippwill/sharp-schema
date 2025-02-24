@@ -9,10 +9,11 @@ namespace SharpSchema.Annotations;
 /// </summary>
 [AttributeUsage(SchemaAttribute.SupportedTypes)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaTraversalModeAttribute(TraversalMode value) : SchemaAttribute
+public
 #else
-internal class SchemaTraversalModeAttribute(TraversalMode value) : SchemaAttribute
+internal
 #endif
+class SchemaTraversalModeAttribute(TraversalMode value) : SchemaAttribute
 {
     /// <summary>
     /// Gets the traversal option for the type.

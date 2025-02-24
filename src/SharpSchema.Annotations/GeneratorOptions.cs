@@ -5,12 +5,13 @@ namespace SharpSchema.Generator;
 #pragma warning restore IDE0130 // Namespace does not match folder structure
 
 /// <summary>
-/// The generator options.
+/// Represents the options for the generator.
 /// </summary>
-/// <param name="AccessibilityMode">The accessibility mode.</param>
-/// <param name="TraversalMode">The traversal mode.</param>
-/// <param name="DictionaryKeyMode">The dictionary key mode.</param>
-/// <param name="EnumMode">The enum mode.</param>
+/// <param name="AccessibilityMode">Specifies the accessibility mode.</param>
+/// <param name="TraversalMode">Specifies the traversal mode.</param>
+/// <param name="DictionaryKeyMode">Specifies the dictionary key mode.</param>
+/// <param name="EnumMode">Specifies the enum mode.</param>
+/// <param name="NumberMode">Specifies the number mode.</param>
 #if SHARPSCHEMA_ASSEMBLY
 public
 #else
@@ -20,7 +21,8 @@ record GeneratorOptions(
     AccessibilityMode AccessibilityMode = AccessibilityMode.Public,
     TraversalMode TraversalMode = TraversalMode.SymbolOnly,
     DictionaryKeyMode DictionaryKeyMode = DictionaryKeyMode.Loose,
-    EnumMode EnumMode = EnumMode.String)
+    EnumMode EnumMode = EnumMode.String,
+    NumberMode NumberMode = NumberMode.StrictDefs)
 {
     /// <summary>
     /// Gets the default generator options.

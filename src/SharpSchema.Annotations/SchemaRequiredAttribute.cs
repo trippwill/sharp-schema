@@ -9,10 +9,11 @@ namespace SharpSchema.Annotations;
 /// </summary>
 [AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaRequiredAttribute(bool isRequired = true) : SchemaAttribute
+public
 #else
-internal class SchemaRequiredAttribute(bool isRequired = true) : SchemaAttribute
+internal
 #endif
+class SchemaRequiredAttribute(bool isRequired = true) : SchemaAttribute
 {
     /// <summary>
     /// Gets a value indicating whether the property is required.

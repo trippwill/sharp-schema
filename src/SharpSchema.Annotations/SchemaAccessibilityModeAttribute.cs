@@ -9,10 +9,11 @@ namespace SharpSchema.Annotations;
 /// </summary>
 [AttributeUsage(SchemaAttribute.SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaAccessibilityModeAttribute(AccessibilityMode value) : SchemaAttribute
+public
 #else
-internal class SchemaAccessibilityModeAttribute(AccessibilityMode value) : SchemaAttribute
+internal
 #endif
+class SchemaAccessibilityModeAttribute(AccessibilityMode value) : SchemaAttribute
 {
     /// <summary>
     /// Gets the accessibility option for the type.

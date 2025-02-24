@@ -9,10 +9,11 @@ namespace SharpSchema.Annotations;
 /// </summary>
 [AttributeUsage(SchemaAttribute.SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaDictionaryKeyModeAttribute(DictionaryKeyMode value) : SchemaAttribute
+public
 #else
-internal class SchemaDictionaryKeyModeAttribute(DictionaryKeyMode value) : SchemaAttribute
+internal
 #endif
+class SchemaDictionaryKeyModeAttribute(DictionaryKeyMode value) : SchemaAttribute
 {
     /// <summary>
     /// Gets the dictionary key mode.

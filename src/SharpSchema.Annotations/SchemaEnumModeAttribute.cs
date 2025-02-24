@@ -9,10 +9,11 @@ namespace SharpSchema.Annotations;
 /// </summary>
 [AttributeUsage(AttributeTargets.Enum)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaEnumModeAttribute(EnumMode value) : SchemaAttribute
+public
 #else
-internal class SchemaEnumModeAttribute(EnumMode value) : SchemaAttribute
+internal
 #endif
+class SchemaEnumModeAttribute(EnumMode value) : SchemaAttribute
 {
     /// <summary>
     /// Gets the enum mode.

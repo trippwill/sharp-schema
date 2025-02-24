@@ -12,10 +12,11 @@ namespace SharpSchema.Annotations;
 /// </remarks>
 [AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaLengthRangeAttribute : SchemaAttribute
+public
 #else
-internal class SchemaLengthRangeAttribute : SchemaAttribute
+internal
 #endif
+class SchemaLengthRangeAttribute : SchemaAttribute
 {
     /// <summary>
     /// Gets or sets the minimum length allowed for the schema.

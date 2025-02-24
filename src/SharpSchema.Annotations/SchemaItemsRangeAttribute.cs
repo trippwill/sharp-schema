@@ -12,10 +12,11 @@ namespace SharpSchema.Annotations;
 /// </remarks>
 [AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaItemsRangeAttribute : SchemaAttribute
+public
 #else
-internal class SchemaItemsRangeAttribute : SchemaAttribute
+internal
 #endif
+class SchemaItemsRangeAttribute : SchemaAttribute
 {
     /// <summary>
     /// Gets or sets the minimum items allowed for the array.

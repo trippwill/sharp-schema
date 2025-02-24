@@ -9,10 +9,11 @@ namespace SharpSchema.Annotations;
 /// </summary>
 [AttributeUsage(AttributeTargets.Field)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaEnumValueAttribute(string value) : SchemaAttribute
+public
 #else
-internal class SchemaEnumValueAttribute(string value) : SchemaAttribute
+internal
 #endif
+class SchemaEnumValueAttribute(string value) : SchemaAttribute
 {
     /// <summary>
     /// Gets the value of the enum member.

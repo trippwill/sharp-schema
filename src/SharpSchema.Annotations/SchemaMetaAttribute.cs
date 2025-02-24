@@ -11,10 +11,11 @@ namespace SharpSchema.Annotations;
 [ExcludeFromCodeCoverage]
 [AttributeUsage(SupportedTypes | SupportedMembers | EnumTargets)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaMetaAttribute : SchemaAttribute
+public
 #else
-internal class SchemaMetaAttribute : SchemaAttribute
+internal
 #endif
+class SchemaMetaAttribute : SchemaAttribute
 {
     /// <summary>
     /// Gets or sets the title of the schema.

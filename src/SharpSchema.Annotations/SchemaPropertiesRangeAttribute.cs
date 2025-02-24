@@ -12,10 +12,11 @@ namespace SharpSchema.Annotations;
 /// </remarks>
 [AttributeUsage(SupportedTypes | SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaPropertiesRangeAttribute : SchemaAttribute
+public
 #else
-internal class SchemaPropertiesRangeAttribute : SchemaAttribute
+internal
 #endif
+class SchemaPropertiesRangeAttribute : SchemaAttribute
 {
     /// <summary>
     /// Gets or sets the minimum number of properties allowed in a schema.

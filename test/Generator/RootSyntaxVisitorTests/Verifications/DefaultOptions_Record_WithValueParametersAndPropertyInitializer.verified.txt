@@ -1,0 +1,31 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Record with value parameters and property initializer",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Name"
+    },
+    "age": {
+      "$ref": "#/$defs/T:System.Int32",
+      "title": "Age"
+    },
+    "title": {
+      "type": "string",
+      "default": "How to make a record",
+      "title": "Title"
+    }
+  },
+  "required": [
+    "name",
+    "age"
+  ],
+  "$defs": {
+    "T:System.Int32": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
+    }
+  }
+}

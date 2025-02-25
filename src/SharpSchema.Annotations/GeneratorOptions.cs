@@ -7,25 +7,40 @@ namespace SharpSchema.Generator;
 /// <summary>
 /// Represents the options for the generator.
 /// </summary>
-/// <param name="AccessibilityMode">Specifies the accessibility mode.</param>
-/// <param name="TraversalMode">Specifies the traversal mode.</param>
-/// <param name="DictionaryKeyMode">Specifies the dictionary key mode.</param>
-/// <param name="EnumMode">Specifies the enum mode.</param>
-/// <param name="NumberMode">Specifies the number mode.</param>
 #if SHARPSCHEMA_ASSEMBLY
 public
 #else
 internal
 #endif
-record GeneratorOptions(
-    AccessibilityMode AccessibilityMode = AccessibilityMode.Public,
-    TraversalMode TraversalMode = TraversalMode.SymbolOnly,
-    DictionaryKeyMode DictionaryKeyMode = DictionaryKeyMode.Loose,
-    EnumMode EnumMode = EnumMode.String,
-    NumberMode NumberMode = NumberMode.StrictDefs)
+class GeneratorOptions
 {
     /// <summary>
     /// Gets the default generator options.
     /// </summary>
     public static GeneratorOptions Default { get; } = new GeneratorOptions();
+
+    /// <summary>
+    /// Gets the accessibility mode.
+    /// </summary>
+    public AccessibilityMode AccessibilityMode { get; init; } = AccessibilityMode.Public;
+
+    /// <summary>
+    /// Gets the traversal mode.
+    /// </summary>
+    public TraversalMode TraversalMode { get; init; } = TraversalMode.SymbolOnly;
+
+    /// <summary>
+    /// Gets the dictionary key mode.
+    /// </summary>
+    public DictionaryKeyMode DictionaryKeyMode { get; init; } = DictionaryKeyMode.Loose;
+
+    /// <summary>
+    /// Gets the enum mode.
+    /// </summary>
+    public EnumMode EnumMode { get; init; } = EnumMode.String;
+
+    /// <summary>
+    /// Gets the number mode.
+    /// </summary>
+    public NumberMode NumberMode { get; init; } = NumberMode.StrictDefs;
 }

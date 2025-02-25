@@ -1,8 +1,10 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis;
-using SharpSchema.Generator.Utilities;
+﻿using System.Collections.Immutable;
 using Json.Schema;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SharpSchema.Generator.Model;
+using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator;
 
@@ -14,6 +16,8 @@ using Builder = JsonSchemaBuilder;
 public class RootSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 {
     private readonly LeafSyntaxVisitor _cachingVisitor;
+    private readonly Compilation _compilation;
+    private readonly SemanticModelCache _semanticModelCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RootSyntaxVisitor"/> class.
@@ -22,7 +26,12 @@ public class RootSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     /// <param name="options">The generator options.</param>
     public RootSyntaxVisitor(Compilation compilation, GeneratorOptions options)
     {
-        _cachingVisitor = new(compilation, options);
+        Throw.IfNullArgument(compilation);
+        Throw.IfNullArgument(options);
+
+        _compilation = compilation;
+        _semanticModelCache = new(compilation);
+        _cachingVisitor = new(compilation, _semanticModelCache, options);
     }
 
     /// <inheritdoc />
@@ -96,9 +105,60 @@ public class RootSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     {
         Builder builder = _cachingVisitor.CreateTypeSchema(node);
 
-        if (_cachingVisitor.GetCachedSchemas() is IReadOnlyDictionary<string, JsonSchema> defs)
+        Dictionary<string, INamedTypeSymbol> cachedAbstractSymbols = _cachingVisitor.CachedAbstractSymbols;
+        Dictionary<string, Builder> cachedTypeSchemas = _cachingVisitor.CachedTypeSchemas;
+
+        if (cachedAbstractSymbols.Count > 0)
         {
-            builder.Defs(defs);
+            using var trace = Tracer.Enter("Building abstract type schemas.");
+            ImmutableArray<NamedType> namedTypes = [.. _compilation.GetAllNamedTypes(_semanticModelCache)];
+
+            foreach ((string key, INamedTypeSymbol abstractSymbol) in cachedAbstractSymbols)
+            {
+                trace.WriteLine($"Building schema for abstract type '{abstractSymbol.Name}'.");
+
+                IEnumerable<NamedType> subTypes = namedTypes
+                    .Where(t => t.Symbol.InheritsFrom(abstractSymbol));
+
+                List<JsonSchema> subSchemas = [];
+
+                foreach (NamedType subType in subTypes)
+                {
+                    // Check if the sub-type is already cached
+                    string cacheKey = subType.Symbol.GetDefCacheKey();
+                    if (cachedTypeSchemas.TryGetValue(cacheKey, out Builder? cachedSchema))
+                    {
+                        trace.WriteLine($"Using cached schema for '{subType.Symbol.Name}'.");
+                        subSchemas.Add(CommonSchemas.DefRef(cacheKey));
+                    }
+                    else
+                    {
+                        trace.WriteLine($"Building schema for '{subType.Symbol.Name}'.");
+                        Builder? subSchema = _cachingVisitor.CreateTypeSchema(subType.Symbol, subType.SyntaxNode);
+                        if (subSchema is not null)
+                        {
+                            cachedTypeSchemas[cacheKey] = subSchema;
+                            subSchemas.Add(CommonSchemas.DefRef(cacheKey));
+                        }
+                    }
+                }
+
+                if (subSchemas.Count > 0)
+                {
+                    trace.WriteLine($"Found {subSchemas.Count} sub-types for '{abstractSymbol.Name}'.");
+                    Builder abstractSchema = CommonSchemas.Object.OneOf(subSchemas);
+                    cachedTypeSchemas[key] = abstractSchema;
+                }
+                else
+                    trace.WriteLine($"No sub-types found for '{abstractSymbol.Name}'.");
+            }
+        }
+
+        if (cachedTypeSchemas.Count > 0)
+        {
+            builder.Defs(cachedTypeSchemas.ToDictionary(
+            p => p.Key,
+            p => p.Value.Build()));
         }
 
         return builder;

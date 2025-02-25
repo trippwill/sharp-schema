@@ -12,13 +12,18 @@ namespace SharpSchema.Generator;
 
 using Builder = JsonSchemaBuilder;
 
-internal class TypeSchemaSymbolVisitor : SymbolVisitor<BaseTypeDeclarationSyntax, Builder?>
+internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.StateContainer?, Builder?>
 {
+    public class StateContainer
+    {
+        internal bool? WasLastPropertyRequired { get; set; }
+    }
+
     private readonly CSharpSyntaxVisitor<Builder?> _syntaxVisitor;
     private readonly SemanticModelCache _semanticModelCache;
     private readonly GeneratorOptions _options;
 
-    public TypeSchemaSymbolVisitor(
+    public NamedTypeSymbolVisitor(
         CSharpSyntaxVisitor<Builder?> visitor,
         SemanticModelCache semanticModelCache,
         GeneratorOptions options)
@@ -30,8 +35,9 @@ internal class TypeSchemaSymbolVisitor : SymbolVisitor<BaseTypeDeclarationSyntax
 
     protected override Builder? DefaultResult { get; }
 
-    public override Builder? VisitNamedType(INamedTypeSymbol symbol, BaseTypeDeclarationSyntax argument)
+    public override Builder? VisitNamedType(INamedTypeSymbol symbol, StateContainer? state)
     {
+        state ??= new StateContainer();
         using var scope = Tracer.Enter($"[SYMBOL] {symbol.Name}");
 
         Dictionary<string, JsonSchema> properties = new(StringComparer.OrdinalIgnoreCase);
@@ -42,75 +48,50 @@ internal class TypeSchemaSymbolVisitor : SymbolVisitor<BaseTypeDeclarationSyntax
             IMethodSymbol primaryCtor = symbol.Constructors.First();
             primaryCtor.Parameters.ForEach(param =>
             {
-                Builder? typeBuilder = param.Accept(this, argument);
+                Builder? typeBuilder = param.Accept(this, state);
                 if (typeBuilder is null)
                     return;
 
                 string propertyName = param.Name.Camelize();
                 properties.Add(propertyName, typeBuilder);
 
-                bool isNullable = param.NullableAnnotation switch
-                {
-                    NullableAnnotation.NotAnnotated => false,
-                    NullableAnnotation.Annotated => true,
-                    NullableAnnotation.None => false, // TODO: Make Configurable
-                    _ => throw new NotSupportedException()
-                };
-
-                bool isRequired = !isNullable;
-                if (param.HasExplicitDefaultValue)
-                    isRequired = false;
-
-                if (EvaluateSchemaRequired(param, isRequired))
+                if (state.WasLastPropertyRequired == true)
                     _requiredProperties.Add(propertyName);
+
+                state.WasLastPropertyRequired = null;
             });
         }
 
         symbol.GetMembers().OfType<IPropertySymbol>().ForEach(prop =>
         {
-            Builder? valueBuilder = prop.Accept(this, argument);
+            Builder? valueBuilder = prop.Accept(this, state);
             if (valueBuilder is null)
                 return;
 
             string propertyName = prop.Name.Camelize();
             properties.Add(propertyName, valueBuilder);
 
-            bool isNullable = prop.NullableAnnotation switch
-            {
-                NullableAnnotation.NotAnnotated => false,
-                NullableAnnotation.Annotated => true,
-                NullableAnnotation.None => false, // TODO: Make Configurable
-                _ => throw new NotSupportedException()
-            };
-
-            bool isRequired = !isNullable;
-            if (EvaluateSchemaRequired(prop, isRequired))
+            if (state.WasLastPropertyRequired == true)
                 _requiredProperties.Add(propertyName);
+
+            state.WasLastPropertyRequired = null;
         });
 
         Builder builder = CommonSchemas.Object;
+
+        if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
+            builder = builder.ApplyMemberMeta(meta);
+
         if (properties.Count > 0)
             builder = builder.Properties(properties);
 
         if (_requiredProperties.Count > 0)
             builder = builder.Required(_requiredProperties);
 
-        if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
-            builder = builder.ApplyMemberMeta(meta);
-
         return builder;
-
-        static bool EvaluateSchemaRequired(ISymbol prop, bool isRequired)
-        {
-            AttributeHandler schemaRequired = prop.GetAttributeHandler<SchemaRequiredAttribute>();
-            if (schemaRequired[0] is bool overrideRequired)
-                return overrideRequired;
-
-            return isRequired;
-        }
     }
 
-    public override Builder? VisitProperty(IPropertySymbol symbol, BaseTypeDeclarationSyntax argument)
+    public override Builder? VisitProperty(IPropertySymbol symbol, StateContainer? state)
     {
         using var scope = Tracer.Enter($"[SYMBOL] {symbol.Name}");
 
@@ -124,18 +105,25 @@ internal class TypeSchemaSymbolVisitor : SymbolVisitor<BaseTypeDeclarationSyntax
             if (typeBuilder is null)
                 return null;
 
+            bool isRequired = !IsNullable(symbol.NullableAnnotation);
+
             if (pdx.ExpressionBody is ArrowExpressionClauseSyntax aec
                 && GetConstantValue(aec.Expression) is JsonNode constantValue)
             {
-                typeBuilder = CommonSchemas.Object.Const(constantValue);
+                typeBuilder = CommonSchemas.Const(constantValue);
+                isRequired = true;
             }
             else if (ExtractDefaultValue(pdx) is JsonNode defaultValue)
             {
                 typeBuilder = typeBuilder.Default(defaultValue);
+                isRequired = false;
             }
 
             if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
                 typeBuilder = typeBuilder.ApplyMemberMeta(meta);
+
+
+            state!.WasLastPropertyRequired = EvaluateSchemaRequired(symbol, isRequired);
 
             return typeBuilder;
         }
@@ -161,7 +149,7 @@ internal class TypeSchemaSymbolVisitor : SymbolVisitor<BaseTypeDeclarationSyntax
         }
     }
 
-    public override Builder? VisitParameter(IParameterSymbol symbol, BaseTypeDeclarationSyntax argument)
+    public override Builder? VisitParameter(IParameterSymbol symbol, StateContainer? state)
     {
         using var scope = Tracer.Enter($"[SYMBOL] {symbol.Name}");
 
@@ -175,19 +163,44 @@ internal class TypeSchemaSymbolVisitor : SymbolVisitor<BaseTypeDeclarationSyntax
             if (typeBuilder is null)
                 return null;
 
+            bool isRequired = !IsNullable(symbol.NullableAnnotation); ;
+
             if (symbol.HasExplicitDefaultValue
                 && symbol.ExplicitDefaultValue is object edv
                 && JsonValue.Create(edv) is JsonNode defaultValue)
             {
                 typeBuilder = typeBuilder.Default(defaultValue);
+                isRequired = false;
             }
 
             if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
                 typeBuilder = typeBuilder.ApplyMemberMeta(meta);
 
+            state!.WasLastPropertyRequired = EvaluateSchemaRequired(symbol, isRequired);
+
             return typeBuilder;
         }
 
         return null;
+    }
+
+    private static bool IsNullable(NullableAnnotation annotation)
+    {
+        return annotation switch
+        {
+            NullableAnnotation.NotAnnotated => false,
+            NullableAnnotation.Annotated => true,
+            NullableAnnotation.None => false, // TODO: Make Configurable
+            _ => throw new NotSupportedException()
+        };
+    }
+
+    private static bool EvaluateSchemaRequired(ISymbol prop, bool isRequired)
+    {
+        AttributeHandler schemaRequired = prop.GetAttributeHandler<SchemaRequiredAttribute>();
+        if (schemaRequired[0] is bool overrideRequired)
+            return overrideRequired;
+
+        return isRequired;
     }
 }

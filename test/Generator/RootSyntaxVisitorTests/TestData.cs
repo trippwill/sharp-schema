@@ -7,12 +7,51 @@ using SharpSchema.Annotations;
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 namespace SharpSchema.Generator.TestData;
 
+using Test.Generator.RootSyntaxVisitorTests;
+
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-public record SimpleRecord(string Name, int Age = 42)
+public record Record_WithValueParameters(string Name, int Age);
+
+public record Record_WithDefaultValueParameter(string Name, int Age = 42);
+
+public record Record_WithNullableParameters(string? Name, int? Age);
+
+public record Record_WithValueParametersAndProperty(string Name, int Age)
 {
-    public string? Description { get; set; }
+    public string Title { get; set; }
 }
+
+public record Record_WithValueParametersAndPropertyInitializer(string Name, int Age)
+{
+    public string Title { get; set; } = "How to make a record";
+}
+
+public record Record_WithDefaultValueParametersAndConstantProperty(string Name, int Age = 42)
+{
+    public string Title => "How to make a record";
+}
+
+/// <summary>
+/// Demonstrates param-based XML metadata.
+/// </summary>
+/// <param name="Name">
+///     <jsonschema>
+///         <title>NameOfRecord</title>
+///         <description>The record's name.</description>
+///         <example>John Doe</example>
+///     </jsonschema>
+/// </param>
+/// <param name="Age">
+///     <jsonschema>
+///         <title>AgeOfRecord</title>
+///         <description>The record's age.</description>
+///         <example>42</example>
+///     </jsonschema>
+/// </param>
+public record Record_WithDocComments(string Name, int Age = 42);
+
 
 public class Class_WithDocComments
 {
@@ -88,29 +127,14 @@ public class Class_WithDictionaryProperties
 
 }
 
+/// <summary>
+/// <see cref="VerifyTests.Verify_DictionaryKeyMode(DictionaryKeyMode)"/>
+/// </summary>
 public class Class_WithUnsupportedDictionaryKey
 {
     public Dictionary<Address, int> Data { get; set; }
 }
 
-/// <summary>
-/// Demonstrates param-based XML metadata.
-/// </summary>
-/// <param name="Name">
-///     <jsonschema>
-///         <title>NameOfRecord</title>
-///         <description>The record's name.</description>
-///         <example>John Doe</example>
-///     </jsonschema>
-/// </param>
-/// <param name="Age">
-///     <jsonschema>
-///         <title>AgeOfRecord</title>
-///         <description>The record's age.</description>
-///         <example>42</example>
-///     </jsonschema>
-/// </param>
-public record Record_WithValueTypeParameters(string Name, int Age = 42);
 
 public record Record_WithReferenceTypeParameters(
     [SchemaMeta(
@@ -206,8 +230,13 @@ public record Record_WithIgnoredParameter(
     string NotIgnored
 );
 
+/// <summary>
+/// <see cref="VerifyTests.Verify_AccessibilityMode(AccessibilityMode)"/>
+/// </summary>
 public record Class_WithInternalProperties
 {
+    public string Public { get; set; }
+
     internal string Internal { get; set; }
 
     protected string Protected { get; set; }

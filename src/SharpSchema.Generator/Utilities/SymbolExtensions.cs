@@ -206,7 +206,7 @@ internal static class SymbolExtensions
 
     public static string GetDefCacheKey(this ITypeSymbol symbol) => symbol.GetDocumentationCommentId() ?? symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-    public static bool IsJsonDefinedType(this ITypeSymbol symbol, [NotNullWhen(true)] out JsonSchemaBuilder? schema)
+    public static bool IsJsonDefinedType(this ITypeSymbol symbol, NumberMode numberMode, [NotNullWhen(true)] out JsonSchemaBuilder? schema)
     {
         using var trace = Tracer.Enter(symbol.Name);
         if (symbol.SpecialType == SpecialType.None)
@@ -219,21 +219,21 @@ internal static class SymbolExtensions
         schema = symbol.SpecialType switch
         {
             SpecialType.System_Boolean => CommonSchemas.Boolean,
-            SpecialType.System_Byte => CommonSchemas.System_Byte,
+            SpecialType.System_Byte => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Byte,
             SpecialType.System_Char => CommonSchemas.System_Char,
             SpecialType.System_DateTime => CommonSchemas.System_DateTime,
-            SpecialType.System_Decimal => CommonSchemas.System_Decimal,
-            SpecialType.System_Double => CommonSchemas.System_Double,
-            SpecialType.System_Int16 => CommonSchemas.System_Int16,
-            SpecialType.System_Int32 => CommonSchemas.System_Int32,
-            SpecialType.System_Int64 => CommonSchemas.System_Int64,
+            SpecialType.System_Decimal => numberMode is NumberMode.JsonNative ? CommonSchemas.Number : CommonSchemas.System_Decimal,
+            SpecialType.System_Double => numberMode is NumberMode.JsonNative ? CommonSchemas.Number : CommonSchemas.System_Double,
+            SpecialType.System_Int16 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Int16,
+            SpecialType.System_Int32 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Int32,
+            SpecialType.System_Int64 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Int64,
             SpecialType.System_Object => throw new InvalidOperationException("System.Object does not map to a json defined type."),
-            SpecialType.System_SByte => CommonSchemas.System_SByte,
-            SpecialType.System_Single => CommonSchemas.System_Single,
+            SpecialType.System_SByte => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_SByte,
+            SpecialType.System_Single => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Single,
             SpecialType.System_String => CommonSchemas.String,
-            SpecialType.System_UInt16 => CommonSchemas.System_UInt16,
-            SpecialType.System_UInt32 => CommonSchemas.System_UInt32,
-            SpecialType.System_UInt64 => CommonSchemas.System_UInt64,
+            SpecialType.System_UInt16 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_UInt16,
+            SpecialType.System_UInt32 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_UInt32,
+            SpecialType.System_UInt64 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_UInt64,
             _ => null
         };
 

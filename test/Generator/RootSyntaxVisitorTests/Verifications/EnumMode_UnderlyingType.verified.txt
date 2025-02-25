@@ -1,0 +1,55 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Record with abstract parameters",
+  "properties": {
+    "card": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card",
+      "title": "Card"
+    },
+    "deck": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card"
+      },
+      "title": "Deck"
+    }
+  },
+  "required": [
+    "card",
+    "deck"
+  ],
+  "$defs": {
+    "T:SharpSchema.Generator.TestData.Card.SuitKind": {
+      "type": "integer",
+      "title": "Suit kind"
+    },
+    "T:SharpSchema.Generator.TestData.Card.RankKind": {
+      "type": "integer",
+      "title": "Rank kind"
+    },
+    "T:SharpSchema.Generator.TestData.Card": {
+      "type": "object",
+      "title": "Card",
+      "properties": {
+        "suit": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card.SuitKind",
+          "title": "Suit"
+        },
+        "rank": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card.RankKind",
+          "title": "Rank"
+        },
+        "isFaceCard": {
+          "type": "boolean",
+          "title": "Is face card"
+        }
+      },
+      "required": [
+        "suit",
+        "rank",
+        "isFaceCard"
+      ]
+    }
+  }
+}

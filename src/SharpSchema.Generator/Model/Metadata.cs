@@ -72,7 +72,7 @@ public record MemberMeta(
         {
             using var trace = Tracer.Enter(symbol.Name);
 
-            string title = symbol.Name.Titleize();
+            string title = symbol.Name.Replace("_", " ").Humanize();
             string? description = null;
             List<string>? examples = null;
             string? comment = null;

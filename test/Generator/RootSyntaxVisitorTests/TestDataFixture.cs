@@ -8,7 +8,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.IO;
 using Xunit;
-using DiffEngine;
 using SharpSchema.Generator;
 using SharpSchema.Test.Generator.TestUtilities;
 using System.Collections.Immutable;
@@ -23,7 +22,6 @@ public class TestDataFixture
 
     public TestDataFixture()
     {
-        DiffRunner.Disabled = true;
         string pathToTestData = PathHelper.GetRepoPath(
                 "test",
                 "Generator",

@@ -1,0 +1,81 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Class with value types",
+  "properties": {
+    "string": {
+      "type": "string",
+      "title": "String"
+    },
+    "int": {
+      "type": "integer",
+      "title": "Int"
+    },
+    "bool": {
+      "type": "boolean",
+      "title": "Bool"
+    },
+    "byte": {
+      "type": "integer",
+      "title": "Byte"
+    },
+    "sByte": {
+      "type": "integer",
+      "title": "S byte"
+    },
+    "short": {
+      "type": "integer",
+      "title": "Short"
+    },
+    "uShort": {
+      "type": "integer",
+      "title": "U short"
+    },
+    "uInt": {
+      "type": "integer",
+      "title": "U int"
+    },
+    "long": {
+      "type": "integer",
+      "title": "Long"
+    },
+    "uLong": {
+      "type": "integer",
+      "title": "U long"
+    },
+    "float": {
+      "type": "integer",
+      "title": "Float"
+    },
+    "double": {
+      "type": "number",
+      "title": "Double"
+    },
+    "decimal": {
+      "type": "number",
+      "title": "Decimal"
+    },
+    "char": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1,
+      "title": "Char"
+    }
+  },
+  "required": [
+    "string",
+    "int",
+    "bool",
+    "byte",
+    "sByte",
+    "short",
+    "uShort",
+    "uInt",
+    "long",
+    "uLong",
+    "float",
+    "double",
+    "decimal",
+    "char"
+  ]
+}

@@ -41,7 +41,7 @@ internal class EnumSymbolVisitor : SymbolVisitor<GeneratorOptions, Builder?>
             trace.WriteLine("Underlying type enum handling.");
 
             if (symbol.EnumUnderlyingType is INamedTypeSymbol underlyingSymbol
-                && underlyingSymbol.IsJsonDefinedType(out Builder? underlyingBuilder))
+                && underlyingSymbol.IsJsonDefinedType(NumberMode.JsonNative, out Builder? underlyingBuilder))
             {
                 return underlyingBuilder;
             }

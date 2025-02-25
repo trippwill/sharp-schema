@@ -14,4 +14,10 @@
   <ItemGroup>
     <Compile Include="..\SharpSchema.Annotations\**\*.cs" Pack="true" PackagePath="content\SharpSchema\;contentFiles\cs\netstandard2.0\SharpSchema\" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="PolySharp">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

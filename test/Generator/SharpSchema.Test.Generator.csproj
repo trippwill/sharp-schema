@@ -26,12 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<ProjectReference Include="..\..\src\SharpSchema.Annotations\SharpSchema.Annotations.csproj" />-->
+    <ProjectReference Include="..\..\src\SharpSchema.Annotations\SharpSchema.Annotations.csproj" />
     <ProjectReference Include="..\..\src\SharpSchema.Generator\SharpSchema.Generator.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\src\SharpSchema.Annotations\**\*.cs" Link="Annotations\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

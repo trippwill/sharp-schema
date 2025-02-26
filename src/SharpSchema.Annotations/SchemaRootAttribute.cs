@@ -9,10 +9,11 @@ namespace SharpSchema.Annotations;
 /// </summary>
 [AttributeUsage(SupportedTypes)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaRootAttribute : SchemaAttribute
+public
 #else
-internal class SchemaRootAttribute : SchemaAttribute
+internal
 #endif
+class SchemaRootAttribute : SchemaAttribute
 {
     /// <summary>
     /// Gets or sets the file name of the schema.

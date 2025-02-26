@@ -1,4 +1,5 @@
-﻿using Json.Schema;
+﻿using System.Text.Json.Nodes;
+using Json.Schema;
 using SharpSchema.Generator.Utilities;
 
 namespace SharpSchema.Generator.Model;
@@ -31,82 +32,72 @@ internal static class CommonSchemas
     public static Builder System_Byte => new Builder()
         .Type(SchemaValueType.Integer)
         .Minimum(byte.MinValue)
-        .Maximum(byte.MaxValue)
-        .Comment("System.Byte");
+        .Maximum(byte.MaxValue);
 
     public static Builder System_SByte => new Builder()
         .Type(SchemaValueType.Integer)
         .Minimum(sbyte.MinValue)
-        .Maximum(sbyte.MaxValue)
-        .Comment("System.SByte");
+        .Maximum(sbyte.MaxValue);
 
     public static Builder System_Int16 => new Builder()
         .Type(SchemaValueType.Integer)
         .Minimum(short.MinValue)
-        .Maximum(short.MaxValue)
-        .Comment("System.Int16");
+        .Maximum(short.MaxValue);
 
     public static Builder System_UInt16 => new Builder()
         .Type(SchemaValueType.Integer)
         .Minimum(ushort.MinValue)
-        .Maximum(ushort.MaxValue)
-        .Comment("System.UInt16");
+        .Maximum(ushort.MaxValue);
 
     public static Builder System_Int32 => new Builder()
         .Type(SchemaValueType.Integer)
         .Minimum(int.MinValue)
-        .Maximum(int.MaxValue)
-        .Comment("System.Int32");
+        .Maximum(int.MaxValue);
 
     public static Builder System_UInt32 => new Builder()
         .Type(SchemaValueType.Integer)
         .Minimum(uint.MinValue)
-        .Maximum(uint.MaxValue)
-        .Comment("System.UInt32");
+        .Maximum(uint.MaxValue);
 
     public static Builder System_Int64 => new Builder()
         .Type(SchemaValueType.Integer)
         .Minimum(long.MinValue)
-        .Maximum(long.MaxValue)
-        .Comment("System.Int64");
+        .Maximum(long.MaxValue);
 
     public static Builder System_UInt64 => new Builder()
         .Type(SchemaValueType.Integer)
         .Minimum(ulong.MinValue)
-        .Maximum(ulong.MaxValue)
-        .Comment("System.UInt64");
+        .Maximum(ulong.MaxValue);
 
     public static Builder System_Single => new Builder()
         .Type(SchemaValueType.Number)
         .Minimum(decimal.MinValue)
-        .Maximum(decimal.MaxValue)
-        .Comment("System.Single");
+        .Maximum(decimal.MaxValue);
 
     public static Builder System_Double => new Builder()
         .Type(SchemaValueType.Number)
         .Minimum(decimal.MinValue)
-        .Maximum(decimal.MaxValue)
-        .Comment("System.Double");
+        .Maximum(decimal.MaxValue);
 
     public static Builder System_Decimal => new Builder()
         .Type(SchemaValueType.Number)
         .Minimum(decimal.MinValue)
-        .Maximum(decimal.MaxValue)
-        .Comment("System.Decimal");
+        .Maximum(decimal.MaxValue);
 
     public static Builder System_Char => new Builder()
         .Type(SchemaValueType.String)
         .MinLength(1)
-        .MaxLength(1)
-        .Comment("System.Char");
+        .MaxLength(1);
 
     public static Builder System_DateTime => new Builder()
         .Type(SchemaValueType.String)
-        .Format(Formats.DateTime)
-        .Comment("System.DateTime");
+        .Format(Formats.DateTime);
 
     public static Builder UnsupportedObject(string value) => new Builder()
         .UnsupportedObject(value);
+
+    public static Builder UnsupportedObject(string format, params object[] args) => new Builder()
+        .UnsupportedObject(string.Format(format, args));
 
     public static Builder DefRef(string key) => new Builder()
         .Ref(string.Format(DefUriFormat, key));
@@ -117,4 +108,7 @@ internal static class CommonSchemas
     public static Builder ArrayOf(Builder schema) => new Builder()
         .Type(SchemaValueType.Array)
         .Items(schema);
+
+    public static Builder Const(JsonNode value) => new Builder()
+        .Const(value);
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <DiffEngine_ToolOrder></DiffEngine_ToolOrder>
+      <DiffEngine_Disabled>true</DiffEngine_Disabled>
+      <DiffEngine_TargetOnLeft>false</DiffEngine_TargetOnLeft>
+      <DiffEngine_MaxInstances>5</DiffEngine_MaxInstances>
+    </EnvironmentVariables>
+  </RunConfiguration>
+</RunSettings>

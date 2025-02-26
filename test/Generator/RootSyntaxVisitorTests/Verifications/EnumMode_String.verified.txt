@@ -1,0 +1,76 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Record with abstract parameters",
+  "properties": {
+    "card": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card",
+      "title": "Card"
+    },
+    "deck": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card"
+      },
+      "title": "Deck"
+    }
+  },
+  "required": [
+    "card",
+    "deck"
+  ],
+  "$defs": {
+    "T:SharpSchema.Generator.TestData.Card.SuitKind": {
+      "type": "string",
+      "enum": [
+        "spades",
+        "hearts",
+        "clubs",
+        "diamonds"
+      ],
+      "title": "Suit kind"
+    },
+    "T:SharpSchema.Generator.TestData.Card.RankKind": {
+      "type": "string",
+      "enum": [
+        "ace",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "jack",
+        "queen",
+        "king"
+      ],
+      "title": "Rank kind"
+    },
+    "T:SharpSchema.Generator.TestData.Card": {
+      "type": "object",
+      "title": "Card",
+      "properties": {
+        "suit": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card.SuitKind",
+          "title": "Suit"
+        },
+        "rank": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card.RankKind",
+          "title": "Rank"
+        },
+        "isFaceCard": {
+          "type": "boolean",
+          "title": "Is face card"
+        }
+      },
+      "required": [
+        "suit",
+        "rank",
+        "isFaceCard"
+      ]
+    }
+  }
+}

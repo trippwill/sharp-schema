@@ -1,0 +1,141 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Class with value types",
+  "properties": {
+    "string": {
+      "type": "string",
+      "title": "String"
+    },
+    "int": {
+      "$ref": "#/$defs/T:System.Int32",
+      "title": "Int"
+    },
+    "bool": {
+      "type": "boolean",
+      "title": "Bool"
+    },
+    "byte": {
+      "$ref": "#/$defs/T:System.Byte",
+      "title": "Byte"
+    },
+    "sByte": {
+      "$ref": "#/$defs/T:System.SByte",
+      "title": "S byte"
+    },
+    "short": {
+      "$ref": "#/$defs/T:System.Int16",
+      "title": "Short"
+    },
+    "uShort": {
+      "$ref": "#/$defs/T:System.UInt16",
+      "title": "U short"
+    },
+    "uInt": {
+      "$ref": "#/$defs/T:System.UInt32",
+      "title": "U int"
+    },
+    "long": {
+      "$ref": "#/$defs/T:System.Int64",
+      "title": "Long"
+    },
+    "uLong": {
+      "$ref": "#/$defs/T:System.UInt64",
+      "title": "U long"
+    },
+    "float": {
+      "$ref": "#/$defs/T:System.Single",
+      "title": "Float"
+    },
+    "double": {
+      "$ref": "#/$defs/T:System.Double",
+      "title": "Double"
+    },
+    "decimal": {
+      "$ref": "#/$defs/T:System.Decimal",
+      "title": "Decimal"
+    },
+    "char": {
+      "$ref": "#/$defs/T:System.Char",
+      "title": "Char"
+    }
+  },
+  "required": [
+    "string",
+    "int",
+    "bool",
+    "byte",
+    "sByte",
+    "short",
+    "uShort",
+    "uInt",
+    "long",
+    "uLong",
+    "float",
+    "double",
+    "decimal",
+    "char"
+  ],
+  "$defs": {
+    "T:System.Int32": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
+    },
+    "T:System.Byte": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "T:System.SByte": {
+      "type": "integer",
+      "minimum": -128,
+      "maximum": 127
+    },
+    "T:System.Int16": {
+      "type": "integer",
+      "minimum": -32768,
+      "maximum": 32767
+    },
+    "T:System.UInt16": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "T:System.UInt32": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "T:System.Int64": {
+      "type": "integer",
+      "minimum": -9223372036854775808,
+      "maximum": 9223372036854775807
+    },
+    "T:System.UInt64": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615
+    },
+    "T:System.Single": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335
+    },
+    "T:System.Double": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335
+    },
+    "T:System.Decimal": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335
+    },
+    "T:System.Char": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1
+    }
+  }
+}

@@ -1,0 +1,212 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Struct with nullable value types",
+  "properties": {
+    "string": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "String"
+    },
+    "int": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.Int32"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Int"
+    },
+    "byte": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.Byte"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Byte"
+    },
+    "sByte": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.SByte"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "S byte"
+    },
+    "short": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.Int16"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Short"
+    },
+    "uShort": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.UInt16"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "U short"
+    },
+    "uInt": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.UInt32"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "U int"
+    },
+    "long": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.Int64"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Long"
+    },
+    "uLong": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.UInt64"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "U long"
+    },
+    "float": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.Single"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Float"
+    },
+    "double": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.Double"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Double"
+    },
+    "decimal": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.Decimal"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Decimal"
+    },
+    "char": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.Char"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Char"
+    }
+  },
+  "$defs": {
+    "T:System.Int32": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
+    },
+    "T:System.Byte": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "T:System.SByte": {
+      "type": "integer",
+      "minimum": -128,
+      "maximum": 127
+    },
+    "T:System.Int16": {
+      "type": "integer",
+      "minimum": -32768,
+      "maximum": 32767
+    },
+    "T:System.UInt16": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "T:System.UInt32": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "T:System.Int64": {
+      "type": "integer",
+      "minimum": -9223372036854775808,
+      "maximum": 9223372036854775807
+    },
+    "T:System.UInt64": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615
+    },
+    "T:System.Single": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335
+    },
+    "T:System.Double": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335
+    },
+    "T:System.Decimal": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335
+    },
+    "T:System.Char": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1
+    }
+  }
+}

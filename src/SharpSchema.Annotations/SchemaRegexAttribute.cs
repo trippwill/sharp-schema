@@ -12,10 +12,11 @@ namespace SharpSchema.Annotations;
 /// </remarks>
 [AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaRegexAttribute(string pattern) : SchemaAttribute
+public
 #else
-internal class SchemaRegexAttribute(string pattern) : SchemaAttribute
+internal
 #endif
+class SchemaRegexAttribute(string pattern) : SchemaAttribute
 {
     /// <summary>
     /// Gets the regular expression pattern.

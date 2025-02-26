@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using SharpSchema.Annotations;
 using SharpSchema.Generator.Model;
-using System.Text.Json.Serialization;
 
 namespace SharpSchema.Generator.Utilities;
 
@@ -17,20 +16,7 @@ internal static class AnnotationExtensions
     /// <returns>True if the symbol is ignored for generation; otherwise, false.</returns>
     public static bool IsIgnoredForGeneration(this ISymbol symbol)
     {
-        if (symbol.GetAttributeData<SchemaIgnoreAttribute>() is not null) return true;
-
-        if (symbol.GetAttributeData<JsonIgnoreAttribute>() is AttributeData jsonIgnoreAttribute)
-        {
-            // Filter out properties that have JsonIgnoreAttribute without any named arguments
-            if (jsonIgnoreAttribute.NamedArguments.Length == 0)
-                return true;
-
-            // Filter out properties that have JsonIgnoreAttribute with named argument "Condition" and value "Always"
-            if (jsonIgnoreAttribute.GetNamedArgument<JsonIgnoreCondition>("Condition") == JsonIgnoreCondition.Always)
-                return true;
-        }
-
-        return false;
+        return symbol.GetAttributeData<SchemaIgnoreAttribute>() is not null;
     }
 
     public static Builder? GetOverrideSchema(this ISymbol symbol)

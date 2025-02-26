@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace SharpSchema.Generator.Utilities;
 
@@ -18,6 +19,7 @@ public static class Tracer
     private static int s_indentLevel = 0;
     private static LineWriter? s_writer;
     private static int s_indentWidth = 2;
+    private static bool s_enableTiming = false;
 
     /// <summary>
     /// Sets the writer to use for writing trace messages.
@@ -28,6 +30,15 @@ public static class Tracer
     /// Sets the number of spaces per indentation level.
     /// </summary>
     public static int IndentWidth { set => s_indentWidth = value; }
+
+    /// <summary>
+    /// Gets or sets whether timing is enabled.
+    /// </summary>
+    public static bool EnableTiming
+    {
+        get => s_enableTiming;
+        set => s_enableTiming = value;
+    }
 
     /// <summary>
     /// Writes a trace message followed by a newline.
@@ -72,6 +83,8 @@ public static class Tracer
     /// </summary>
     public readonly struct TraceScope() : IDisposable
     {
+        private readonly Stopwatch? _stopwatch = Tracer.EnableTiming ? Stopwatch.StartNew() : null;
+
         /// <summary>
         /// Writes a trace message followed by a newline.
         /// </summary>
@@ -84,6 +97,16 @@ public static class Tracer
         /// <summary>
         /// Decreases the indent level when the scope is disposed.
         /// </summary>
-        public void Dispose() => Tracer.s_indentLevel--;
+        public void Dispose()
+        {
+            if (Tracer.EnableTiming)
+            {
+                _stopwatch!.Stop();
+                double seconds = _stopwatch.Elapsed.TotalSeconds;
+                WriteLine($"Done [{seconds:0.00}s]", "Scope");
+            }
+
+            Tracer.s_indentLevel--;
+        }
     }
 }

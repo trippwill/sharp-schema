@@ -114,6 +114,10 @@ public class Class_WithArrayProperties
 
 public class Class_WithInvalidProperties
 {
+    public int Mutable { get; set; }
+
+    public int Immutable { get; }
+
     public string Name { set { } }
 
     public static string Static { get; set; }
@@ -148,10 +152,6 @@ public record Record_WithReferenceTypeParameters(
         Title = "Addresses Title")]
     List<Address>? Addresses);
 
-public record Record_WithParametersAndProperties(string Name, int Age)
-{
-    public required Address Address { get; set; }
-}
 
 public struct Struct_WithNullableValueTypes
 {
@@ -183,15 +183,6 @@ public struct Struct_WithNullableValueTypes
 
 }
 
-public record Record_WithReferenceTypeProperties
-{
-    public string Name { get; set; }
-
-    public int Age { get; set; }
-
-    public Person Person { get; set; }
-}
-
 public class Class_WithSchemaOverride
 {
     [SchemaOverride("{\"type\":\"string\",\"maxLength\":50}")]
@@ -219,7 +210,7 @@ public class Class_WithIgnoredProperty
     [SchemaIgnore]
     public string Ignored { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
+    [SchemaIgnore]
     public string AlsoIgnored { get; set; }
 
     public string NotIgnored { get; set; }

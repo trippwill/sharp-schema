@@ -122,8 +122,7 @@ internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.Sta
             if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
                 typeBuilder = typeBuilder.ApplyMemberMeta(meta);
 
-
-            state!.WasLastPropertyRequired = EvaluateSchemaRequired(symbol, isRequired);
+            state!.WasLastPropertyRequired = EvaluateSchemaRequired(symbol, symbol.IsRequired || isRequired);
 
             return typeBuilder;
         }

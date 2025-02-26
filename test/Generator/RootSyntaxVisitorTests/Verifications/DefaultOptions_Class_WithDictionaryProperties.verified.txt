@@ -1,0 +1,50 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Class with dictionary properties",
+  "properties": {
+    "valueTypes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/T:System.Int32"
+      },
+      "title": "Value types"
+    },
+    "referenceTypes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Address"
+      },
+      "title": "Reference types"
+    }
+  },
+  "required": [
+    "valueTypes",
+    "referenceTypes"
+  ],
+  "$defs": {
+    "T:System.Int32": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
+    },
+    "T:SharpSchema.Generator.TestData.Address": {
+      "type": "object",
+      "title": "Address",
+      "properties": {
+        "street": {
+          "type": "string",
+          "title": "Street"
+        },
+        "city": {
+          "type": "string",
+          "title": "City"
+        }
+      },
+      "required": [
+        "street",
+        "city"
+      ]
+    }
+  }
+}

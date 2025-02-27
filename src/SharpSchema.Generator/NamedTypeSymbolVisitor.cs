@@ -48,11 +48,14 @@ internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.Sta
             IMethodSymbol primaryCtor = symbol.Constructors.First();
             primaryCtor.Parameters.ForEach(param =>
             {
+                string propertyName = param.Name.Camelize();
+                if (symbol.GetOverrideSchema() is Builder overrideSchema)
+                    properties.Add(propertyName, overrideSchema);
+
                 Builder? typeBuilder = param.Accept(this, state);
                 if (typeBuilder is null)
                     return;
 
-                string propertyName = param.Name.Camelize();
                 properties.Add(propertyName, typeBuilder);
 
                 if (state.WasLastPropertyRequired == true)
@@ -64,11 +67,12 @@ internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.Sta
 
         symbol.GetMembers().OfType<IPropertySymbol>().ForEach(prop =>
         {
+            string propertyName = prop.Name.Camelize();
+
             Builder? valueBuilder = prop.Accept(this, state);
             if (valueBuilder is null)
                 return;
 
-            string propertyName = prop.Name.Camelize();
             properties.Add(propertyName, valueBuilder);
 
             if (state.WasLastPropertyRequired == true)
@@ -98,14 +102,18 @@ internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.Sta
         if (!_options.ShouldProcess(symbol) || !symbol.IsValidForGeneration())
             return null;
 
+        Builder? typeBuilder = null;
+        if (symbol.GetOverrideSchema() is Builder overrideSchema)
+            typeBuilder = overrideSchema;
+
+        bool isRequired = symbol.IsRequired || !IsNullable(symbol.NullableAnnotation);
+
         // Excludes generated properties.
-        if (symbol.FindDeclaringSyntax() is PropertyDeclarationSyntax pdx)
+        if (typeBuilder is null && symbol.FindDeclaringSyntax() is PropertyDeclarationSyntax pdx)
         {
-            Builder? typeBuilder = pdx.Type.Accept(_syntaxVisitor);
+            typeBuilder = pdx.Type.Accept(_syntaxVisitor);
             if (typeBuilder is null)
                 return null;
-
-            bool isRequired = !IsNullable(symbol.NullableAnnotation);
 
             if (pdx.ExpressionBody is ArrowExpressionClauseSyntax aec
                 && GetConstantValue(aec.Expression) is JsonNode constantValue)
@@ -118,16 +126,17 @@ internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.Sta
                 typeBuilder = typeBuilder.Default(defaultValue);
                 isRequired = false;
             }
-
-            if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
-                typeBuilder = typeBuilder.ApplyMemberMeta(meta);
-
-            state!.WasLastPropertyRequired = EvaluateSchemaRequired(symbol, symbol.IsRequired || isRequired);
-
-            return typeBuilder;
         }
 
-        return null;
+        if (typeBuilder is null)
+            return null;
+
+        if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
+            typeBuilder = typeBuilder.ApplyMemberMeta(meta);
+
+        state!.WasLastPropertyRequired = EvaluateSchemaRequired(symbol, isRequired);
+
+        return typeBuilder;
 
         // -- Local functions --
 
@@ -155,32 +164,36 @@ internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.Sta
         if (!_options.ShouldProcess(symbol) || !symbol.IsValidForGeneration())
             return null;
 
+        Builder? typeBuilder = null;
+        if (symbol.GetOverrideSchema() is Builder overrideSchema)
+            typeBuilder = overrideSchema;
+
+        bool isRequired = !IsNullable(symbol.NullableAnnotation);
+
         // Excludes implicitly-typed parameters.
-        if (symbol.FindDeclaringSyntax() is ParameterSyntax px && px.Type is TypeSyntax tx)
+        if (typeBuilder is null && symbol.FindDeclaringSyntax() is ParameterSyntax px && px.Type is TypeSyntax tx)
         {
-            Builder? typeBuilder = px.Type.Accept(_syntaxVisitor);
-            if (typeBuilder is null)
-                return null;
-
-            bool isRequired = !IsNullable(symbol.NullableAnnotation); ;
-
-            if (symbol.HasExplicitDefaultValue
-                && symbol.ExplicitDefaultValue is object edv
-                && JsonValue.Create(edv) is JsonNode defaultValue)
-            {
-                typeBuilder = typeBuilder.Default(defaultValue);
-                isRequired = false;
-            }
-
-            if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
-                typeBuilder = typeBuilder.ApplyMemberMeta(meta);
-
-            state!.WasLastPropertyRequired = EvaluateSchemaRequired(symbol, isRequired);
-
-            return typeBuilder;
+            typeBuilder = px.Type.Accept(_syntaxVisitor);
         }
 
-        return null;
+        if (typeBuilder is null)
+            return null;
+
+        if (symbol.HasExplicitDefaultValue
+            && symbol.ExplicitDefaultValue is object edv
+            && JsonValue.Create(edv) is JsonNode defaultValue)
+        {
+            typeBuilder = typeBuilder.Default(defaultValue);
+            isRequired = false;
+        }
+
+        if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
+            typeBuilder = typeBuilder.ApplyMemberMeta(meta);
+
+        state!.WasLastPropertyRequired = EvaluateSchemaRequired(symbol, isRequired);
+
+        return typeBuilder;
+
     }
 
     private static bool IsNullable(NullableAnnotation annotation)

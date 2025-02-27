@@ -54,6 +54,9 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
     [InlineData(nameof(Class_WithIgnoredProperty))]
     [InlineData(nameof(Class_WithRequiredProperties))]
     [InlineData(nameof(Struct_WithNullableValueTypes))]
+    [InlineData(nameof(Class_WithSchemaOverride))]
+    [InlineData(nameof(Class_WithTypeSchemaOverride))]
+    [InlineData(nameof(Record_WithSchemaOverride))]
     [InlineData(nameof(GameHall))]
     public Task Verify_DefaultOptions(string testName)
     {

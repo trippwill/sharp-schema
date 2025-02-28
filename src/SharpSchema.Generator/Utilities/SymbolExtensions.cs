@@ -17,6 +17,54 @@ internal static class SymbolExtensions
         return new AttributeHandler(GetAttributeData<T>(symbol, traversal));
     }
 
+    public static AttributeHandler GetAttributeHandler<T>(this IPropertySymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        return new AttributeHandler(GetAttributeData<T>(symbol, traversal));
+    }
+
+    public static AttributeHandler GetAttributeHandler<T>(this IFieldSymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        return new AttributeHandler(GetAttributeData<T>(symbol, traversal));
+    }
+
+    public static AttributeHandler GetAttributeHandler<T>(this IParameterSymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        return new AttributeHandler(GetAttributeData<T>(symbol, traversal));
+    }
+
+    public static ObjectAttributes GetObjectAttributes(this ISymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+    {
+        return new ObjectAttributes(
+            GetAttributeHandler<SchemaAccessibilityModeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaDictionaryKeyModeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaEnumModeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaMetaAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaOverrideAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaPropertiesRangeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaRootAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaTraversalModeAttribute>(symbol, traversal));
+    }
+
+    public static PropertyAttributes GetPropertyAttributes(this ISymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+    {
+        return new PropertyAttributes(
+            GetAttributeHandler<SchemaConstAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaDictionaryKeyModeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaEnumModeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaIgnoreAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaItemsRangeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaFormatAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaLengthRangeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaMetaAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaOverrideAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaRegexAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaRequiredAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaValueRangeAttribute>(symbol, traversal));
+    }
+
     /// <summary>
     /// Gets the attribute data of the specified type from the symbol.
     /// </summary>
@@ -27,6 +75,8 @@ internal static class SymbolExtensions
     public static AttributeData? GetAttributeData<T>(this ISymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
         where T : Attribute
     {
+        AttributeData? mostDerivedAttribute = null;
+
         // Search for the attribute on the symbol itself
         foreach (AttributeData attribute in symbol.GetAttributes())
         {
@@ -45,7 +95,10 @@ internal static class SymbolExtensions
                     foreach (AttributeData attribute in baseType.GetAttributes())
                     {
                         if (attribute.AttributeClass?.MatchesType<T>() ?? false)
-                            return attribute;
+                        {
+                            mostDerivedAttribute = attribute;
+                            break;
+                        }
                     }
 
                     baseType = baseType.BaseType;
@@ -60,13 +113,168 @@ internal static class SymbolExtensions
                     foreach (AttributeData attribute in interfaceType.GetAttributes())
                     {
                         if (attribute.AttributeClass?.MatchesType<T>() ?? false)
-                            return attribute;
+                        {
+                            mostDerivedAttribute = attribute;
+                            break;
+                        }
                     }
                 }
             }
         }
 
-        return null;
+        return mostDerivedAttribute;
+    }
+
+    public static AttributeData? GetAttributeData<T>(this IPropertySymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        AttributeData? mostDerivedAttribute = null;
+
+        // Search for the attribute on the symbol itself
+        foreach (AttributeData attribute in symbol.GetAttributes())
+        {
+            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                return attribute;
+        }
+
+        if (symbol.ContainingType is INamedTypeSymbol containingType)
+        {
+            if (traversal.CheckFlag(TraversalMode.Bases))
+            {
+                // Search on base classes
+                INamedTypeSymbol? baseType = containingType.BaseType;
+                while (baseType is not null)
+                {
+                    var baseProperty = baseType.GetMembers(symbol.Name).OfType<IPropertySymbol>().FirstOrDefault();
+                    if (baseProperty is not null)
+                    {
+                        foreach (AttributeData attribute in baseProperty.GetAttributes())
+                        {
+                            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                            {
+                                mostDerivedAttribute = attribute;
+                                break;
+                            }
+                        }
+                    }
+
+                    baseType = baseType.BaseType;
+                }
+            }
+
+            if (traversal.CheckFlag(TraversalMode.Interfaces))
+            {
+                // Search on interfaces
+                foreach (INamedTypeSymbol interfaceType in containingType.AllInterfaces)
+                {
+                    var interfaceProperty = interfaceType.GetMembers(symbol.Name).OfType<IPropertySymbol>().FirstOrDefault();
+                    if (interfaceProperty is not null)
+                    {
+                        foreach (AttributeData attribute in interfaceProperty.GetAttributes())
+                        {
+                            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                            {
+                                mostDerivedAttribute = attribute;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return mostDerivedAttribute;
+    }
+
+    public static AttributeData? GetAttributeData<T>(this IParameterSymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        AttributeData? mostDerivedAttribute = null;
+
+        // Search for the attribute on the symbol itself
+        foreach (AttributeData attribute in symbol.GetAttributes())
+        {
+            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                return attribute;
+        }
+
+        if (symbol.ContainingSymbol is IMethodSymbol methodSymbol &&
+            methodSymbol.MethodKind == MethodKind.Constructor &&
+            methodSymbol.ContainingType.IsRecord)
+        {
+            if (methodSymbol.ContainingType is INamedTypeSymbol containingType)
+            {
+                if (traversal.CheckFlag(TraversalMode.Bases))
+                {
+                    // Search on base records
+                    INamedTypeSymbol? baseType = containingType.BaseType;
+                    while (baseType is not null)
+                    {
+                        var baseConstructor = baseType.InstanceConstructors.FirstOrDefault();
+                        if (baseConstructor is not null)
+                        {
+                            var baseParameter = baseConstructor.Parameters.FirstOrDefault(p => p.Name == symbol.Name);
+                            if (baseParameter is not null)
+                            {
+                                foreach (AttributeData attribute in baseParameter.GetAttributes())
+                                {
+                                    if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                                    {
+                                        mostDerivedAttribute = attribute;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        baseType = baseType.BaseType;
+                    }
+                }
+            }
+        }
+
+        return mostDerivedAttribute;
+    }
+
+    public static AttributeData? GetAttributeData<T>(this IFieldSymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        AttributeData? mostDerivedAttribute = null;
+
+        // Search for the attribute on the symbol itself
+        foreach (AttributeData attribute in symbol.GetAttributes())
+        {
+            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                return attribute;
+        }
+
+        if (symbol.ContainingType is INamedTypeSymbol containingType)
+        {
+            if (traversal.CheckFlag(TraversalMode.Bases))
+            {
+                // Search on base classes
+                INamedTypeSymbol? baseType = containingType.BaseType;
+                while (baseType is not null)
+                {
+                    var baseField = baseType.GetMembers(symbol.Name).OfType<IFieldSymbol>().FirstOrDefault();
+                    if (baseField is not null)
+                    {
+                        foreach (AttributeData attribute in baseField.GetAttributes())
+                        {
+                            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                            {
+                                mostDerivedAttribute = attribute;
+                                break;
+                            }
+                        }
+                    }
+
+                    baseType = baseType.BaseType;
+                }
+            }
+        }
+
+        return mostDerivedAttribute;
     }
 
     public static bool MatchesType<T>(this INamedTypeSymbol typeSymbol)
@@ -201,8 +409,6 @@ internal static class SymbolExtensions
 
         return false;
     }
-
-
 
     public static string GetDefCacheKey(this ITypeSymbol symbol) => symbol.GetDocumentationCommentId() ?? symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 

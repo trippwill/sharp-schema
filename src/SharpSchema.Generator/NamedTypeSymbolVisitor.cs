@@ -40,6 +40,8 @@ internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.Sta
         state ??= new StateContainer();
         using var scope = Tracer.Enter($"[SYMBOL] {symbol.Name}");
 
+        ObjectAttributes attributes = symbol.GetObjectAttributes(_options.TraversalMode);
+
         Dictionary<string, JsonSchema> properties = new(StringComparer.OrdinalIgnoreCase);
         HashSet<string> _requiredProperties = new(StringComparer.OrdinalIgnoreCase);
 
@@ -82,7 +84,6 @@ internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.Sta
         });
 
         Builder builder = CommonSchemas.Object;
-
         if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
             builder = builder.ApplyMemberMeta(meta);
 
@@ -91,6 +92,37 @@ internal class NamedTypeSymbolVisitor : SymbolVisitor<NamedTypeSymbolVisitor.Sta
 
         if (_requiredProperties.Count > 0)
             builder = builder.Required(_requiredProperties);
+
+        TraversalMode mode = _options.TraversalMode;
+        if (attributes.TraversalMode.Get<TraversalMode>(0) is TraversalMode traversalMode)
+            mode = traversalMode;
+
+        if (mode.CheckFlag(TraversalMode.Bases))
+        {
+            INamedTypeSymbol? @base = symbol.BaseType;
+            while (@base is not null && @base.SpecialType is not SpecialType.System_Object)
+            {
+                NamedTypeSymbolVisitor baseSymbolVisitor = new(_syntaxVisitor, _semanticModelCache, _options with { TraversalMode = mode });
+                if (@base.Accept(baseSymbolVisitor, state) is Builder baseBuilder)
+                {
+                    builder = builder.MergeProperties(baseBuilder);
+                }
+
+                @base = @base.BaseType;
+            }
+        }
+
+        if (_options.TraversalMode.CheckFlag(TraversalMode.Interfaces))
+        {
+            symbol.AllInterfaces.ForEach(@interface =>
+            {
+                NamedTypeSymbolVisitor interfaceSymbolVisitor = new(_syntaxVisitor, _semanticModelCache, _options with { TraversalMode = mode });
+                if (@interface.Accept(interfaceSymbolVisitor, state) is Builder interfaceBuilder)
+                {
+                    builder = builder.MergeProperties(interfaceBuilder);
+                }
+            });
+        }
 
         return builder;
     }

@@ -30,7 +30,7 @@ internal class EnumSymbolVisitor : SymbolVisitor<GeneratorOptions, Builder?>
         {
             var names = symbol.GetMembers()
                 .OfType<IFieldSymbol>()
-                .Select(fieldSymbol => fieldSymbol.GetAttributeHandler<SchemaEnumValueAttribute>()[0] as string
+                .Select(fieldSymbol => fieldSymbol.GetAttributeHandler<SchemaEnumValueAttribute>(TraversalMode.SymbolOnly)[0] as string
                     ?? fieldSymbol.Name.Camelize())
                 .ToList();
 

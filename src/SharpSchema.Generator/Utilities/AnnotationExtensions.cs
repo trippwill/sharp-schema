@@ -21,8 +21,7 @@ internal static class AnnotationExtensions
 
     public static Builder? GetOverrideSchema(this ISymbol symbol)
     {
-        if (symbol.GetAttributeData<SchemaOverrideAttribute>() is AttributeData data
-            && data.GetConstructorArgument<string>(0) is string schemaString)
+        if (symbol.GetAttributeHandler<SchemaOverrideAttribute>().Get(0) is string schemaString)
         {
             try
             {

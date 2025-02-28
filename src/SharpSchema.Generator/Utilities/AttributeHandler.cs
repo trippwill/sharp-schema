@@ -7,6 +7,8 @@ namespace SharpSchema.Generator.Utilities;
 [ExcludeFromCodeCoverage]
 internal readonly struct AttributeHandler(AttributeData? data)
 {
+    public bool Present => data is not null;
+
     public object? this[int index]
     {
         get

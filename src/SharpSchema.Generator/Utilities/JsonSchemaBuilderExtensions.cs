@@ -51,6 +51,37 @@ internal static class JsonSchemaBuilderExtensions
         return builder;
     }
 
+    public static JsonSchemaBuilder MergeProperties(this JsonSchemaBuilder @base, JsonSchema apply)
+    {
+        using var trace = Tracer.Enter($"{apply.BaseUri}");
+
+        IReadOnlyDictionary<string, JsonSchema>? baseProperties = @base.Get<PropertiesKeyword>()?.Properties;
+        IReadOnlyDictionary<string, JsonSchema>? applyProperties = apply.GetProperties();
+
+        if (applyProperties is null)
+            return @base;
+
+        Dictionary<string, JsonSchema> properties = new(StringComparer.OrdinalIgnoreCase);
+        if (baseProperties is not null)
+        {
+            foreach ((string name, JsonSchema value) in baseProperties)
+                properties.Add(name, value);
+        }
+
+        if (apply.GetProperties() is IReadOnlyDictionary<string, JsonSchema> props)
+        {
+            foreach ((string name, JsonSchema applyValue) in props)
+            {
+                if (properties.TryGetValue(name, out JsonSchema? baseValue))
+                    properties[name] = baseValue.ApplySchema(applyValue);
+                else
+                    properties.Add(name, applyValue);
+            }
+        }
+
+        return properties.Count > 0 ? @base.Properties(properties) : @base;
+    }
+
     public static JsonSchemaBuilder UnsupportedObject(this JsonSchemaBuilder builder, string value)
     {
         builder.Add(new UnsupportedObjectKeyword(value));

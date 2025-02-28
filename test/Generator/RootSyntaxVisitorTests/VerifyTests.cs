@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Schema;
 using System.Threading.Tasks;
 using Json.Schema;
 using SharpSchema.Annotations;
@@ -40,23 +37,24 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
     }
 
     [Theory]
-    [InlineData(nameof(Record_WithValueParameters))]
+    [InlineData(nameof(Class_WithArrayProperties))]
+    [InlineData(nameof(Class_WithDictionaryProperties))]
+    [InlineData(nameof(Class_WithDocComments))]
+    [InlineData(nameof(Class_WithIgnoredProperty))]
+    [InlineData(nameof(Class_WithInvalidProperties))]
+    [InlineData(nameof(Class_WithRequiredProperties))]
+    [InlineData(nameof(Class_WithSchemaOverride))]
+    [InlineData(nameof(Class_WithTypeSchemaOverride))]
+    [InlineData(nameof(Class_ExtendsAbstractClass))]
     [InlineData(nameof(Record_WithDefaultValueParameter))]
-    [InlineData(nameof(Record_WithValueParametersAndProperty))]
-    [InlineData(nameof(Record_WithValueParametersAndPropertyInitializer))]
     [InlineData(nameof(Record_WithDefaultValueParametersAndConstantProperty))]
     [InlineData(nameof(Record_WithDocComments))]
     [InlineData(nameof(Record_WithIgnoredParameter))]
-    [InlineData(nameof(Class_WithDocComments))]
-    [InlineData(nameof(Class_WithArrayProperties))]
-    [InlineData(nameof(Class_WithDictionaryProperties))]
-    [InlineData(nameof(Class_WithInvalidProperties))]
-    [InlineData(nameof(Class_WithIgnoredProperty))]
-    [InlineData(nameof(Class_WithRequiredProperties))]
-    [InlineData(nameof(Struct_WithNullableValueTypes))]
-    [InlineData(nameof(Class_WithSchemaOverride))]
-    [InlineData(nameof(Class_WithTypeSchemaOverride))]
     [InlineData(nameof(Record_WithSchemaOverride))]
+    [InlineData(nameof(Record_WithValueParameters))]
+    [InlineData(nameof(Record_WithValueParametersAndProperty))]
+    [InlineData(nameof(Record_WithValueParametersAndPropertyInitializer))]
+    [InlineData(nameof(Struct_WithNullableValueTypes))]
     [InlineData(nameof(GameHall))]
     public Task Verify_DefaultOptions(string testName)
     {
@@ -148,7 +146,7 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
     [InlineData(TraversalMode.Bases)]
     [InlineData(TraversalMode.Interfaces)]
     [InlineData(TraversalMode.Full)]
-    [Theory(Skip = "Traversal is not correctly implemented.")]
+    [Theory]
     public Task Verify_Traversal(TraversalMode traversal)
     {
         GeneratorOptions options = new()

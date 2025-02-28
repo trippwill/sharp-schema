@@ -247,6 +247,9 @@ public class Class_WithRequiredProperties
     public string? Default { get; set; } = "default";
 }
 
+// -- Not Tested -- //
+
+
 public class Class_ExtendsAbstractClass : AbstractClass
 {
     public override string Name { get; set; }
@@ -333,7 +336,6 @@ public struct GameRoom
     public BridgeTable BridgeTable { get; set; }
 }
 
-[SchemaTraversalMode(TraversalMode.Bases)]
 public abstract record Table<T>(int PlayerCount) where T : BaseHand
 {
     public abstract T? DealerHand { get; }
@@ -341,24 +343,25 @@ public abstract record Table<T>(int PlayerCount) where T : BaseHand
     public IReadOnlyCollection<T> Hands { get; }
 }
 
-[SchemaTraversalMode(TraversalMode.Bases)]
+[SchemaTraversalMode(TraversalMode.SymbolOnly)]
 public record PokerTable(int PlayerCount) : Table<BaseHand.Poker>(PlayerCount)
 {
     public override BaseHand.Poker DealerHand { get; }
 }
 
-[SchemaTraversalMode(TraversalMode.Bases)]
+[SchemaTraversalMode(TraversalMode.SymbolOnly)]
 public record BlackjackTable(int PlayerCount) : Table<BaseHand.Blackjack>(PlayerCount)
 {
     public override BaseHand.Blackjack DealerHand { get; }
 }
 
-[SchemaTraversalMode(TraversalMode.Bases)]
+[SchemaTraversalMode(TraversalMode.SymbolOnly)]
 public record BridgeTable(int PlayerCount) : Table<BaseHand.Bridge>(PlayerCount)
 {
     public override BaseHand.Bridge? DealerHand => null;
 }
 
+[SchemaTraversalMode(TraversalMode.SymbolOnly)]
 public record WhistTable(int PlayerCount) : Table<BaseHand.Bridge>(PlayerCount)
 {
     public override BaseHand.Bridge? DealerHand => null;
@@ -370,7 +373,7 @@ public abstract record BaseHand(int Size)
 
     public List<Card> Cards { get; set; }
 
-    [SchemaTraversalMode(TraversalMode.Bases)]
+    [SchemaTraversalMode(TraversalMode.SymbolOnly)]
     public record Poker() : BaseHand(5)
     {
         public override string Game => "Poker";
@@ -378,7 +381,7 @@ public abstract record BaseHand(int Size)
         public bool IsRoyalFlush => Cards.Count == Size && Cards.All(c => c.IsFaceCard);
     }
 
-    [SchemaTraversalMode(TraversalMode.Bases)]
+    [SchemaTraversalMode(TraversalMode.SymbolOnly)]
     public record Blackjack() : BaseHand(2)
     {
         public override string Game => "Blackjack";
@@ -393,7 +396,7 @@ public abstract record BaseHand(int Size)
         });
     }
 
-    [SchemaTraversalMode(TraversalMode.Bases)]
+    [SchemaTraversalMode(TraversalMode.SymbolOnly)]
     public record Bridge() : BaseHand(13)
     {
         public override string Game => "Bridge";

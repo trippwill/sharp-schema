@@ -42,6 +42,10 @@ public record MemberMeta(
 
         public static SymbolVisitor Default { get; } = new();
 
+        private SymbolVisitor()
+        {
+        }
+
         /// <summary>
         /// Visits a named type symbol and extracts <see cref="MemberMeta"/>.
         /// </summary>

@@ -96,8 +96,13 @@ internal static class CommonSchemas
     public static Builder UnsupportedObject(string value) => new Builder()
         .UnsupportedObject(value);
 
-    public static Builder UnsupportedObject(string format, params object[] args) => new Builder()
-        .UnsupportedObject(string.Format(format, args));
+    public static Builder UnsupportedObject(string format, params object[] args)
+    {
+        string formatted = string.Format(format, args);
+        using var trace = Tracer.Enter(formatted);
+        return new Builder()
+            .UnsupportedObject(formatted);
+    }
 
     public static Builder DefRef(string key) => new Builder()
         .Ref(string.Format(DefUriFormat, key));

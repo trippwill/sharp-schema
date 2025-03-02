@@ -9,20 +9,14 @@ namespace SharpSchema.Generator.Resolvers;
 
 using Builder = JsonSchemaBuilder;
 
-internal class EnumSymbolVisitor : SymbolVisitor<GeneratorOptions, Builder?>
+internal class EnumResolver
 {
-    public static EnumSymbolVisitor Instance { get; } = new EnumSymbolVisitor();
-
-    private EnumSymbolVisitor() { }
-
-    protected override Builder? DefaultResult => null;
-
-    public override Builder? VisitNamedType(INamedTypeSymbol symbol, GeneratorOptions options)
+    public static Builder? Resolve(INamedTypeSymbol symbol, GeneratorOptions options)
     {
         using var trace = Tracer.Enter(symbol.Name);
 
         if (symbol.TypeKind != TypeKind.Enum)
-            return DefaultResult;
+            return null;
 
         trace.WriteLine($"{options.EnumMode}");
 
@@ -47,6 +41,6 @@ internal class EnumSymbolVisitor : SymbolVisitor<GeneratorOptions, Builder?>
             }
         }
 
-        return DefaultResult;
+        return null;
     }
 }

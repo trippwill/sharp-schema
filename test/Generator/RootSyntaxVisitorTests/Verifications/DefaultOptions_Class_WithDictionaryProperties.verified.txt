@@ -23,11 +23,6 @@
     "referenceTypes"
   ],
   "$defs": {
-    "T:System.Int32": {
-      "type": "integer",
-      "minimum": -2147483648,
-      "maximum": 2147483647
-    },
     "T:SharpSchema.Generator.TestData.Address": {
       "type": "object",
       "title": "Address",
@@ -45,6 +40,11 @@
         "street",
         "city"
       ]
+    },
+    "T:System.Int32": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
     }
   }
 }

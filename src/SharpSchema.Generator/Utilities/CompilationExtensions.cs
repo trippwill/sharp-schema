@@ -4,11 +4,9 @@ using SharpSchema.Generator.Model;
 
 namespace SharpSchema.Generator.Utilities;
 
-internal readonly record struct NamedType(TypeDeclarationSyntax SyntaxNode, INamedTypeSymbol Symbol);
-
 internal static class CompilationExtensions
 {
-    internal static IEnumerable<NamedType> GetAllNamedTypes(this Compilation compilation, SemanticModelCache semanticModelCache)
+    internal static IEnumerable<DeclaredTypePair> GetAllNamedTypes(this Compilation compilation, SemanticModelCache semanticModelCache)
     {
         foreach (SyntaxTree tree in compilation.SyntaxTrees)
         {

@@ -1,5 +1,5 @@
-﻿using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using Json.Schema;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -15,28 +15,14 @@ using Builder = JsonSchemaBuilder;
 
 internal partial class LeafSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 {
-    private readonly Compilation _compilation;
+    private readonly RootContext _context;
     private readonly GeneratorOptions _options;
-    private readonly SemanticModelCache _semanticModelCache;
-    private readonly MemberMeta.SymbolVisitor _metadataVisitor;
-    private readonly CollectionResolver _collectionResolver;
-    private readonly Dictionary<string, Builder> _cachedTypeSchemas;
-    private readonly Dictionary<string, INamedTypeSymbol> _cachedAbstractSymbols;
 
-    public LeafSyntaxVisitor(Compilation compilation, SemanticModelCache semanticModelCache,  GeneratorOptions options)
+    public LeafSyntaxVisitor(RootContext context, GeneratorOptions options)
     {
-        _compilation = compilation;
+        _context = context;
         _options = options;
-        _semanticModelCache = semanticModelCache;
-        _metadataVisitor = new();
-        _collectionResolver = new(compilation);
-        _cachedTypeSchemas = [];
-        _cachedAbstractSymbols = [];
     }
-
-    internal Dictionary<string, Builder> CachedTypeSchemas => _cachedTypeSchemas;
-
-    internal Dictionary<string, INamedTypeSymbol> CachedAbstractSymbols => _cachedAbstractSymbols;
 
     [ExcludeFromCodeCoverage]
     public override Builder? DefaultVisit(SyntaxNode node)
@@ -79,22 +65,22 @@ internal partial class LeafSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         Throw.IfNullArgument(node);
         using Tracer.TraceScope trace = Tracer.Enter(node.Identifier.Text);
 
-        if (node.GetDeclaredSymbol(_semanticModelCache) is not INamedTypeSymbol enumSymbol)
+        if (node.GetDeclaredSymbol(_context.SemanticModelCache) is not INamedTypeSymbol enumSymbol)
             return CommonSchemas.UnsupportedObject(Unsupported.EnumMessage, node.Identifier);
 
         if (enumSymbol.GetOverrideSchema() is Builder overrideSchema)
             return overrideSchema;
 
         string cacheKey = enumSymbol.GetDefCacheKey();
-        if (!_cachedTypeSchemas.TryGetValue(cacheKey, out Builder? cachedSchema))
-        {
-            MemberMeta metadata = Throw.ForUnexpectedNull(_metadataVisitor.Visit(enumSymbol));
+        if (_context.CachedTypeSchemas.TryGetValue(cacheKey, out Builder? cachedSchema))
+            return CommonSchemas.DefRef(cacheKey);
 
-            Builder builder = EnumSymbolVisitor.Instance.Visit(enumSymbol, _options) ??
-                CommonSchemas.UnsupportedObject(Unsupported.EnumMessage, node.Identifier);
+        MemberMeta metadata = Throw.IfUnexpectedNull(MemberMeta.SymbolVisitor.Default.Visit(enumSymbol));
 
-            _cachedTypeSchemas[cacheKey] = builder.ApplyMemberMeta(metadata);
-        }
+        Builder builder = EnumResolver.Resolve(enumSymbol, _options) ??
+            CommonSchemas.UnsupportedObject(Unsupported.EnumMessage, node.Identifier);
+
+        _context.CachedTypeSchemas[cacheKey] = builder.ApplyMemberMeta(metadata);
 
         return CommonSchemas.DefRef(cacheKey);
     }
@@ -105,12 +91,14 @@ internal partial class LeafSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 
         using Tracer.TraceScope trace = Tracer.Enter(node.Identifier.Text);
 
-        TypeInfo typeInfo = node.GetTypeInfo(_semanticModelCache);
+        TypeInfo typeInfo = node.GetTypeInfo(_context.SemanticModelCache);
         if (typeInfo.ConvertedType is not ITypeSymbol typeSymbol)
             return CommonSchemas.UnsupportedObject(Unsupported.IdentifierMessage, node.Identifier);
 
-        return this.Visit(typeSymbol.FindDeclaringSyntax())
-            ?? CommonSchemas.UnsupportedObject(Unsupported.DeclarationMessage, node.Identifier);
+        if (typeSymbol.FindDeclaringSyntax() is SyntaxNode syntaxNode)
+            return this.Visit(syntaxNode);
+
+        return null;
     }
 
     public override Builder? VisitGenericName(GenericNameSyntax node)
@@ -121,70 +109,78 @@ internal partial class LeafSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         if (node.IsUnboundGenericName)
             return CommonSchemas.UnsupportedObject(Unsupported.UnboundGenericMessage, node.Identifier);
 
-        SemanticModel semanticModel = _semanticModelCache.GetSemanticModel(node);
-
-        if (semanticModel.GetTypeInfo(node).Type is not INamedTypeSymbol boundTypeSymbol)
+        if (node.GetTypeInfo(_context.SemanticModelCache).Type is not INamedTypeSymbol boundTypeSymbol)
             return CommonSchemas.UnsupportedObject(Unsupported.TypeSymbolMessage, node.Identifier.Text);
 
-        Builder? elementSchema = null;
-        var (kind, keyType, elementSymbol) = _collectionResolver.Resolve(boundTypeSymbol);
-        if (kind is CollectionKind.Dictionary or CollectionKind.Array)
+        if (boundTypeSymbol.HasUnresolvedTypeArguments())
         {
-            elementSchema = node.TypeArgumentList.Arguments.Last().Accept(this);
+            trace.WriteLine("Unresolved type arguments found.");
+            return null;
         }
 
-        if (kind is CollectionKind.Dictionary)
+        var (kind, keyType, elementSymbol) = _context.CollectionResolver.Resolve(boundTypeSymbol);
+
+        return kind switch
         {
-            if (elementSchema is null)
+            CollectionKind.Dictionary => HandleDictionaryType(node, keyType, elementSymbol),
+            CollectionKind.Array => HandleArrayType(node, elementSymbol),
+            _ => HandleGenericType(node, boundTypeSymbol)
+        };
+
+        // -- Local functions --
+
+        Builder? HandleDictionaryType(GenericNameSyntax node, SchemaValueType keyType, ITypeSymbol elementSymbol)
+        {
+            if (node.TypeArgumentList.Arguments[^1].Accept(this) is not Builder elementSchema)
                 return CommonSchemas.UnsupportedObject(Unsupported.DictionaryElementMessage, elementSymbol.Name);
 
-            Builder builder = CommonSchemas.Object;
+            if (keyType is SchemaValueType.String)
+                return CommonSchemas.Object.AdditionalProperties(elementSchema);
 
-            if (keyType is not SchemaValueType.String)
+            return _options.DictionaryKeyMode switch
             {
-                switch (_options.DictionaryKeyMode)
-                {
-                    case DictionaryKeyMode.Skip:
-                        return null;
-                    case DictionaryKeyMode.Strict:
-                        return CommonSchemas.UnsupportedObject(Unsupported.KeyTypeMessage, keyType);
-                    case DictionaryKeyMode.Loose:
-                        builder = builder.Comment($"Key type '{keyType}' must be convertible to string");
-                        break;
-                    case DictionaryKeyMode.Silent:
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Unexpected dictionary key mode '{_options.DictionaryKeyMode}'.");
-                }
-            }
-
-            return builder.AdditionalProperties(elementSchema);
+                DictionaryKeyMode.Skip => null,
+                DictionaryKeyMode.Strict => CommonSchemas.UnsupportedObject(Unsupported.KeyTypeMessage, keyType),
+                DictionaryKeyMode.Loose => CommonSchemas.Object
+                    .Comment($"Key type '{keyType}' must be convertible to string")
+                    .AdditionalProperties(elementSchema),
+                DictionaryKeyMode.Silent => CommonSchemas.Object
+                    .AdditionalProperties(elementSchema),
+                _ => Throw.UnknownEnumValue<Builder?>(_options.DictionaryKeyMode)
+            };
         }
 
-        if (kind is CollectionKind.Array)
+        Builder? HandleArrayType(GenericNameSyntax node, ITypeSymbol elementSymbol)
         {
+            Builder? elementSchema = node.TypeArgumentList.Arguments[^1].Accept(this);
             if (elementSchema is null)
                 return CommonSchemas.UnsupportedObject(Unsupported.ArrayElementMessage, elementSymbol);
 
             return CommonSchemas.ArrayOf(elementSchema);
         }
 
-        Builder? boundTypeBuilder = this.Visit(boundTypeSymbol.FindDeclaringSyntax<BaseTypeDeclarationSyntax>());
-        if (boundTypeBuilder is null)
-            return CommonSchemas.UnsupportedObject(Unsupported.GenericTypeMessage, node.Identifier);
-
-        // Add to the oneOf for the unbound generic type
-        INamedTypeSymbol unboundGeneric = boundTypeSymbol.ConstructUnboundGenericType();
-        string cacheKey = unboundGeneric.GetDefCacheKey();
-        if (_cachedTypeSchemas.TryGetValue(cacheKey, out Builder? cachedSchema))
+        Builder? HandleGenericType(GenericNameSyntax node, INamedTypeSymbol boundTypeSymbol)
         {
-            IReadOnlyList<JsonSchema>? currentOneOf = cachedSchema.Get<OneOfKeyword>()?.Schemas;
-            cachedSchema = currentOneOf is not null
-                ? cachedSchema.OneOf(currentOneOf.Append(boundTypeBuilder))
-                : CommonSchemas.Object.OneOf(cachedSchema, boundTypeBuilder);
-        }
+            Builder? boundTypeBuilder = Visit(boundTypeSymbol.FindDeclaringSyntax<BaseTypeDeclarationSyntax>());
+            if (boundTypeBuilder is null)
+                return CommonSchemas.UnsupportedObject(Unsupported.GenericTypeMessage, node.Identifier);
 
-        return boundTypeBuilder;
+            // Add to the oneOf for the unbound generic type
+            INamedTypeSymbol unboundGeneric = boundTypeSymbol.ConstructUnboundGenericType();
+            string cacheKey = unboundGeneric.GetDefCacheKey();
+
+            if (_context.CachedTypeSchemas.TryGetValue(cacheKey, out Builder? cachedSchema) &&
+                cachedSchema.Get<OneOfKeyword>()?.Schemas is IReadOnlyList<JsonSchema> currentOneOf)
+            {
+                _context.CachedTypeSchemas[cacheKey] = cachedSchema.OneOf(currentOneOf.Append(boundTypeBuilder));
+            }
+            else if (_context.CachedTypeSchemas.TryGetValue(cacheKey, out cachedSchema))
+            {
+                _context.CachedTypeSchemas[cacheKey] = CommonSchemas.Object.OneOf(cachedSchema, boundTypeBuilder);
+            }
+
+            return boundTypeBuilder;
+        }
     }
 
     public override Builder? VisitNullableType(NullableTypeSyntax node)
@@ -192,11 +188,10 @@ internal partial class LeafSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         Throw.IfNullArgument(node);
         using Tracer.TraceScope trace = Tracer.Enter(node.Kind().ToString());
 
-        Builder? elementSchema = node.ElementType.Accept(this);
-        if (elementSchema is null)
-            return CommonSchemas.UnsupportedObject(Unsupported.NullableElementMessage, node.ElementType);
+        if (node.ElementType.Accept(this) is Builder elementSchema)
+            return CommonSchemas.Nullable(elementSchema);
 
-        return CommonSchemas.Nullable(elementSchema);
+        return null;
     }
 
     public override Builder? VisitPredefinedType(PredefinedTypeSyntax node)
@@ -210,13 +205,13 @@ internal partial class LeafSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         if (node.Keyword.IsKind(SyntaxKind.BoolKeyword))
             return CommonSchemas.Boolean;
 
-        if (_semanticModelCache.GetSemanticModel(node).GetTypeInfo(node).Type is not INamedTypeSymbol typeSymbol)
+        if (_context.SemanticModelCache.GetSemanticModel(node).GetTypeInfo(node).Type is not INamedTypeSymbol typeSymbol)
             return CommonSchemas.UnsupportedObject(Unsupported.PredefinedTypeMessage, node);
 
         bool shouldCache = _options.NumberMode is NumberMode.StrictDefs;
-
         string cacheKey = typeSymbol.GetDefCacheKey();
-        if (shouldCache && _cachedTypeSchemas.TryGetValue(cacheKey, out Builder? cachedSchema))
+
+        if (shouldCache && _context.CachedTypeSchemas.TryGetValue(cacheKey, out Builder? cachedSchema))
             return CommonSchemas.DefRef(cacheKey);
 
         if (!typeSymbol.IsJsonDefinedType(_options.NumberMode, out Builder? valueTypeSchema))
@@ -224,7 +219,7 @@ internal partial class LeafSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 
         if (shouldCache)
         {
-            _cachedTypeSchemas[cacheKey] = valueTypeSchema;
+            _context.CachedTypeSchemas[cacheKey] = valueTypeSchema;
             return CommonSchemas.DefRef(cacheKey);
         }
 
@@ -236,44 +231,93 @@ internal partial class LeafSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         Throw.IfNullArgument(node);
         using Tracer.TraceScope trace = Tracer.Enter(node.Kind().ToString());
 
-        Builder? elementSchema = node.ElementType.Accept(this);
-        if (elementSchema is null)
-            return CommonSchemas.UnsupportedObject(Unsupported.ArrayElementMessage, node.ElementType);
+        if (node.ElementType.Accept(this) is Builder elementSchema)
+            return CommonSchemas.ArrayOf(elementSchema);
 
-        return CommonSchemas.ArrayOf(elementSchema);
+        return null;
     }
 
+    public override Builder? VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+    {
+        Throw.IfNullArgument(node);
+        using Tracer.TraceScope trace = Tracer.Enter(node.Identifier.Text);
+
+        Builder? typeBuilder = node.Type.Accept(this);
+        if (typeBuilder is null)
+            return null;
+
+        if (node.ExpressionBody is ArrowExpressionClauseSyntax aec
+            && GetConstantValue(aec.Expression) is JsonNode constantValue)
+        {
+            typeBuilder = CommonSchemas.Const(constantValue);
+        }
+        else if (ExtractDefaultValue(node) is JsonNode defaultValue)
+        {
+            typeBuilder = typeBuilder.Default(defaultValue);
+        }
+
+        return typeBuilder;
+
+        // -- Local functions --
+
+        JsonNode? ExtractDefaultValue(PropertyDeclarationSyntax propertyDeclaration)
+        {
+            return propertyDeclaration.Initializer is EqualsValueClauseSyntax evc
+                ? GetConstantValue(evc.Value)
+                : null;
+        }
+
+        JsonNode? GetConstantValue(SyntaxNode node)
+        {
+            SemanticModel sm = _context.SemanticModelCache.GetSemanticModel(node);
+            return sm.GetConstantValue(node) is Optional<object?> optValue
+                && optValue.HasValue
+                ? JsonValue.Create(optValue.Value)
+                : (JsonNode?)null;
+        }
+    }
+
+    /// <summary>
+    /// Creates a type schema for the specified type declaration syntax.
+    /// </summary>
+    /// <param name="node">The type declaration syntax node.</param>
+    /// <returns>A JSON schema builder for the type.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when node is null.</exception>
     public Builder CreateTypeSchema(TypeDeclarationSyntax node)
     {
         Throw.IfNullArgument(node);
 
-        if (node.GetDeclaredSymbol(_semanticModelCache) is not INamedTypeSymbol typeSymbol)
+        if (node.GetDeclaredSymbol(_context.SemanticModelCache) is not INamedTypeSymbol typeSymbol)
             return CommonSchemas.UnsupportedObject(Unsupported.TypeMessage, node.Identifier);
 
         return this.CreateTypeSchema(typeSymbol, node);
     }
 
+    /// <summary>
+    /// Creates a type schema for the specified symbol and declaration syntax.
+    /// </summary>
+    /// <param name="symbol">The named type symbol.</param>
+    /// <param name="node">The type declaration syntax node.</param>
+    /// <param name="traversalMode">Optional traversal mode override.</param>
+    /// <returns>A JSON schema builder for the type.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when node is null.</exception>
     public Builder CreateTypeSchema(INamedTypeSymbol symbol, TypeDeclarationSyntax node, TraversalMode? traversalMode = null)
     {
         Throw.IfNullArgument(node);
         using Tracer.TraceScope trace = Tracer.Enter(node.Identifier.Text);
 
-        return symbol.Accept(
-            new NamedTypeSymbolVisitor( // Always create a new visitor instance
-                this,
-                _semanticModelCache,
-                _options),
-            argument: null)
-            ?? CommonSchemas.UnsupportedObject(symbol.Name);
+        NamedTypeResolver visitor = new(_context);
+        return visitor.Resolve(symbol, _options) ?? CommonSchemas.UnsupportedObject(symbol.Name);
     }
 
     private Builder? VisitTypeDeclaration(TypeDeclarationSyntax node, Tracer.TraceScope trace)
     {
-        if (_semanticModelCache.GetSemanticModel(node).GetDeclaredSymbol(node) is not INamedTypeSymbol typeSymbol)
+        if (node.GetDeclaredSymbol(_context.SemanticModelCache) is not INamedTypeSymbol typeSymbol)
             return CommonSchemas.UnsupportedObject(Unsupported.SymbolMessage, node.Identifier.ValueText);
 
         string typeId = typeSymbol.GetDefCacheKey();
-        if (_cachedTypeSchemas.TryGetValue(typeId, out _))
+
+        if (_context.CachedTypeSchemas.TryGetValue(typeId, out _))
             return CommonSchemas.DefRef(typeId);
 
         if (typeSymbol.GetOverrideSchema() is Builder overrideSchema)
@@ -282,20 +326,21 @@ internal partial class LeafSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         if (typeSymbol.IsAbstract)
         {
             trace.WriteLine($"Found abstract type '{typeSymbol.Name}'.");
-            if (!_cachedAbstractSymbols.TryGetValue(typeId, out _))
+            if (!_context.CachedAbstractSymbols.ContainsKey(typeId))
             {
-                _cachedAbstractSymbols.Add(typeId, typeSymbol);
+                _context.CachedAbstractSymbols.Add(typeId, typeSymbol);
             }
 
             return CommonSchemas.DefRef(typeId);
         }
 
         AttributeHandler schemaTraversal = typeSymbol.GetAttributeHandler<SchemaTraversalModeAttribute>();
+        TraversalMode effectiveTraversalMode = schemaTraversal.Get<TraversalMode>(0) ?? _options.TraversalMode;
 
         // Regular concrete type.
-        Builder builder = CreateTypeSchema(typeSymbol, node, schemaTraversal.Get<TraversalMode>(0) ?? _options.TraversalMode);
+        Builder builder = CreateTypeSchema(typeSymbol, node, effectiveTraversalMode);
 
-        _cachedTypeSchemas[typeId] = builder;
+        _context.CachedTypeSchemas[typeId] = builder;
         return CommonSchemas.DefRef(typeId);
     }
 }

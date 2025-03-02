@@ -58,22 +58,13 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
     [InlineData(nameof(GameHall))]
     public Task Verify_DefaultOptions(string testName)
     {
-        Tracer.EnableTiming = true;
-
         RootSyntaxVisitor visitor = _fixture.GetVisitor(GeneratorOptions.Default);
         JsonSchemaBuilder builder = _fixture.GetJsonSchemaBuilder(visitor, testName);
         _output.WriteSeparator();
+
         string schemaString = builder.Build().SerializeToJson();
         _output.WriteLine(schemaString);
         _output.WriteSeparator();
-
-        //// Get type instance from test name
-        //Type? type = Assembly.GetExecutingAssembly().GetType($"SharpSchema.Generator.TestData.{testName}");
-        //if (type is not null)
-        //{
-        //    System.Text.Json.Nodes.JsonNode n = JsonSchemaExporter.GetJsonSchemaAsNode(JsonSerializerOptions.Default, type, JsonSchemaExporterOptions.Default);
-        //    _output.WriteLine(n.ToString());
-        //}
 
         return Verify(schemaString, "DefaultOptions", testName);
     }

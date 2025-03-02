@@ -29,6 +29,18 @@
       ],
       "title": "Optional"
     },
+    "defaultRequired": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "default",
+      "title": "Default required"
+    },
     "default": {
       "oneOf": [
         {
@@ -45,7 +57,7 @@
   "required": [
     "requiredInt",
     "required",
-    "default"
+    "defaultRequired"
   ],
   "$defs": {
     "T:System.Int32": {

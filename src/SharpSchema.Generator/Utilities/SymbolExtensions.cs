@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Json.Schema;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpSchema.Annotations;
 using SharpSchema.Generator.Model;
 
@@ -301,6 +302,14 @@ internal static class SymbolExtensions
         // Handle concrete generic types
         string runtimeTypeName = runtimeType.FullName!;
         return normalizedSymbolName.SequenceEqual(runtimeTypeName.AsSpan());
+    }
+
+    public static bool HasUnresolvedTypeArguments(this INamedTypeSymbol namedTypeSymbol)
+    {
+        if (namedTypeSymbol.IsGenericType)
+            return namedTypeSymbol.TypeArguments.Any(arg => arg.TypeKind == TypeKind.TypeParameter);
+
+        return false;
     }
 
     /// <summary>

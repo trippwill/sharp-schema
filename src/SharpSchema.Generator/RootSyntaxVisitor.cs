@@ -15,9 +15,8 @@ using Builder = JsonSchemaBuilder;
 /// </summary>
 public class RootSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
 {
-    private readonly LeafSyntaxVisitor _cachingVisitor;
-    private readonly Compilation _compilation;
-    private readonly SemanticModelCache _semanticModelCache;
+    private readonly LeafSyntaxVisitor _leafSyntaxVisitor;
+    private readonly RootContext _context;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RootSyntaxVisitor"/> class.
@@ -29,9 +28,8 @@ public class RootSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
         Throw.IfNullArgument(compilation);
         Throw.IfNullArgument(options);
 
-        _compilation = compilation;
-        _semanticModelCache = new(compilation);
-        _cachingVisitor = new(compilation, _semanticModelCache, options);
+        _context = new RootContext(compilation, new SemanticModelCache(compilation));
+        _leafSyntaxVisitor = new(_context, options);
     }
 
     /// <inheritdoc />
@@ -103,26 +101,26 @@ public class RootSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
     /// <returns>A JSON schema builder or null.</returns>
     private Builder? VisitTypeDeclaration(TypeDeclarationSyntax node)
     {
-        Builder builder = _cachingVisitor.CreateTypeSchema(node);
+        Builder builder = _leafSyntaxVisitor.CreateTypeSchema(node);
 
-        Dictionary<string, INamedTypeSymbol> cachedAbstractSymbols = _cachingVisitor.CachedAbstractSymbols;
-        Dictionary<string, Builder> cachedTypeSchemas = _cachingVisitor.CachedTypeSchemas;
+        Dictionary<string, INamedTypeSymbol> cachedAbstractSymbols = _context.CachedAbstractSymbols;
+        Dictionary<string, Builder> cachedTypeSchemas = _context.CachedTypeSchemas;
 
         if (cachedAbstractSymbols.Count > 0)
         {
             using var trace = Tracer.Enter("Building abstract type schemas.");
-            ImmutableArray<NamedType> namedTypes = [.. _compilation.GetAllNamedTypes(_semanticModelCache)];
+            ImmutableArray<DeclaredTypePair> namedTypes = [.. _context.Compilation.GetAllNamedTypes(_context.SemanticModelCache)];
 
             foreach ((string key, INamedTypeSymbol abstractSymbol) in cachedAbstractSymbols)
             {
                 trace.WriteLine($"Building schema for abstract type '{abstractSymbol.Name}'.");
 
-                IEnumerable<NamedType> subTypes = namedTypes
+                IEnumerable<DeclaredTypePair> subTypes = namedTypes
                     .Where(t => t.Symbol.InheritsFrom(abstractSymbol));
 
                 List<JsonSchema> subSchemas = [];
 
-                foreach (NamedType subType in subTypes)
+                foreach (DeclaredTypePair subType in subTypes)
                 {
                     // Check if the sub-type is already cached
                     string cacheKey = subType.Symbol.GetDefCacheKey();
@@ -134,7 +132,7 @@ public class RootSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
                     else
                     {
                         trace.WriteLine($"Building schema for '{subType.Symbol.Name}'.");
-                        Builder? subSchema = _cachingVisitor.CreateTypeSchema(subType.Symbol, subType.SyntaxNode);
+                        Builder? subSchema = _leafSyntaxVisitor.CreateTypeSchema(subType.Symbol, subType.SyntaxNode);
                         if (subSchema is not null)
                         {
                             cachedTypeSchemas[cacheKey] = subSchema;
@@ -150,15 +148,17 @@ public class RootSyntaxVisitor : CSharpSyntaxVisitor<Builder?>
                     cachedTypeSchemas[key] = abstractSchema;
                 }
                 else
+                {
                     trace.WriteLine($"No sub-types found for '{abstractSymbol.Name}'.");
+                }
             }
         }
 
         if (cachedTypeSchemas.Count > 0)
         {
-            builder.Defs(cachedTypeSchemas.ToDictionary(
-            p => p.Key,
-            p => p.Value.Build()));
+            builder.Defs(cachedTypeSchemas.ToImmutableSortedDictionary(
+                p => p.Key,
+                p => p.Value.Build()));
         }
 
         return builder;

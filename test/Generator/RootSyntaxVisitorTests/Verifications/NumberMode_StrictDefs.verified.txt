@@ -77,25 +77,50 @@
     "char"
   ],
   "$defs": {
+    "T:System.Byte": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "T:System.Char": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1
+    },
+    "T:System.Decimal": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335
+    },
+    "T:System.Double": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335
+    },
+    "T:System.Int16": {
+      "type": "integer",
+      "minimum": -32768,
+      "maximum": 32767
+    },
     "T:System.Int32": {
       "type": "integer",
       "minimum": -2147483648,
       "maximum": 2147483647
     },
-    "T:System.Byte": {
+    "T:System.Int64": {
       "type": "integer",
-      "minimum": 0,
-      "maximum": 255
+      "minimum": -9223372036854775808,
+      "maximum": 9223372036854775807
     },
     "T:System.SByte": {
       "type": "integer",
       "minimum": -128,
       "maximum": 127
     },
-    "T:System.Int16": {
-      "type": "integer",
-      "minimum": -32768,
-      "maximum": 32767
+    "T:System.Single": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335
     },
     "T:System.UInt16": {
       "type": "integer",
@@ -107,35 +132,10 @@
       "minimum": 0,
       "maximum": 4294967295
     },
-    "T:System.Int64": {
-      "type": "integer",
-      "minimum": -9223372036854775808,
-      "maximum": 9223372036854775807
-    },
     "T:System.UInt64": {
       "type": "integer",
       "minimum": 0,
       "maximum": 18446744073709551615
-    },
-    "T:System.Single": {
-      "type": "number",
-      "minimum": -79228162514264337593543950335,
-      "maximum": 79228162514264337593543950335
-    },
-    "T:System.Double": {
-      "type": "number",
-      "minimum": -79228162514264337593543950335,
-      "maximum": 79228162514264337593543950335
-    },
-    "T:System.Decimal": {
-      "type": "number",
-      "minimum": -79228162514264337593543950335,
-      "maximum": 79228162514264337593543950335
-    },
-    "T:System.Char": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 1
     }
   }
 }

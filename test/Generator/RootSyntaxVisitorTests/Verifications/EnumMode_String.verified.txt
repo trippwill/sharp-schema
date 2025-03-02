@@ -20,35 +20,6 @@
     "deck"
   ],
   "$defs": {
-    "T:SharpSchema.Generator.TestData.Card.SuitKind": {
-      "type": "string",
-      "enum": [
-        "spades",
-        "hearts",
-        "clubs",
-        "diamonds"
-      ],
-      "title": "Suit kind"
-    },
-    "T:SharpSchema.Generator.TestData.Card.RankKind": {
-      "type": "string",
-      "enum": [
-        "ace",
-        "two",
-        "three",
-        "four",
-        "five",
-        "six",
-        "seven",
-        "eight",
-        "nine",
-        "ten",
-        "jack",
-        "queen",
-        "king"
-      ],
-      "title": "Rank kind"
-    },
     "T:SharpSchema.Generator.TestData.Card": {
       "type": "object",
       "title": "Card",
@@ -71,6 +42,35 @@
         "rank",
         "isFaceCard"
       ]
+    },
+    "T:SharpSchema.Generator.TestData.Card.RankKind": {
+      "type": "string",
+      "enum": [
+        "ace",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "jack",
+        "queen",
+        "king"
+      ],
+      "title": "Rank kind"
+    },
+    "T:SharpSchema.Generator.TestData.Card.SuitKind": {
+      "type": "string",
+      "enum": [
+        "spades",
+        "hearts",
+        "clubs",
+        "diamonds"
+      ],
+      "title": "Suit kind"
     }
   }
 }

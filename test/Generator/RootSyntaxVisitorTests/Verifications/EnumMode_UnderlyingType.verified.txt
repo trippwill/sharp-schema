@@ -20,14 +20,6 @@
     "deck"
   ],
   "$defs": {
-    "T:SharpSchema.Generator.TestData.Card.SuitKind": {
-      "type": "integer",
-      "title": "Suit kind"
-    },
-    "T:SharpSchema.Generator.TestData.Card.RankKind": {
-      "type": "integer",
-      "title": "Rank kind"
-    },
     "T:SharpSchema.Generator.TestData.Card": {
       "type": "object",
       "title": "Card",
@@ -50,6 +42,14 @@
         "rank",
         "isFaceCard"
       ]
+    },
+    "T:SharpSchema.Generator.TestData.Card.RankKind": {
+      "type": "integer",
+      "title": "Rank kind"
+    },
+    "T:SharpSchema.Generator.TestData.Card.SuitKind": {
+      "type": "integer",
+      "title": "Suit kind"
     }
   }
 }

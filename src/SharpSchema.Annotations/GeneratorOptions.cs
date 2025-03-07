@@ -20,6 +20,22 @@ record GeneratorOptions(
     NumberMode NumberMode = NumberMode.StrictDefs)
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="GeneratorOptions"/> class by copying the values from another instance.
+    /// </summary>
+    /// <param name="options">The <see cref="GeneratorOptions"/> instance to copy values from.</param>
+    public GeneratorOptions(GeneratorOptions options)
+    {
+        if (options is null)
+            throw new System.ArgumentNullException(nameof(options));
+
+        AccessibilityMode = options.AccessibilityMode;
+        TraversalMode = options.TraversalMode;
+        DictionaryKeyMode = options.DictionaryKeyMode;
+        EnumMode = options.EnumMode;
+        NumberMode = options.NumberMode;
+    }
+
+    /// <summary>
     /// Gets the default generator options.
     /// </summary>
     public static GeneratorOptions Default { get; } = new GeneratorOptions();

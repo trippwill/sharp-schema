@@ -28,13 +28,24 @@ public class TestDataFixture
                 "RootSyntaxVisitorTests",
                 "TestData.cs");
 
+        string pathToAccessibility = PathHelper.GetRepoPath(
+                "test",
+                "Generator",
+                "RootSyntaxVisitorTests",
+                "TestData.Accessibility.cs");
+
         // Create an array of syntax tree from all cs files in src/SharpSchema.Annotations/
         string[] annotationFiles = Directory.GetFiles(
             PathHelper.GetRepoPath("src", "SharpSchema.Annotations"), "*.cs", SearchOption.AllDirectories);
 
         List<SyntaxTree> annotationSyntaxTrees = [.. annotationFiles.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file)))];
 
-        _syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText(pathToTestData));
+        _syntaxTree = CSharpSyntaxTree.ParseText(
+            string.Join(
+                Environment.NewLine,
+                File.ReadAllText(pathToTestData),
+                File.ReadAllText(pathToAccessibility)));
+
         _compilation = CSharpCompilation.Create("TestDataCompilation")
             .AddReferences(
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),

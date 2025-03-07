@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Accessibility class override",
+  "properties": {
+    "internal": {
+      "type": "string",
+      "title": "Internal"
+    },
+    "private": {
+      "type": "string",
+      "title": "Private"
+    }
+  },
+  "required": [
+    "internal",
+    "private"
+  ]
+}

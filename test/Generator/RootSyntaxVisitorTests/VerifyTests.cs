@@ -69,6 +69,25 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
         return Verify(schemaString, "DefaultOptions", testName);
     }
 
+    [Theory]
+    [InlineData(nameof(Accessibility_Default))]
+    [InlineData(nameof(Accessibility_ClassOverride))]
+    [InlineData(nameof(Accessibility_NestedDefault))]
+    [InlineData(nameof(Accessibility_NestedOverride))]
+    public Task Verify_AccessibilityOverride(string testName)
+    {
+        RootSyntaxVisitor visitor = _fixture.GetVisitor(GeneratorOptions.Default);
+        JsonSchemaBuilder builder = _fixture.GetJsonSchemaBuilder(visitor, testName);
+        _output.WriteSeparator();
+
+        string schemaString = builder.Build().SerializeToJson();
+        _output.WriteLine(schemaString);
+        _output.WriteSeparator();
+
+        return Verify(schemaString, "AccessibilityOverride", testName);
+
+    }
+
     [InlineData(DictionaryKeyMode.Loose)]
     [InlineData(DictionaryKeyMode.Strict)]
     [InlineData(DictionaryKeyMode.Silent)]

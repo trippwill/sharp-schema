@@ -1,0 +1,52 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Accessibility nested default",
+  "properties": {
+    "default": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.SharpSchema.Generator.TestData.Accessibility_Default",
+      "title": "Default"
+    },
+    "classOverride": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.SharpSchema.Generator.TestData.Accessibility_ClassOverride",
+      "title": "Class override"
+    }
+  },
+  "required": [
+    "default",
+    "classOverride"
+  ],
+  "$defs": {
+    "T:SharpSchema.Generator.TestData.SharpSchema.Generator.TestData.Accessibility_ClassOverride": {
+      "type": "object",
+      "title": "Accessibility class override",
+      "properties": {
+        "internal": {
+          "type": "string",
+          "title": "Internal"
+        },
+        "private": {
+          "type": "string",
+          "title": "Private"
+        }
+      },
+      "required": [
+        "internal",
+        "private"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.SharpSchema.Generator.TestData.Accessibility_Default": {
+      "type": "object",
+      "title": "Accessibility default",
+      "properties": {
+        "public": {
+          "type": "string",
+          "title": "Public"
+        }
+      },
+      "required": [
+        "public"
+      ]
+    }
+  }
+}

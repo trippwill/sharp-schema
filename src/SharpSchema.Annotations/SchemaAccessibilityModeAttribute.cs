@@ -7,7 +7,7 @@ namespace SharpSchema.Annotations;
 /// <summary>
 /// Overrides the default traversal option for a given type.
 /// </summary>
-[AttributeUsage(SchemaAttribute.SupportedMembers)]
+[AttributeUsage(SchemaAttribute.SupportedTypes)]
 #if SHARPSCHEMA_ASSEMBLY
 public
 #else

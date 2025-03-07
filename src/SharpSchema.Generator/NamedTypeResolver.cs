@@ -27,6 +27,7 @@ internal class NamedTypeResolver
         using var scope = Tracer.Enter($"[SYMBOL] {symbol.Name}");
 
         ObjectAttributes attributes = symbol.GetObjectAttributes(options.TraversalMode);
+        GeneratorOptions originalOptions = new GeneratorOptions(options);
         options = options.Override(attributes);
 
         scope.WriteLine(options.ToString(), "Options");
@@ -37,34 +38,41 @@ internal class NamedTypeResolver
         if (symbol.IsRecord)
         {
             IMethodSymbol primaryCtor = symbol.Constructors.First();
-            primaryCtor.Parameters.ForEach(param =>
+            for (int i = 0; i < primaryCtor.Parameters.Length; i++)
             {
+                IParameterSymbol param = primaryCtor.Parameters[i];
+                if (!options.ShouldProcess(param) || !param.IsValidForGeneration())
+                    continue;
+
                 string propertyName = param.Name.Camelize();
 
-                (Builder? typeBuilder, bool isRequired) = this.VisitParameter(param, options);
+                (Builder? typeBuilder, bool isRequired) = this.VisitParameter(param, originalOptions);
                 if (typeBuilder is null)
-                    return;
+                    continue;
 
                 properties.Add(propertyName, typeBuilder);
 
                 if (isRequired)
                     _requiredProperties.Add(propertyName);
-            });
+            }
         }
 
-        symbol.GetMembers().OfType<IPropertySymbol>().ForEach(prop =>
+        foreach (IPropertySymbol prop in symbol.GetMembers().OfType<IPropertySymbol>())
         {
+            if (!options.ShouldProcess(prop) || !prop.IsValidForGeneration())
+                continue;
+
             string propertyName = prop.Name.Camelize();
 
-            (Builder? valueBuilder, bool isRequired) = this.VisitProperty(prop, options);
+            (Builder? valueBuilder, bool isRequired) = this.VisitProperty(prop, originalOptions);
             if (valueBuilder is null)
-                return;
+                continue;
 
             properties.Add(propertyName, valueBuilder);
 
             if (isRequired)
                 _requiredProperties.Add(propertyName);
-        });
+        }
 
         Builder builder = CommonSchemas.Object;
         if (symbol.Accept(MemberMeta.SymbolVisitor.Default) is MemberMeta meta)
@@ -115,9 +123,6 @@ internal class NamedTypeResolver
 
         scope.WriteLine(options.ToString(), "Options");
 
-        if (!options.ShouldProcess(symbol) || !symbol.IsValidForGeneration())
-            return (null, false);
-
         bool isRequired = symbol.IsRequired || !IsNullable(symbol.NullableAnnotation);
 
         if (symbol.GetOverrideSchema() is Builder overrideBuilder)
@@ -152,9 +157,6 @@ internal class NamedTypeResolver
         options = options.Override(attributes);
 
         scope.WriteLine(options.ToString(), "Options");
-
-        if (!options.ShouldProcess(symbol) || !symbol.IsValidForGeneration())
-            return (null, false);
 
         bool isRequired = !IsNullable(symbol.NullableAnnotation);
 

@@ -12,10 +12,11 @@ namespace SharpSchema.Annotations;
 /// </remarks>
 [AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaFormatAttribute(string format) : SchemaAttribute
+public
 #else
-internal class SchemaFormatAttribute(string format) : SchemaAttribute
+internal
 #endif
+class SchemaFormatAttribute(string format) : SchemaAttribute
 {
     /// <summary>
     /// Gets the format of the schema.

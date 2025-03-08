@@ -1,0 +1,103 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Class with value types",
+  "properties": {
+    "string": {
+      "type": "string",
+      "title": "String"
+    },
+    "int": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647,
+      "title": "Int"
+    },
+    "bool": {
+      "type": "boolean",
+      "title": "Bool"
+    },
+    "byte": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "title": "Byte"
+    },
+    "sByte": {
+      "type": "integer",
+      "minimum": -128,
+      "maximum": 127,
+      "title": "S byte"
+    },
+    "short": {
+      "type": "integer",
+      "minimum": -32768,
+      "maximum": 32767,
+      "title": "Short"
+    },
+    "uShort": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
+      "title": "U short"
+    },
+    "uInt": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "title": "U int"
+    },
+    "long": {
+      "type": "integer",
+      "minimum": -9223372036854775808,
+      "maximum": 9223372036854775807,
+      "title": "Long"
+    },
+    "uLong": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615,
+      "title": "U long"
+    },
+    "float": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335,
+      "title": "Float"
+    },
+    "double": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335,
+      "title": "Double"
+    },
+    "decimal": {
+      "type": "number",
+      "minimum": -79228162514264337593543950335,
+      "maximum": 79228162514264337593543950335,
+      "title": "Decimal"
+    },
+    "char": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1,
+      "title": "Char"
+    }
+  },
+  "required": [
+    "string",
+    "int",
+    "bool",
+    "byte",
+    "sByte",
+    "short",
+    "uShort",
+    "uInt",
+    "long",
+    "uLong",
+    "float",
+    "double",
+    "decimal",
+    "char"
+  ]
+}

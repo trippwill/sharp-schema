@@ -65,29 +65,4 @@ internal static class AttributeDataExtensions
             _ => default
         };
     }
-
-    public static List<T> GetConstructorArgumentArray<T>(this AttributeData attributeData, int argumentIndex)
-        where T : notnull
-    {
-        if (argumentIndex >= attributeData.ConstructorArguments.Length)
-        {
-            return [];
-        }
-
-        TypedConstant constructorArgument = attributeData.ConstructorArguments[argumentIndex];
-
-        List<T> result = [];
-        if (constructorArgument.Kind == TypedConstantKind.Array)
-        {
-            foreach (TypedConstant value in constructorArgument.Values)
-            {
-                if (value.Value is T item)
-                {
-                    result.Add(item);
-                }
-            }
-        }
-
-        return result;
-    }
 }

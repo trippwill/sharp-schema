@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Class with internal properties",
+  "properties": {
+    "public": {
+      "type": "string",
+      "title": "Public"
+    },
+    "internal": {
+      "type": "string",
+      "title": "Internal"
+    }
+  },
+  "required": [
+    "public",
+    "internal"
+  ]
+}

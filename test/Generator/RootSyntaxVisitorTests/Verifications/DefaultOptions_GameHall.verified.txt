@@ -1,0 +1,305 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Game hall",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Name"
+    },
+    "rooms": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/T:SharpSchema.Generator.TestData.GameRoom"
+      },
+      "title": "Rooms"
+    }
+  },
+  "required": [
+    "name",
+    "rooms"
+  ],
+  "$defs": {
+    "T:SharpSchema.Generator.TestData.BaseHand.Blackjack": {
+      "type": "object",
+      "title": "Blackjack",
+      "properties": {
+        "game": {
+          "const": "Blackjack",
+          "title": "Game",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/T:System.Int32",
+          "title": "Value"
+        },
+        "size": {
+          "$ref": "#/$defs/T:System.Int32",
+          "title": "Size"
+        },
+        "cards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card"
+          },
+          "title": "Cards"
+        }
+      },
+      "required": [
+        "game",
+        "value"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.BaseHand.Bridge": {
+      "type": "object",
+      "title": "Bridge",
+      "properties": {
+        "game": {
+          "const": "Bridge",
+          "title": "Game",
+          "type": "string"
+        },
+        "isNoTrump": {
+          "type": "boolean",
+          "title": "Is no trump"
+        },
+        "size": {
+          "$ref": "#/$defs/T:System.Int32",
+          "title": "Size"
+        },
+        "cards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card"
+          },
+          "title": "Cards"
+        }
+      },
+      "required": [
+        "game",
+        "isNoTrump"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.BaseHand.Poker": {
+      "type": "object",
+      "title": "Poker",
+      "properties": {
+        "game": {
+          "const": "Poker",
+          "title": "Game",
+          "type": "string"
+        },
+        "isRoyalFlush": {
+          "type": "boolean",
+          "title": "Is royal flush"
+        },
+        "size": {
+          "$ref": "#/$defs/T:System.Int32",
+          "title": "Size"
+        },
+        "cards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card"
+          },
+          "title": "Cards"
+        }
+      },
+      "required": [
+        "game",
+        "isRoyalFlush"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.BlackjackTable": {
+      "type": "object",
+      "title": "Blackjack table",
+      "properties": {
+        "playerCount": {
+          "$ref": "#/$defs/T:System.Int32",
+          "title": "Player count"
+        },
+        "dealerHand": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.BaseHand.Blackjack",
+          "title": "Dealer hand"
+        }
+      },
+      "required": [
+        "playerCount",
+        "dealerHand"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.BridgeTable": {
+      "type": "object",
+      "title": "Bridge table",
+      "properties": {
+        "playerCount": {
+          "$ref": "#/$defs/T:System.Int32",
+          "title": "Player count"
+        },
+        "dealerHand": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/T:SharpSchema.Generator.TestData.BaseHand.Bridge"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dealer hand"
+        }
+      },
+      "required": [
+        "playerCount"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.Card": {
+      "type": "object",
+      "title": "Card",
+      "properties": {
+        "suit": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card.SuitKind",
+          "title": "Suit"
+        },
+        "rank": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Card.RankKind",
+          "title": "Rank"
+        },
+        "isFaceCard": {
+          "type": "boolean",
+          "title": "Is face card"
+        }
+      },
+      "required": [
+        "suit",
+        "rank",
+        "isFaceCard"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.Card.RankKind": {
+      "type": "string",
+      "enum": [
+        "ace",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "jack",
+        "queen",
+        "king"
+      ],
+      "title": "Rank kind"
+    },
+    "T:SharpSchema.Generator.TestData.Card.SuitKind": {
+      "type": "string",
+      "enum": [
+        "spades",
+        "hearts",
+        "clubs",
+        "diamonds"
+      ],
+      "title": "Suit kind"
+    },
+    "T:SharpSchema.Generator.TestData.GameRoom": {
+      "type": "object",
+      "title": "Game room",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "wildCardTable": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.Table`1",
+          "title": "Wild card table"
+        },
+        "pokerTable": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.PokerTable",
+          "title": "Poker table"
+        },
+        "blackjackTable": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.BlackjackTable",
+          "title": "Blackjack table"
+        },
+        "bridgeTable": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.BridgeTable",
+          "title": "Bridge table"
+        }
+      },
+      "required": [
+        "name",
+        "wildCardTable",
+        "pokerTable",
+        "blackjackTable",
+        "bridgeTable"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.PokerTable": {
+      "type": "object",
+      "title": "Poker table",
+      "properties": {
+        "playerCount": {
+          "$ref": "#/$defs/T:System.Int32",
+          "title": "Player count"
+        },
+        "dealerHand": {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.BaseHand.Poker",
+          "title": "Dealer hand"
+        }
+      },
+      "required": [
+        "playerCount",
+        "dealerHand"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.Table`1": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.PokerTable"
+        },
+        {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.BlackjackTable"
+        },
+        {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.BridgeTable"
+        },
+        {
+          "$ref": "#/$defs/T:SharpSchema.Generator.TestData.WhistTable"
+        }
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.WhistTable": {
+      "type": "object",
+      "title": "Whist table",
+      "properties": {
+        "playerCount": {
+          "$ref": "#/$defs/T:System.Int32",
+          "title": "Player count"
+        },
+        "dealerHand": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/T:SharpSchema.Generator.TestData.BaseHand.Bridge"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dealer hand"
+        }
+      },
+      "required": [
+        "playerCount"
+      ]
+    },
+    "T:System.Int32": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
+    }
+  }
+}

@@ -9,10 +9,11 @@ namespace SharpSchema.Annotations;
 /// </summary>
 [AttributeUsage(SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaConstAttribute(object value) : SchemaAttribute
+public
 #else
-internal class SchemaConstAttribute(object value) : SchemaAttribute
+internal
 #endif
+class SchemaConstAttribute(object value) : SchemaAttribute
 {
     /// <summary>
     /// Gets the constant value.

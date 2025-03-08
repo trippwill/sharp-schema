@@ -9,9 +9,10 @@ namespace SharpSchema.Annotations;
 /// </summary>
 [AttributeUsage(SupportedTypes | SupportedMembers)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaIgnoreAttribute : SchemaAttribute
+public
 #else
-internal class SchemaIgnoreAttribute : SchemaAttribute
+internal
 #endif
+class SchemaIgnoreAttribute : SchemaAttribute
 {
 }

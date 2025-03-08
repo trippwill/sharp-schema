@@ -12,10 +12,11 @@ namespace SharpSchema.Annotations;
 /// </remarks>
 [AttributeUsage(SupportedTypes | SupportedMembers | EnumTargets)]
 #if SHARPSCHEMA_ASSEMBLY
-public class SchemaOverrideAttribute(string value) : SchemaAttribute
+public
 #else
-internal class SchemaOverrideAttribute(string value) : SchemaAttribute
+internal
 #endif
+class SchemaOverrideAttribute(string value) : SchemaAttribute
 {
     /// <summary>
     /// Gets the overridden value for the schema.

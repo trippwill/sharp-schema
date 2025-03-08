@@ -1,0 +1,69 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Class with required properties",
+  "properties": {
+    "requiredInt": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/T:System.Int32"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Required int"
+    },
+    "required": {
+      "type": "string",
+      "title": "Required"
+    },
+    "optional": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Optional"
+    },
+    "defaultRequired": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "default",
+      "title": "Default required"
+    },
+    "default": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "default",
+      "title": "Default"
+    }
+  },
+  "required": [
+    "requiredInt",
+    "required",
+    "defaultRequired"
+  ],
+  "$defs": {
+    "T:System.Int32": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
+    }
+  }
+}

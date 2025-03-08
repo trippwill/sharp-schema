@@ -2,6 +2,7 @@
 using Json.Schema;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SharpSchema.Annotations;
 using SharpSchema.Generator.Model;
 
 namespace SharpSchema.Generator.Utilities;
@@ -11,10 +12,57 @@ namespace SharpSchema.Generator.Utilities;
 /// </summary>
 internal static class SymbolExtensions
 {
-    public static AttributeHandler GetAttributeHandler<T>(this ISymbol symbol, Traversal traversal = Traversal.SymbolOnly)
+    public static AttributeHandler GetAttributeHandler<T>(this ISymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
         where T : Attribute
     {
         return new AttributeHandler(GetAttributeData<T>(symbol, traversal));
+    }
+
+    public static AttributeHandler GetAttributeHandler<T>(this IPropertySymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        return new AttributeHandler(GetAttributeData<T>(symbol, traversal));
+    }
+
+    public static AttributeHandler GetAttributeHandler<T>(this IFieldSymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        return new AttributeHandler(GetAttributeData<T>(symbol, traversal));
+    }
+
+    public static AttributeHandler GetAttributeHandler<T>(this IParameterSymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        return new AttributeHandler(GetAttributeData<T>(symbol, traversal));
+    }
+
+    public static ObjectAttributes GetObjectAttributes(this ISymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+    {
+        return new ObjectAttributes(
+            GetAttributeHandler<SchemaAccessibilityModeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaEnumModeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaMetaAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaOverrideAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaPropertiesRangeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaRootAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaTraversalModeAttribute>(symbol, traversal));
+    }
+
+    public static PropertyAttributes GetPropertyAttributes(this ISymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+    {
+        return new PropertyAttributes(
+            GetAttributeHandler<SchemaConstAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaDictionaryKeyModeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaEnumModeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaIgnoreAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaItemsRangeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaFormatAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaLengthRangeAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaMetaAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaOverrideAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaRegexAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaRequiredAttribute>(symbol, traversal),
+            GetAttributeHandler<SchemaValueRangeAttribute>(symbol, traversal));
     }
 
     /// <summary>
@@ -24,9 +72,11 @@ internal static class SymbolExtensions
     /// <param name="symbol">The symbol.</param>
     /// <param name="traversal">Indicates whether to search for attributes on base classes and interfaces.</param>
     /// <returns>The attribute data if found; otherwise, null.</returns>
-    public static AttributeData? GetAttributeData<T>(this ISymbol symbol, Traversal traversal = Traversal.SymbolOnly)
+    public static AttributeData? GetAttributeData<T>(this ISymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
         where T : Attribute
     {
+        AttributeData? mostDerivedAttribute = null;
+
         // Search for the attribute on the symbol itself
         foreach (AttributeData attribute in symbol.GetAttributes())
         {
@@ -36,7 +86,7 @@ internal static class SymbolExtensions
 
         if (symbol is INamedTypeSymbol namedTypeSymbol)
         {
-            if (traversal.CheckFlag(Traversal.Bases))
+            if (traversal.CheckFlag(TraversalMode.Bases))
             {
                 // Search on base classes
                 INamedTypeSymbol? baseType = namedTypeSymbol.BaseType;
@@ -45,14 +95,17 @@ internal static class SymbolExtensions
                     foreach (AttributeData attribute in baseType.GetAttributes())
                     {
                         if (attribute.AttributeClass?.MatchesType<T>() ?? false)
-                            return attribute;
+                        {
+                            mostDerivedAttribute = attribute;
+                            break;
+                        }
                     }
 
                     baseType = baseType.BaseType;
                 }
             }
 
-            if (traversal.CheckFlag(Traversal.Interfaces))
+            if (traversal.CheckFlag(TraversalMode.Interfaces))
             {
                 // Search on interfaces
                 foreach (INamedTypeSymbol interfaceType in namedTypeSymbol.AllInterfaces)
@@ -60,24 +113,168 @@ internal static class SymbolExtensions
                     foreach (AttributeData attribute in interfaceType.GetAttributes())
                     {
                         if (attribute.AttributeClass?.MatchesType<T>() ?? false)
-                            return attribute;
+                        {
+                            mostDerivedAttribute = attribute;
+                            break;
+                        }
                     }
                 }
             }
         }
 
-        return null;
+        return mostDerivedAttribute;
     }
 
-    public static TValue? GetAttributeConstructorArgument<TAttribute, TValue>(this ISymbol symbol, int argumentIndex, Traversal traversal = Traversal.SymbolOnly)
-        where TAttribute : Attribute
-        where TValue : notnull
+    public static AttributeData? GetAttributeData<T>(this IPropertySymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
     {
-        AttributeData? attributeData = symbol.GetAttributeData<TAttribute>(traversal);
-        if (attributeData is null)
-            return default;
+        AttributeData? mostDerivedAttribute = null;
 
-        return attributeData.GetConstructorArgument<TValue>(argumentIndex);
+        // Search for the attribute on the symbol itself
+        foreach (AttributeData attribute in symbol.GetAttributes())
+        {
+            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                return attribute;
+        }
+
+        if (symbol.ContainingType is INamedTypeSymbol containingType)
+        {
+            if (traversal.CheckFlag(TraversalMode.Bases))
+            {
+                // Search on base classes
+                INamedTypeSymbol? baseType = containingType.BaseType;
+                while (baseType is not null)
+                {
+                    var baseProperty = baseType.GetMembers(symbol.Name).OfType<IPropertySymbol>().FirstOrDefault();
+                    if (baseProperty is not null)
+                    {
+                        foreach (AttributeData attribute in baseProperty.GetAttributes())
+                        {
+                            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                            {
+                                mostDerivedAttribute = attribute;
+                                break;
+                            }
+                        }
+                    }
+
+                    baseType = baseType.BaseType;
+                }
+            }
+
+            if (traversal.CheckFlag(TraversalMode.Interfaces))
+            {
+                // Search on interfaces
+                foreach (INamedTypeSymbol interfaceType in containingType.AllInterfaces)
+                {
+                    var interfaceProperty = interfaceType.GetMembers(symbol.Name).OfType<IPropertySymbol>().FirstOrDefault();
+                    if (interfaceProperty is not null)
+                    {
+                        foreach (AttributeData attribute in interfaceProperty.GetAttributes())
+                        {
+                            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                            {
+                                mostDerivedAttribute = attribute;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return mostDerivedAttribute;
+    }
+
+    public static AttributeData? GetAttributeData<T>(this IParameterSymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        AttributeData? mostDerivedAttribute = null;
+
+        // Search for the attribute on the symbol itself
+        foreach (AttributeData attribute in symbol.GetAttributes())
+        {
+            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                return attribute;
+        }
+
+        if (symbol.ContainingSymbol is IMethodSymbol methodSymbol &&
+            methodSymbol.MethodKind == MethodKind.Constructor &&
+            methodSymbol.ContainingType.IsRecord)
+        {
+            if (methodSymbol.ContainingType is INamedTypeSymbol containingType)
+            {
+                if (traversal.CheckFlag(TraversalMode.Bases))
+                {
+                    // Search on base records
+                    INamedTypeSymbol? baseType = containingType.BaseType;
+                    while (baseType is not null)
+                    {
+                        var baseConstructor = baseType.InstanceConstructors.FirstOrDefault();
+                        if (baseConstructor is not null)
+                        {
+                            var baseParameter = baseConstructor.Parameters.FirstOrDefault(p => p.Name == symbol.Name);
+                            if (baseParameter is not null)
+                            {
+                                foreach (AttributeData attribute in baseParameter.GetAttributes())
+                                {
+                                    if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                                    {
+                                        mostDerivedAttribute = attribute;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        baseType = baseType.BaseType;
+                    }
+                }
+            }
+        }
+
+        return mostDerivedAttribute;
+    }
+
+    public static AttributeData? GetAttributeData<T>(this IFieldSymbol symbol, TraversalMode traversal = TraversalMode.SymbolOnly)
+        where T : Attribute
+    {
+        AttributeData? mostDerivedAttribute = null;
+
+        // Search for the attribute on the symbol itself
+        foreach (AttributeData attribute in symbol.GetAttributes())
+        {
+            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                return attribute;
+        }
+
+        if (symbol.ContainingType is INamedTypeSymbol containingType)
+        {
+            if (traversal.CheckFlag(TraversalMode.Bases))
+            {
+                // Search on base classes
+                INamedTypeSymbol? baseType = containingType.BaseType;
+                while (baseType is not null)
+                {
+                    var baseField = baseType.GetMembers(symbol.Name).OfType<IFieldSymbol>().FirstOrDefault();
+                    if (baseField is not null)
+                    {
+                        foreach (AttributeData attribute in baseField.GetAttributes())
+                        {
+                            if (attribute.AttributeClass?.MatchesType<T>() ?? false)
+                            {
+                                mostDerivedAttribute = attribute;
+                                break;
+                            }
+                        }
+                    }
+
+                    baseType = baseType.BaseType;
+                }
+            }
+        }
+
+        return mostDerivedAttribute;
     }
 
     public static bool MatchesType<T>(this INamedTypeSymbol typeSymbol)
@@ -106,6 +303,14 @@ internal static class SymbolExtensions
         return normalizedSymbolName.SequenceEqual(runtimeTypeName.AsSpan());
     }
 
+    public static bool HasUnresolvedTypeArguments(this INamedTypeSymbol namedTypeSymbol)
+    {
+        if (namedTypeSymbol.IsGenericType)
+            return namedTypeSymbol.TypeArguments.Any(arg => arg.TypeKind == TypeKind.TypeParameter);
+
+        return false;
+    }
+
     /// <summary>
     /// Determines if the symbol is valid for generation.
     /// </summary>
@@ -114,7 +319,6 @@ internal static class SymbolExtensions
     public static bool IsValidForGeneration(this ISymbol symbol)
     {
         return !symbol.IsStatic
-            && !symbol.IsVirtual
             && !symbol.IsImplicitlyDeclared
             && symbol switch
             {
@@ -125,12 +329,11 @@ internal static class SymbolExtensions
 
         static bool IsValidNamedTypeSymbol(INamedTypeSymbol symbol)
         {
-            return !symbol.IsStatic
+            return !symbol.IsVirtual
                 && !symbol.IsAnonymousType
                 && !symbol.IsComImport
                 && !symbol.IsImplicitClass
-                && !symbol.IsExtern
-                && !symbol.IsImplicitlyDeclared;
+                && !symbol.IsExtern;
         }
 
         static bool IsValidPropertySymbol(IPropertySymbol symbol)
@@ -141,36 +344,31 @@ internal static class SymbolExtensions
     }
 
     /// <summary>
-    /// Finds the type declaration syntax for the symbol.
+    /// Finds the declaring syntax node of the specified type for the given symbol.
     /// </summary>
-    /// <param name="symbol">The symbol.</param>
-    /// <returns>The type declaration syntax if found; otherwise, null.</returns>
-    public static TypeDeclarationSyntax? FindTypeDeclaration(this INamedTypeSymbol symbol)
+    /// <typeparam name="T">The type of the syntax node to find.</typeparam>
+    /// <param name="symbol">The symbol whose declaring syntax node is to be found.</param>
+    /// <returns>The declaring syntax node of the specified type if found; otherwise, null.</returns>
+    public static T? FindDeclaringSyntax<T>(this ISymbol symbol)
+        where T : SyntaxNode
     {
         foreach (SyntaxReference reference in symbol.DeclaringSyntaxReferences)
         {
             SyntaxNode syntax = reference.GetSyntax();
-            if (syntax is TypeDeclarationSyntax typeDeclarationSyntax)
+            if (syntax is T node)
             {
-                return typeDeclarationSyntax;
+                return node;
             }
         }
 
         return null;
     }
 
-    public static BaseTypeDeclarationSyntax? FindBaseTypeDeclaration(this ITypeSymbol symbol)
+    public static SyntaxNode? FindDeclaringSyntax(this ISymbol symbol)
     {
-        foreach (SyntaxReference reference in symbol.DeclaringSyntaxReferences)
-        {
-            SyntaxNode syntax = reference.GetSyntax();
-            if (syntax is BaseTypeDeclarationSyntax baseTypeDeclarationSyntax)
-            {
-                return baseTypeDeclarationSyntax;
-            }
-        }
-
-        return null;
+        return symbol.DeclaringSyntaxReferences
+            .FirstOrDefault()?
+            .GetSyntax();
     }
 
     /// <summary>
@@ -196,22 +394,38 @@ internal static class SymbolExtensions
 
     public static bool InheritsFrom(this INamedTypeSymbol symbol, INamedTypeSymbol baseType)
     {
-        INamedTypeSymbol? current = symbol.BaseType;
-        while (current is not null)
+        // Traverse base types
+        for (INamedTypeSymbol? current = symbol.BaseType; current is not null; current = current.BaseType)
         {
-            if (SymbolEqualityComparer.Default.Equals(current, baseType))
+            if (SymbolEqualityComparer.Default.Equals(current.OriginalDefinition, baseType.OriginalDefinition))
+            {
                 return true;
-            current = current.BaseType;
+            }
         }
+
+        // Check interfaces as well
+        if (baseType.TypeKind == TypeKind.Interface)
+        {
+            foreach (var iface in symbol.AllInterfaces)
+            {
+                if (SymbolEqualityComparer.Default.Equals(iface.OriginalDefinition, baseType.OriginalDefinition))
+                {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
     public static string GetDefCacheKey(this ITypeSymbol symbol) => symbol.GetDocumentationCommentId() ?? symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-    public static bool IsJsonDefinedType(this ITypeSymbol symbol, [NotNullWhen(true)] out JsonSchemaBuilder? schema)
+    public static bool IsJsonDefinedType(this ITypeSymbol symbol, NumberMode numberMode, [NotNullWhen(true)] out JsonSchemaBuilder? schema)
     {
+        using var trace = Tracer.Enter(symbol.Name);
         if (symbol.SpecialType == SpecialType.None)
         {
+            trace.WriteLine("Symbol is not a special type.");
             schema = null;
             return false;
         }
@@ -219,21 +433,21 @@ internal static class SymbolExtensions
         schema = symbol.SpecialType switch
         {
             SpecialType.System_Boolean => CommonSchemas.Boolean,
-            SpecialType.System_Byte => CommonSchemas.System_Byte,
+            SpecialType.System_Byte => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Byte,
             SpecialType.System_Char => CommonSchemas.System_Char,
             SpecialType.System_DateTime => CommonSchemas.System_DateTime,
-            SpecialType.System_Decimal => CommonSchemas.System_Decimal,
-            SpecialType.System_Double => CommonSchemas.System_Double,
-            SpecialType.System_Int16 => CommonSchemas.System_Int16,
-            SpecialType.System_Int32 => CommonSchemas.System_Int32,
-            SpecialType.System_Int64 => CommonSchemas.System_Int64,
+            SpecialType.System_Decimal => numberMode is NumberMode.JsonNative ? CommonSchemas.Number : CommonSchemas.System_Decimal,
+            SpecialType.System_Double => numberMode is NumberMode.JsonNative ? CommonSchemas.Number : CommonSchemas.System_Double,
+            SpecialType.System_Int16 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Int16,
+            SpecialType.System_Int32 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Int32,
+            SpecialType.System_Int64 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Int64,
             SpecialType.System_Object => throw new InvalidOperationException("System.Object does not map to a json defined type."),
-            SpecialType.System_SByte => CommonSchemas.System_SByte,
-            SpecialType.System_Single => CommonSchemas.System_Single,
+            SpecialType.System_SByte => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_SByte,
+            SpecialType.System_Single => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_Single,
             SpecialType.System_String => CommonSchemas.String,
-            SpecialType.System_UInt16 => CommonSchemas.System_UInt16,
-            SpecialType.System_UInt32 => CommonSchemas.System_UInt32,
-            SpecialType.System_UInt64 => CommonSchemas.System_UInt64,
+            SpecialType.System_UInt16 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_UInt16,
+            SpecialType.System_UInt32 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_UInt32,
+            SpecialType.System_UInt64 => numberMode is NumberMode.JsonNative ? CommonSchemas.Integer : CommonSchemas.System_UInt64,
             _ => null
         };
 

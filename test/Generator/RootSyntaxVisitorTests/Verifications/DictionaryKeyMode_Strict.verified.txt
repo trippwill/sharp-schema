@@ -1,0 +1,21 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Class with unsupported dictionary key",
+  "properties": {
+    "data": {
+      "$unsupportedObject": "Key type 'Object' is not supported.",
+      "title": "Data"
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "$defs": {
+    "T:System.Int32": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
+    }
+  }
+}

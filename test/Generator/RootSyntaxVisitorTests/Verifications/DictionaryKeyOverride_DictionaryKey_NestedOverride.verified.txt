@@ -1,0 +1,93 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Dictionary key nested override",
+  "properties": {
+    "default": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.SharpSchema.Generator.TestData.DictionaryKey_Default",
+      "title": "Default"
+    },
+    "propertyOverride": {
+      "$ref": "#/$defs/T:SharpSchema.Generator.TestData.SharpSchema.Generator.TestData.DictionaryKey_PropertyOverride",
+      "title": "Property override"
+    }
+  },
+  "required": [
+    "default",
+    "propertyOverride"
+  ],
+  "$defs": {
+    "T:SharpSchema.Generator.TestData.SharpSchema.Generator.TestData.DictionaryKey_Default": {
+      "type": "object",
+      "title": "Dictionary key default",
+      "properties": {
+        "stringKey": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "String key"
+        },
+        "intKey": {
+          "type": "object",
+          "$comment": "Key type 'Integer' must be convertible to string",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Int key"
+        },
+        "classKey": {
+          "type": "object",
+          "$comment": "Key type 'Object' must be convertible to string",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Class key"
+        }
+      },
+      "required": [
+        "stringKey",
+        "intKey",
+        "classKey"
+      ]
+    },
+    "T:SharpSchema.Generator.TestData.SharpSchema.Generator.TestData.DictionaryKey_PropertyOverride": {
+      "type": "object",
+      "title": "Dictionary key property override",
+      "properties": {
+        "stringKey": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "String key"
+        },
+        "intKey": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Int key"
+        },
+        "boolKey": {
+          "type": "object",
+          "$comment": "Key type 'Boolean' must be convertible to string",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Bool key"
+        },
+        "classKey": {
+          "$unsupportedObject": "Key type 'Object' is not supported.",
+          "title": "Class key"
+        }
+      },
+      "required": [
+        "stringKey",
+        "intKey",
+        "boolKey",
+        "classKey"
+      ]
+    }
+  }
+}

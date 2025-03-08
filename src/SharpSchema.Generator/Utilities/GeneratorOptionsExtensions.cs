@@ -39,7 +39,7 @@ internal static class GeneratorOptionsExtensions
         return new GeneratorOptions(
             AccessibilityMode: attributes.AccessibilityMode.Get<AccessibilityMode>(0) ?? options.AccessibilityMode,
             TraversalMode: attributes.TraversalMode.Get<TraversalMode>(0) ?? (options.TraversalMode),
-            DictionaryKeyMode: attributes.DictionaryKeyMode.Get<DictionaryKeyMode>(0) ?? options.DictionaryKeyMode,
+            DictionaryKeyMode: options.DictionaryKeyMode,
             EnumMode: attributes.EnumMode.Get<EnumMode>(0) ?? options.EnumMode,
             NumberMode: options.NumberMode);
     }

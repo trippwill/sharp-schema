@@ -32,7 +32,7 @@ public class TestDataFixture
                 "test",
                 "Generator",
                 "RootSyntaxVisitorTests",
-                "TestData.Accessibility.cs");
+                "TestData.Attributes.cs");
 
         // Create an array of syntax tree from all cs files in src/SharpSchema.Annotations/
         string[] annotationFiles = Directory.GetFiles(

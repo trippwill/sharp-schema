@@ -4,13 +4,13 @@ namespace SharpSchema.Generator.Model;
 
 internal record ObjectAttributes(
     AttributeHandler AccessibilityMode,
-    AttributeHandler DictionaryKeyMode,
     AttributeHandler EnumMode,
     AttributeHandler Meta,
     AttributeHandler Override,
     AttributeHandler PropertiesRange,
     AttributeHandler Root,
-    AttributeHandler TraversalMode);
+    AttributeHandler TraversalMode
+);
 
 internal record PropertyAttributes(
     AttributeHandler Const,
@@ -24,4 +24,5 @@ internal record PropertyAttributes(
     AttributeHandler Override,
     AttributeHandler Regex,
     AttributeHandler Required,
-    AttributeHandler ValueRange);
+    AttributeHandler ValueRange
+);

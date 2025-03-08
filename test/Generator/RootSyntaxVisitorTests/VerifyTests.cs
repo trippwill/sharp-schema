@@ -88,6 +88,23 @@ public class VerifyTests : IDisposable, IClassFixture<TestDataFixture>
 
     }
 
+    [Theory]
+    [InlineData(nameof(DictionaryKey_Default))]
+    [InlineData(nameof(DictionaryKey_PropertyOverride))]
+    [InlineData(nameof(DictionaryKey_NestedOverride))]
+    public Task Verify_DictionaryKeyOverride(string testName)
+    {
+        RootSyntaxVisitor visitor = _fixture.GetVisitor(GeneratorOptions.Default);
+        JsonSchemaBuilder builder = _fixture.GetJsonSchemaBuilder(visitor, testName);
+        _output.WriteSeparator();
+
+        string schemaString = builder.Build().SerializeToJson();
+        _output.WriteLine(schemaString);
+        _output.WriteSeparator();
+
+        return Verify(schemaString, "DictionaryKeyOverride", testName);
+    }
+
     [InlineData(DictionaryKeyMode.Loose)]
     [InlineData(DictionaryKeyMode.Strict)]
     [InlineData(DictionaryKeyMode.Silent)]

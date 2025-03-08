@@ -40,7 +40,6 @@ internal static class SymbolExtensions
     {
         return new ObjectAttributes(
             GetAttributeHandler<SchemaAccessibilityModeAttribute>(symbol, traversal),
-            GetAttributeHandler<SchemaDictionaryKeyModeAttribute>(symbol, traversal),
             GetAttributeHandler<SchemaEnumModeAttribute>(symbol, traversal),
             GetAttributeHandler<SchemaMetaAttribute>(symbol, traversal),
             GetAttributeHandler<SchemaOverrideAttribute>(symbol, traversal),
